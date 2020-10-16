@@ -88,31 +88,31 @@ public class Instagram {
 
         InstagramData.UserData user = instagramData.entry_data.ProfilePage[0].graphql.user;
 
-        var profilePicture = user.profile_pic_url;
-        var username = user.username;
-        var biography = user.biography;
-        var followsViewer = (user.follows_viewer) ? "&#10004" : "NO";
-        var edgeFollowedByCount = user.edge_followed_by.count;
-        var edgeOwnerToTimelineMediaCount = user.edge_owner_to_timeline_media.count;
+        String profilePicture = user.profile_pic_url;
+        String username = user.username;
+        String biography = user.biography;
+        String followsViewer = (user.follows_viewer) ? "&#10004" : "NO";
+        int edgeFollowedByCount = user.edge_followed_by.count;
+        int edgeOwnerToTimelineMediaCount = user.edge_owner_to_timeline_media.count;
 
-        var averageLikes = 0;
-        var averageComments = 0;
-        var totalLikes = 0;
-        var totalComments = 0;
+        int averageLikes = 0;
+        int averageComments = 0;
+        int totalLikes = 0;
+        int totalComments = 0;
         float totalEngagementRate = 0;
 
-        var edgeCounts = user.edge_owner_to_timeline_media.edges.length;
+        int edgeCounts = user.edge_owner_to_timeline_media.edges.length;
 
-        for (var index = 1; index < edgeCounts; index++) {
+        for (int index = 1; index < edgeCounts; index++) {
 
-            var likes = user.edge_owner_to_timeline_media.edges[index].node.edge_liked_by.count;
-            var comments = user.edge_owner_to_timeline_media.edges[index].node.edge_media_to_comment.count;
+            int likes = user.edge_owner_to_timeline_media.edges[index].node.edge_liked_by.count;
+            int comments = user.edge_owner_to_timeline_media.edges[index].node.edge_media_to_comment.count;
             totalLikes += likes;
             totalComments += comments;
             totalEngagementRate += (float) (likes + comments) / edgeFollowedByCount;
         }
 
-        var engagementRate = -1;
+        int engagementRate = -1;
 
         if ((totalLikes + totalComments) > 0) {
 
@@ -129,9 +129,9 @@ public class Instagram {
             averageComments = totalComments / (edgeCounts - 1);
         }
 
-        var averageLikes2 = Math.round(averageLikes);
-        var averageComments2 = Math.round(averageComments);
-        var engagementRate2 = engagementRate + 1;
+        int averageLikes2 = Math.round(averageLikes);
+        int averageComments2 = Math.round(averageComments);
+        int engagementRate2 = engagementRate + 1;
 
         Map<String, Integer> data = new HashMap<>();
         data.put("followers", edgeFollowedByCount);

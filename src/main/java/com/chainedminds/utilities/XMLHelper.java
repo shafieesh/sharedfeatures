@@ -165,14 +165,14 @@ public class XMLHelper {
 
                 xml.append("\r\n");
 
-                xml.append("    ".repeat(Math.max(0, level)));
+                xml.append(new String(new char[Math.max(0, level)]).replace("\0", "    "));
 
                 xml.append(makeXML(element, level + 1));
             }
 
             xml.append("\r\n");
 
-            xml.append("    ".repeat(Math.max(0, level - 1)));
+            xml.append(new String(new char[Math.max(0, level - 1)]).replace("\0", "    "));
 
             xml.append("</").append(rootNode.name).append(">");
         }

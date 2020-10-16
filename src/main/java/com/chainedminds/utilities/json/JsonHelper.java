@@ -26,7 +26,7 @@ public class JsonHelper {
 
         SimpleModule module = new SimpleModule();
 
-        module.addSerializer(List.class, new JsonSerializer<>() {
+        module.addSerializer(List.class, new JsonSerializer<List>() {
             @Override
             public void serialize(List value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 
@@ -41,7 +41,7 @@ public class JsonHelper {
             }
         });
 
-        module.addSerializer(Map.class, new JsonSerializer<>() {
+        module.addSerializer(Map.class, new JsonSerializer<Map>() {
             @Override
             public void serialize(Map value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 
@@ -64,7 +64,7 @@ public class JsonHelper {
             }
         });
 
-        module.addSerializer(Set.class, new JsonSerializer<>() {
+        module.addSerializer(Set.class, new JsonSerializer<Set>() {
             @Override
             public void serialize(Set value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 

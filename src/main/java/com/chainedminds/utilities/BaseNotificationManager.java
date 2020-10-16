@@ -569,7 +569,7 @@ public class BaseNotificationManager {
                 inputStream = connection.getErrorStream();
             }
 
-            String responseString = new Scanner(inputStream, StandardCharsets.UTF_8).useDelimiter("\\A").next();
+            String responseString = new Scanner(inputStream, "UTF_8").useDelimiter("\\A").next();
 
             inputStream.close();
 

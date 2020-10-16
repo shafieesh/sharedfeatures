@@ -206,7 +206,7 @@ public class Utilities {
                 inputStream = connection.getErrorStream();
             }
 
-            String responseMessage = new Scanner(inputStream, StandardCharsets.UTF_8).useDelimiter("\\A").next();
+            String responseMessage = new Scanner(inputStream, "UTF_8").useDelimiter("\\A").next();
 
             inputStream.close();
 
@@ -274,7 +274,7 @@ public class Utilities {
                 inputStream = connection.getErrorStream();
             }
 
-            String responseMessage = new Scanner(inputStream, StandardCharsets.UTF_8).useDelimiter("\\A").next();
+            String responseMessage = new Scanner(inputStream, "UTF_8").useDelimiter("\\A").next();
 
             inputStream.close();
 
