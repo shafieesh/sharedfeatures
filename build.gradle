@@ -11,4 +11,11 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.11.3')
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.5.3')
+    implementation('com.slack.api:slack-api-client:1.0.11')
+    implementation('com.squareup.okhttp3:okhttp:4.7.2')
+    implementation('com.sun.mail:javax.mail:1.6.2')
+    implementation('io.netty:netty-all:4.1.50.Final')
+    implementation('mysql:mysql-connector-java:8.0.20')
 }
