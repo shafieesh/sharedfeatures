@@ -40,15 +40,13 @@ public class TaskManager extends Thread {
 
         long currentTime = System.currentTimeMillis();
 
-        if (task.startAndSchedule) {
+        addInterval(task);
 
-            addInterval(task);
+        if (task.startAndSchedule) {
 
             startTask(task, currentTime);
 
         } else if (task.startAsyncAndSchedule || !task.executedBefore) {
-
-            addInterval(task);
 
             startTaskAsync(task, currentTime);
         }
