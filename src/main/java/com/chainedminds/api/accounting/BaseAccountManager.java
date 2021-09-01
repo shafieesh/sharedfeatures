@@ -179,7 +179,13 @@ public class BaseAccountManager<Data extends BaseData> {
 
                         INDEX_USERNAME.clear();
 
-                        MAPPING_USERNAME.values().forEach(gamerTag -> INDEX_USERNAME.add(gamerTag.toLowerCase()));
+                        MAPPING_USERNAME.values().forEach(gamerTag ->{
+
+                            if (gamerTag != null) {
+
+                                INDEX_USERNAME.add(gamerTag.toLowerCase());
+                            }
+                        });
                     });
                 }
             }
@@ -445,7 +451,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         String oldPassword = getPassword(connection, userID);
 
-        boolean wasSuccessful = setProperty(userID, FIELD_PASSWORD, newPassword);
+        boolean wasSuccessful = setProperty(connection, userID, FIELD_PASSWORD, newPassword);
 
         wasSuccessful &= Log.log(connection, userID, "Password", oldPassword + " -> " + newPassword);
 
@@ -647,7 +653,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         if (isBruteForcing(address)) {
 
-            BaseNotificationManager.reportBruteForce(address, username, password);
+            //BaseNotificationManager.reportBruteForce(address, username, password);
 
             data.response = BaseCodes.RESPONSE_INVALID_GAMER_TAG_OR_PASSWORD;
 
@@ -674,7 +680,7 @@ public class BaseAccountManager<Data extends BaseData> {
                     AccountPermissionsManager.hasPermission(userID, "*", "ADMIN") ||
                     AccountPermissionsManager.hasPermission(userID, "*", "MODERATOR")) {
 
-                BaseNotificationManager.reportLogin(username, password, passwordValidated, address);
+                //BaseNotificationManager.reportLogin(username, password, passwordValidated, address);
 
                 if (BaseConfig.APP_NAME_CAFE_CHAT.equals(appName)) {
 

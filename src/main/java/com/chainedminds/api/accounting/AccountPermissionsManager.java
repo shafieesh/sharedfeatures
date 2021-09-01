@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -154,6 +155,27 @@ public class AccountPermissionsManager {
         return permissions;
     }
 
+    public static String getCurrentPermission(int userID) {
+
+        AtomicReference<String> userPermission = new AtomicReference<>("EMPTY");
+
+        String selectStatement = "SELECT " + FIELD_PERMISSION + " FROM " + BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
+                " WHERE " + FIELD_USER_ID + " = ?";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, userID);
+
+        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+
+            if (resultSet.next()) {
+
+                userPermission.set(resultSet.getString(FIELD_PERMISSION));
+            }
+        });
+
+        return userPermission.get();
+    }
+
     public static List<String> getPermissions(int userID, String appName) {
 
         List<String> permissions = new ArrayList<>();
@@ -219,6 +241,7 @@ public class AccountPermissionsManager {
         });
     }
 
+    @Deprecated
     public static boolean hasPermissions(int userID) {
 
         AtomicBoolean hasPermissions = new AtomicBoolean(false);
@@ -350,6 +373,37 @@ public class AccountPermissionsManager {
 
             PERMISSIONS.add(permissionData);
         }
+    }
+
+    public static boolean removePermission(Connection connection, int userID, String appName, String permission) {
+
+        String deleteStatement = "DELETE FROM " + BaseConfig.TABLE_ACCOUNTS_PERMISSIONS + " WHERE " +
+                FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ? AND " + FIELD_PERMISSION + " = ?";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+
+        parameters.put(1, userID);
+        parameters.put(2, appName);
+        parameters.put(3, permission);
+
+        return DatabaseHelper.update(connection, TAG, deleteStatement, parameters, (wasSuccessful, error) -> {
+
+            Utilities.lock(TAG, LOCK.writeLock(), () -> {
+
+                for (int index = PERMISSIONS.size()-1; index >= 0 ; index--) {
+
+                    Permission loopingPermission = PERMISSIONS.get(index);
+
+                    if (loopingPermission.userID == userID && loopingPermission.appName.equals(appName) &&
+                            loopingPermission.permission.equals(permission)) {
+
+                        PERMISSIONS.remove(index);
+                    }
+                }
+            });
+        });
+
+
     }
 
     private static class Permission {

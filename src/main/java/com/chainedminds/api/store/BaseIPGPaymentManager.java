@@ -9,7 +9,6 @@ import com.chainedminds.dataClasses.BaseProductData;
 import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
 import com.chainedminds.dataClasses.payment.PasargadData;
 import com.chainedminds.dataClasses.payment.ZarinPalData;
-import com.chainedminds.network.DataTransportManager;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.DatabaseHelper;
 import com.chainedminds.utilities.json.JsonHelper;
@@ -33,7 +32,6 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
     //-------------------------------------------------------------//
 
-    public static final String ZARINPAL_MERCHANT_ID = "3008a7d4-95de-11e9-9446-000c29344814";
     public static final String ZARINPAL_SERVICES_LINK = "https://www.zarinpal.com/pg/services/WebGate/service";
     public static final String ZARINPAL_METHOD_PAYMENT_REQUEST = "PaymentRequest";
     public static final String ZARINPAL_METHOD_PAYMENT_VERIFICATION = "PaymentVerification";
@@ -120,6 +118,60 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         }
 
         return data;
+    }
+
+    public BaseIPGTransactionData prepareOrderPayment(IPGTransactionData ipgTransaction) {
+
+        if (ipgTransaction == null || ipgTransaction.price == 0) {
+
+            return null;
+        }
+
+        int userID = ipgTransaction.userID;
+        String appName = ipgTransaction.appName;
+        String market = ipgTransaction.market;
+        String sku = ipgTransaction.sku;
+        int price = (int)ipgTransaction.price;
+
+        BaseIPGTransactionData transaction = BaseClasses.construct(
+                BaseClasses.getInstance().ipgTransactionClass);
+
+        transaction.orderID = System.currentTimeMillis() + "";
+        transaction.userID = userID;
+        transaction.appName = appName;
+        transaction.market = market;
+        transaction.sku = sku;
+        transaction.amount = price;
+        transaction.redirectAddress = "https://payment.fandoghapps.com/verify/" + transaction.orderID + "/";
+
+        if ("CafeGame".equals(appName)) {
+
+            transaction.redirectAddress = "https://payment.fandoghapps.com/verify/" + transaction.orderID + "/";
+        }
+
+        if ("VRCT".equals(appName)) {
+
+            transaction.redirectAddress = "https://payment.vrct.ir/verifyorders/" + transaction.orderID + "/";
+        }
+
+        if ("SymoTeb".equals(appName)) {
+
+            transaction.redirectAddress = "https://payment.symoteb.ir/verify/" + transaction.orderID + "/";
+        }
+
+        transaction = generatePaymentLink(appName, transaction);
+
+        if (transaction.gateway != null) {
+
+            boolean wasSuccessful = addTransaction(transaction);
+
+            if (wasSuccessful) {
+
+                return transaction;
+            }
+        }
+
+        return null;
     }
 
     public Data verifyPayment(Data data) {
@@ -219,12 +271,96 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         return data;
     }
 
+    /*public Data verifyOrderPayment(Data data) {
+
+        System.out.println(JsonHelper.getString(data));
+
+        data.response = BaseCodes.RESPONSE_NOK;
+
+        if (data.ipgTransaction == null) {
+
+            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+
+            return data;
+        }
+
+        String orderID = data.ipgTransaction.orderID;
+
+        Map<String, String> arbitraryData = data.ipgTransaction.arbitraryData;
+
+        System.out.println("GETTING ORDER ID : " + orderID);
+
+        IPGTransactionData transaction = getTransaction(orderID);
+
+        if (transaction == null) {
+
+            data.message = "The transaction id was not found";
+            return data;
+        }
+
+        transaction.arbitraryData.putAll(arbitraryData);
+
+        System.out.println("VERIFYING TRANSACTION : " + JsonHelper.getString(transaction));
+
+        boolean verified = false;
+
+        String gateway = transaction.gateway;
+
+        switch (gateway) {
+
+            case "Pasargad":
+
+                verified = verifyPasargadPayment(transaction);
+                break;
+
+            case "ZarinPal":
+
+                verified = verifyZarinPalPayment(transaction);
+                break;
+        }
+
+        if (verified) {
+
+            String sku = transaction.sku;
+
+            Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+
+            boolean wasSuccessful = VRStoreManager.applyPurchasedOrder(connection, sku);
+
+            wasSuccessful &= updatePurchaseState(connection, transaction.id, PURCHASE_STATE_APPLIED);
+
+            if (wasSuccessful) {
+
+                ConnectionManager.commit(connection);
+
+                transaction.state = PURCHASE_STATE_APPLIED;
+
+            } else {
+
+                ConnectionManager.rollback(connection);
+            }
+
+            ConnectionManager.close(connection);
+
+            data.response = BaseCodes.RESPONSE_OK;
+            data.message = "The transaction needs to be updated";
+
+        } else {
+
+            data.response = BaseCodes.RESPONSE_NOK;
+        }
+
+        System.out.println(JsonHelper.getString(data));
+
+        return data;
+    }*/
+
     public boolean verifyZarinPalPayment(IPGTransactionData transaction) {
 
         String url = "https://www.zarinpal.com/pg/rest/WebGate/PaymentVerification.json";
 
         ZarinPalData zarinPal = new ZarinPalData();
-        zarinPal.MerchantID = ZARINPAL_MERCHANT_ID;
+        zarinPal.MerchantID = DynamicConfig.getMap("ZarinPal-MerchantID", transaction.appName);
         zarinPal.Authority = transaction.arbitraryData.get("Authority");
         zarinPal.Amount = transaction.amount;
 
@@ -372,6 +508,14 @@ public class BaseIPGPaymentManager<Data extends BaseData,
             }
         }
 
+        if ("VRCT".equals(appName)) {
+
+            if (transaction.gateway == null) {
+
+                transaction = generateZarinPalPaymentLink(transaction);
+            }
+        }
+
         if ("SymoTeb".equals(appName)) {
 
             if (transaction.gateway == null) {
@@ -457,7 +601,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         String url = "https://www.zarinpal.com/pg/rest/WebGate/PaymentRequest.json";
 
         ZarinPalData zarinPal = new ZarinPalData();
-        zarinPal.MerchantID = ZARINPAL_MERCHANT_ID;
+        zarinPal.MerchantID = DynamicConfig.getMap("ZarinPal-MerchantID", transaction.appName);
         zarinPal.Amount = transaction.amount;
         zarinPal.Description = "خرید درون برنامه\u200Cای";
         zarinPal.CallbackURL = transaction.redirectAddress;

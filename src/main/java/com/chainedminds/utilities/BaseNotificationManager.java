@@ -3,7 +3,7 @@ package com.chainedminds.utilities;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
-import com.chainedminds.dataClasses.BaseMessageClass;
+import com.chainedminds.dataClasses.BaseMessageData;
 import com.chainedminds.dataClasses.firebase.FirebaseMessageData;
 import com.chainedminds.dataClasses.notification.Action;
 import com.chainedminds.dataClasses.notification.BaseNotificationData;
@@ -458,7 +458,7 @@ public class BaseNotificationManager {
 
                 Action action = new Action();
                 action.request = BaseCodes.REQUEST_BROADCAST_MESSAGE;
-                action.message = new BaseMessageClass();
+                action.message = new BaseMessageData();
                 action.message.message = message;
 
                 content.data = new HashMap<>();
@@ -484,7 +484,7 @@ public class BaseNotificationManager {
 
                 Action action = new Action();
                 action.request = BaseCodes.REQUEST_BROADCAST_MESSAGE;
-                action.message = new BaseMessageClass();
+                action.message = new BaseMessageData();
                 action.message.message = message;
 
                 content.data = new HashMap<>();

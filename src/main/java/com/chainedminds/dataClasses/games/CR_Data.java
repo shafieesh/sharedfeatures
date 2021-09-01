@@ -1,10 +1,10 @@
 package com.chainedminds.dataClasses.games;
 
-import com.chainedminds.dataClasses.BaseMessageClass;
+import com.chainedminds.dataClasses.BaseMessageData;
 
 import java.util.List;
 
 public class CR_Data extends GameData {
 
-    public List<BaseMessageClass> lastMessages;
+    public List<BaseMessageData> lastMessages;
 }

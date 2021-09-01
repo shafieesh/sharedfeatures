@@ -4,12 +4,14 @@ import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.api.accounting.AccountPermissionsManager;
 import com.chainedminds.dataClasses.BaseData;
+import com.chainedminds.dataClasses.payment.BaseTransactionData;
 import com.chainedminds.utilities.BackendHelper;
 import com.chainedminds.utilities.database.DatabaseHelper;
 
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InternalPaymentManager {
@@ -17,8 +19,10 @@ public class InternalPaymentManager {
     private static final String TAG = InternalPaymentManager.class.getSimpleName();
 
     private static final String FIELD_USER_ID = "UserID";
+    private static final String FIELD_TRANSACTION_ID = "TransactionID";
     private static final String FIELD_TRANSACTION_TYPE = "TransactionType";
     private static final String FIELD_TRANSACTION_VALUE = "TransactionValue";
+    private static final String FIELD_TRANSACTION_TIME = "TransactionTime";
 
     public static boolean logTransaction(Connection connection, int userID, String type, float value) {
 
@@ -56,6 +60,43 @@ public class InternalPaymentManager {
         }
 
         return days;
+    }
+
+    public static BaseData getMyTransactions(BaseData data) {
+
+        data.response = BaseCodes.RESPONSE_NOK;
+
+        int userID = data.account.id;
+
+        List<BaseTransactionData> transactionsList = new ArrayList<>();
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, userID);
+
+        String statement = "SELECT * FROM " + BaseConfig.TABLE_TRANSACTIONS_INTERNAL + " WHERE " + FIELD_USER_ID +
+                " = ? ORDER BY " + FIELD_TRANSACTION_TIME + " DESC";
+
+        DatabaseHelper.query(TAG, statement, parameters,(resultSet) -> {
+
+            while (resultSet.next()) {
+
+                BaseTransactionData transaction = new BaseTransactionData();
+
+                transaction.id = resultSet.getInt(FIELD_TRANSACTION_ID);
+                transaction.userID = resultSet.getInt(FIELD_USER_ID);
+                transaction.name = resultSet.getString(FIELD_TRANSACTION_TYPE);
+                transaction.price = resultSet.getFloat(FIELD_TRANSACTION_VALUE);
+                transaction.purchaseDate = resultSet.getTimestamp(FIELD_TRANSACTION_TIME).getTime();
+
+                transactionsList.add(transaction);
+            }
+        });
+
+        data.account.transactions = transactionsList;
+
+        data.response = BaseCodes.RESPONSE_OK;
+
+        return data;
     }
 
     //FIXME

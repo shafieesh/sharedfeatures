@@ -195,7 +195,7 @@ public class Utilities {
 
             int httpResponseCode = connection.getResponseCode();
 
-            if (httpResponseCode == 200) {
+            if (httpResponseCode >= 200 && httpResponseCode < 300) {
 
                 wasSuccessful = true;
 
@@ -483,7 +483,7 @@ public class Utilities {
 
                     if (home_directory.contains("root")) {
 
-                        home_directory = home_directory.replace("root", "ubuntu");
+                        //home_directory = home_directory.replace("root", "ubuntu");
                     }
                 }
             }

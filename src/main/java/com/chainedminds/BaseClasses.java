@@ -26,7 +26,7 @@ public class BaseClasses {
     public Class<? extends BaseIABTransactionData> iabTransactionClass;
     public Class<? extends BaseIPGTransactionData> ipgTransactionClass;
     public Class<? extends BaseProductData> productClass;
-    public Class<? extends BaseMessageClass> messageClass;
+    public Class<? extends BaseMessageData> messageClass;
     public Class<? extends BaseNotificationData> notificationClass;
     public Class<? extends BaseNewsData> newsClass;
     public Class<? extends BaseProfileData> profileClass;

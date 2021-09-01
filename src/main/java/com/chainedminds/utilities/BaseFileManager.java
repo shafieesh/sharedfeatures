@@ -26,6 +26,8 @@ public class BaseFileManager {
     public static final int SECTION_NEWS = 4;
     public static final int SECTION_LOG_ERRORS = 5;
     public static final int SECTION_LOG_INFO = 6;
+    public static final int SECTION_ARTICLES = 7;
+
 
     public final String PROJECT_DIRECTORY = BaseConfig.PROJECT_NAME;
     public final String DIRECTORY_APP = "cafegame";
@@ -40,8 +42,7 @@ public class BaseFileManager {
     public String DIRECTORY_LOGS_INFO = "info";
     public String DIRECTORY_BANNERS = "banners";
     public String DIRECTORY_GAMES = "games";
-
-    protected String DRIVE_WINDOWS = "C:";
+    public String DIRECTORY_ARTICLES = "articles";
 
     public final String[] FILE_IMAGE = {".jpg", ".jpeg", ".png"};
     public final String[] FILE_AUDIO = {".ogg", ".amr", ".mp3"};
@@ -54,27 +55,21 @@ public class BaseFileManager {
 
     protected void init() {
 
-        String OS = (System.getProperty("os.name")).toUpperCase();
-
         String sep = File.separator;
 
-        if (OS.contains("WIN")) {
+        String workingDirectory = Utilities.OS.getWorkingDirectory();
 
-            BASE_DIRECTORY = DRIVE_WINDOWS + sep + "WebServer" + sep + "cloud.fandoghapps.com";
+        BASE_DIRECTORY = workingDirectory + "WebServer" + sep + "cloud.fandoghapps.com";
 
-        } else {
-
-            BASE_DIRECTORY = System.getProperty("user.home") + "/Library/Application Support";
-        }
-
-        DIRECTORY_LOGS_ERRORS = DRIVE_WINDOWS + sep + DIRECTORY_LOGS + sep + DIRECTORY_LOGS_ERRORS;
-        DIRECTORY_LOGS_INFO = DRIVE_WINDOWS + sep + DIRECTORY_LOGS + sep + DIRECTORY_LOGS_INFO;
+        DIRECTORY_LOGS_ERRORS = BASE_DIRECTORY + sep + DIRECTORY_LOGS + sep + DIRECTORY_LOGS_ERRORS;
+        DIRECTORY_LOGS_INFO = BASE_DIRECTORY + sep + DIRECTORY_LOGS + sep + DIRECTORY_LOGS_INFO;
         DIRECTORY_LEAGUES = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_LEAGUES;
         DIRECTORY_PROFILES = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_PROFILES;
         DIRECTORY_ASSETS = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_ASSETS;
         DIRECTORY_NEWS = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_NEWS;
         DIRECTORY_BANNERS = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_BANNERS;
         DIRECTORY_GAMES = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_GAMES;
+        DIRECTORY_ARTICLES = BASE_DIRECTORY + sep + DIRECTORY_APP + sep + DIRECTORY_ARTICLES;
     }
 
     private String getPath(int section) {
@@ -96,6 +91,9 @@ public class BaseFileManager {
         }
         if (section == SECTION_LOG_INFO) {
             return DIRECTORY_LOGS_INFO;
+        }
+        if (section == SECTION_ARTICLES) {
+            return DIRECTORY_ARTICLES;
         }
         return null;
     }
@@ -205,7 +203,7 @@ public class BaseFileManager {
         }
     }
 
-    private void deleteFile(String filePath, String fileName) {
+    public void deleteFile(String filePath, String fileName) {
 
         try {
 

@@ -342,7 +342,7 @@ public class ConnectionManager {
 
             } catch (SQLException e) {
 
-                System.out.println(e.getMessage());
+                e.printStackTrace();
 
                 Log.error(TAG, e);
             }

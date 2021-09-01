@@ -27,7 +27,7 @@ public class GameSettings {
     public String message;
     public String gameRule;
 
-    public List<BaseMessageClass> newMessages;
+    public List<BaseMessageData> newMessages;
 
     public int[] numbers;
 

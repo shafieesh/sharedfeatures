@@ -85,7 +85,7 @@ class TestResources extends BaseResources<
         baseClasses.iabTransactionClass = BaseIABTransactionData.class;
         baseClasses.ipgTransactionClass = BaseIPGTransactionData.class;
         baseClasses.productClass = BaseProductData.class;
-        baseClasses.messageClass = BaseMessageClass.class;
+        baseClasses.messageClass = BaseMessageData.class;
         baseClasses.notificationClass = BaseNotificationData.class;
         baseClasses.newsClass = BaseNewsData.class;
         baseClasses.profileClass = BaseProfileData.class;

@@ -1,7 +1,7 @@
 package com.chainedminds.dataClasses.notification;
 
 import com.chainedminds.dataClasses.BarNotification;
-import com.chainedminds.dataClasses.BaseMessageClass;
+import com.chainedminds.dataClasses.BaseMessageData;
 import com.chainedminds.dataClasses.BaseNewsData;
 import com.chainedminds.dataClasses.account.BaseAccountData;
 
@@ -14,6 +14,6 @@ public class Action {
     public String name;
     public BaseAccountData account;
     public BaseNewsData news;
-    public BaseMessageClass message;
+    public BaseMessageData message;
     public List<BarNotification> barNotifications;
 }

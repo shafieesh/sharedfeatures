@@ -12,4 +12,5 @@ public class BaseNotificationData {
 
     public NotificationButton button;
     public List<NotificationButton> buttons;
+    public String appName;
 }

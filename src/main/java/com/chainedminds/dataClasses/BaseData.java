@@ -20,7 +20,7 @@ public class BaseData<
         IABTransactionData extends BaseIABTransactionData,
         IPGTransactionData extends BaseIPGTransactionData,
         ProductData extends BaseProductData,
-        MessageClass extends BaseMessageClass,
+        MessageClass extends BaseMessageData,
         NotificationData extends BaseNotificationData,
         NewsData extends BaseNewsData>{
 

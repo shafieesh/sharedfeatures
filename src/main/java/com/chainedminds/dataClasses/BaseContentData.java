@@ -14,4 +14,6 @@ public class BaseContentData {
     public byte[] blob;
     @Deprecated
     public String fileName;
+
+    public String base64;
 }

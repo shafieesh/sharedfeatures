@@ -262,4 +262,149 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
 
         return data;
     }
+
+    public boolean replaceProduct(String name, String appName, String market, String sku, String type, String category,
+                                  boolean consumable, int tier, int coins, float price, int discount,
+                                  boolean available) {
+
+        if (name == null || appName == null || market == null || sku == null || type == null || category == null) {
+
+            return false;
+        }
+
+        ProductData oldProduct = getProduct(market, sku);
+
+        int id = 0;
+
+        if (oldProduct != null) {
+
+            id = oldProduct.id;
+        }
+
+        String statement;
+        Map<Integer, Object> parameters = new HashMap<>();
+
+        if (id == 0) {
+
+            parameters.put(1, name);
+            parameters.put(2, appName);
+            parameters.put(3, market);
+            parameters.put(4, sku);
+            parameters.put(5, type);
+            parameters.put(6, category);
+            parameters.put(7, consumable);
+            parameters.put(8, tier);
+            parameters.put(9, coins);
+            parameters.put(10, price);
+            parameters.put(11, discount);
+            parameters.put(12, available);
+
+            statement = "INSERT INTO " + BaseConfig.TABLE_PRODUCTS +
+                    " (" + FIELD_NAME + ", " + FIELD_APP_NAME + ", " + FIELD_MARKET + ", " +
+                    FIELD_SKU + ", " + FIELD_TYPE + ", " + FIELD_CATEGORY + ", " + FIELD_CONSUMABLE + ", " + FIELD_TIER +
+                    ", " + FIELD_COINS + ", " + FIELD_PRICE + ", " + FIELD_DISCOUNT + ", " + FIELD_AVAILABILITY +
+                    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + FIELD_NAME + " = Values(" +
+                    FIELD_NAME + "), " + FIELD_APP_NAME + " = Values(" + FIELD_APP_NAME + "), " + FIELD_MARKET +
+                    " = Values(" + FIELD_MARKET + "), " + FIELD_SKU + " = Values(" + FIELD_SKU + "), " + FIELD_TYPE
+                    + " = Values(" + FIELD_TYPE + "), " + FIELD_CATEGORY + " = Values(" + FIELD_CATEGORY +
+                    "), " + FIELD_CONSUMABLE + " = Values(" + FIELD_CONSUMABLE + "), " + FIELD_TIER + " = Values(" +
+                    FIELD_TIER + "), " + FIELD_COINS + " = Values(" + FIELD_COINS + "), " + FIELD_PRICE + " = Values(" +
+                    FIELD_PRICE + "), " + FIELD_DISCOUNT + " = Values(" + FIELD_DISCOUNT + "), " + FIELD_AVAILABILITY +
+                    " = Values(" + FIELD_AVAILABILITY + ")";
+
+        } else {
+
+            parameters.put(1, id);
+            parameters.put(2, name);
+            parameters.put(3, appName);
+            parameters.put(4, market);
+            parameters.put(5, sku);
+            parameters.put(6, type);
+            parameters.put(7, category);
+            parameters.put(8, consumable);
+            parameters.put(9, tier);
+            parameters.put(10, coins);
+            parameters.put(11, price);
+            parameters.put(12, discount);
+            parameters.put(13, available);
+
+            statement = "INSERT INTO " + BaseConfig.TABLE_PRODUCTS +
+                    " (" + FIELD_ID + ", " + FIELD_NAME + ", " + FIELD_APP_NAME + ", " + FIELD_MARKET + ", " +
+                    FIELD_SKU + ", " + FIELD_TYPE + ", " + FIELD_CATEGORY + ", " + FIELD_CONSUMABLE + ", " + FIELD_TIER
+                    + ", " + FIELD_COINS + ", " + FIELD_PRICE + ", " + FIELD_DISCOUNT + ", " + FIELD_AVAILABILITY +
+                    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + FIELD_ID +
+                    " = Values(" + FIELD_ID + "), " + FIELD_NAME + " = Values(" + FIELD_NAME + "), " + FIELD_APP_NAME +
+                    " = Values(" + FIELD_APP_NAME + "), " + FIELD_MARKET + " = Values(" + FIELD_MARKET + "), " +
+                    FIELD_SKU + " = Values(" + FIELD_SKU + "), " + FIELD_TYPE + " = Values(" + FIELD_TYPE + "), " +
+                    FIELD_CATEGORY + " = Values(" + FIELD_CATEGORY + "), " + FIELD_CONSUMABLE + " = Values(" +
+                    FIELD_CONSUMABLE + "), " + FIELD_TIER + " = Values(" + FIELD_TIER + "), " + FIELD_COINS +
+                    " = Values(" + FIELD_COINS + "), " + FIELD_PRICE + " = Values(" + FIELD_PRICE + "), " +
+                    FIELD_DISCOUNT + " = Values(" + FIELD_DISCOUNT + "), " + FIELD_AVAILABILITY +
+                    " = Values(" + FIELD_AVAILABILITY + ")";
+        }
+
+        return DatabaseHelper.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
+
+            if (wasSuccessful) {
+
+                fetch();
+
+            } else {
+
+                error.printStackTrace();
+            }
+        });
+    }
+
+    public boolean replaceProduct(ProductData product) {
+
+        if (product == null || product.name == null || product.appName == null || product.market == null ||
+                product.sku == null || product.type == null || product.category == null) {
+
+            return false;
+        }
+
+        String name = product.name;
+        String appName = product.appName;
+        String market = product.market;
+        String sku = product.sku;
+        String type = product.type;
+        String category = product.category;
+        boolean consumable = product.consumable;
+        int tier = product.tier;
+        int coins = product.coins;
+        float price = product.price;
+        int discount = product.discount;
+        boolean available = product.available;
+
+        return replaceProduct(name, appName, market, sku, type, category, consumable, tier, coins, price, discount,
+                available);
+    }
+
+    public boolean removeProduct(String appName, String sku) {
+
+        if (appName == null || sku == null) {
+
+            return false;
+        }
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, appName);
+        parameters.put(2, sku);
+
+        String statement = "DELETE FROM " + BaseConfig.TABLE_PRODUCTS + " WHERE " + FIELD_APP_NAME +
+                " = ? AND " + FIELD_SKU + " = ?";
+
+        return DatabaseHelper.update(TAG, statement, parameters, (wasSuccessful, error) -> {
+
+            if (wasSuccessful) {
+
+                fetch();
+
+            } else {
+
+                error.printStackTrace();
+            }
+        });
+    }
 }

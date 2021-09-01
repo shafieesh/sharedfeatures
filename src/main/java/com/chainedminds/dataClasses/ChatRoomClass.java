@@ -6,7 +6,7 @@ class ChatRoomClass {
 
     public int gameRequest;
 
-    public BaseMessageClass newMessage;
+    public BaseMessageData newMessage;
 
-    public List<BaseMessageClass> lastMessages;
+    public List<BaseMessageData> lastMessages;
 }

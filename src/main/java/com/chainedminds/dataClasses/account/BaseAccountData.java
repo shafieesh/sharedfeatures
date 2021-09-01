@@ -2,6 +2,7 @@ package com.chainedminds.dataClasses.account;
 
 import com.chainedminds.dataClasses.BaseProfileData;
 import com.chainedminds.dataClasses.Customization;
+import com.chainedminds.dataClasses.payment.BaseTransactionData;
 
 import java.util.List;
 
@@ -49,4 +50,6 @@ public class BaseAccountData<FriendData extends BaseFriendData> {
     public int lastCoinChargeAmount;
     public int lastTicketChargeAmount;
     public String avatar;
+
+    public List<BaseTransactionData> transactions;
 }

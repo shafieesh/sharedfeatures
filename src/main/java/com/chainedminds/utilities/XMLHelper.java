@@ -4,10 +4,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class XMLHelper {
 
@@ -17,18 +14,18 @@ public class XMLHelper {
 
     }
 
-    public static void generateMultiSitemap(String filePath, String webAddress, List<String> urls) {
+    public static void generateMultiSitemap(String filePath, String webAddress, List<String> sitemapFiles) {
 
         Node root = new Node("sitemapindex");
         root.declarations.put("encoding", "UTF-8");
         root.attributes.put("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-        for (String url : urls) {
+        for (String sitemapFile : sitemapFiles) {
 
             Node sitemapNode = new Node("sitemap");
 
             Node locNode = new Node("loc");
-            locNode.value = webAddress + "/" + url;
+            locNode.value = webAddress + "/" + sitemapFile;
 
             sitemapNode.elements.add(locNode);
 
@@ -43,7 +40,7 @@ public class XMLHelper {
     public static List<String> generateSitemap(String path,
                                                String fileName,
                                                List<String> urls,
-                                               Map<String, List<String>> linkedImages) {
+                                               Map<String, Set<String>> linkedImages) {
 
         List<String> sitemapNames = new ArrayList<>();
 
@@ -61,7 +58,7 @@ public class XMLHelper {
         return sitemapNames;
     }
 
-    private static void generateSitemap2(String filePath, List<String> urls, Map<String, List<String>> linkedImages) {
+    private static void generateSitemap2(String filePath, List<String> urls, Map<String, Set<String>> linkedImages) {
 
         Node root = new Node("urlset");
         root.declarations.put("encoding", "UTF-8");
@@ -77,7 +74,7 @@ public class XMLHelper {
 
             urlNode.elements.add(locNode);
 
-            for (String imageUrl : linkedImages.getOrDefault(url, new ArrayList<>())) {
+            for (String imageUrl : linkedImages.getOrDefault(url, new HashSet<>())) {
 
                 Node imageNode = new Node("image:image");
 

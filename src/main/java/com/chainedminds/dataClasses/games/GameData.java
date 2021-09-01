@@ -1,6 +1,6 @@
 package com.chainedminds.dataClasses.games;
 
-import com.chainedminds.dataClasses.BaseMessageClass;
+import com.chainedminds.dataClasses.BaseMessageData;
 import com.chainedminds.dataClasses.GameSettings;
 import com.chainedminds.dataClasses.Player;
 import com.chainedminds.dataClasses.account.BaseAccountData;
@@ -16,7 +16,7 @@ public class GameData {
 
     public GameSettings gameSettings;
 
-    public BaseMessageClass newMessage;
+    public BaseMessageData newMessage;
 
     public BaseAccountData account;
     public Player player;

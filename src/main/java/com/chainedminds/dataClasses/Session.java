@@ -9,6 +9,6 @@ public class Session {
     public int ownerID;
     public String ownerGamerTag;
 
-    public BaseMessageClass lastMessage;
-    public List<BaseMessageClass> messages;
+    public BaseMessageData lastMessage;
+    public List<BaseMessageData> messages;
 }

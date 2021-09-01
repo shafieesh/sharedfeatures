@@ -90,7 +90,7 @@ public class BackendHelper {
 
         Calendar calendar = Calendar.getInstance();
 
-        int firstDayOfTheWeek = "fa".equals(language.toLowerCase()) ? Calendar.SATURDAY : Calendar.SUNDAY;
+        int firstDayOfTheWeek = "fa".equalsIgnoreCase(language) ? Calendar.SATURDAY : Calendar.SUNDAY;
         int today = calendar.get(Calendar.DAY_OF_WEEK);
         int diff = 0;
 

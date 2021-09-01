@@ -392,7 +392,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return value.get();
     }
 
-    private <T> DBResult<T> getProperty(int userID, String appName, String field, Class<T> T) {
+    public  <T> DBResult<T> getProperty(int userID, String appName, String field, Class<T> T) {
 
         DBResult<T> result = new DBResult<>();
 
@@ -443,7 +443,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return result;
     }
 
-    private <T, E extends Collection<T>> DBResult<E> getProperties(int userID, String field,
+    public  <T, E extends Collection<T>> DBResult<E> getProperties(int userID, String field,
                                                                    E values,
                                                                    Class<T> type) {
 
@@ -487,7 +487,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return result;
     }
 
-    private boolean setProperty(int userID, String appName, String field, Object value) {
+    public boolean setProperty(int userID, String appName, String field, Object value) {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
@@ -502,7 +502,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return DatabaseHelper.update(TAG, updateStatement, parameters);
     }
 
-    private boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
+    public boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field + ") VALUES (?, ?, ?) " +
