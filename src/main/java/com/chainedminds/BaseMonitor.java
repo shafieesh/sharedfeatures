@@ -3,7 +3,7 @@ package com.chainedminds;
 import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
@@ -97,7 +97,7 @@ public class BaseMonitor extends Thread {
 
                     counter = 0;
 
-                    database = DatabaseHelper.getConnectionsCount();
+                    database = BaseDatabaseHelperOld.getConnectionsCount();
                     network = NettyServer.getConnectionsCount();
 
                     StringBuilder stringBuilder = new StringBuilder();

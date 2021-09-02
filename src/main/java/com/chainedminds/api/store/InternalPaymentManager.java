@@ -6,7 +6,7 @@ import com.chainedminds.api.accounting.AccountPermissionsManager;
 import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.dataClasses.payment.BaseTransactionData;
 import com.chainedminds.utilities.BackendHelper;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class InternalPaymentManager {
         parameters.put(2, type);
         parameters.put(3, value);
 
-        return DatabaseHelper.update(connection, TAG, updateStatement, parameters);
+        return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
     }
 
     public static int getSubscriptionPeriod(String market) {
@@ -76,7 +76,7 @@ public class InternalPaymentManager {
         String statement = "SELECT * FROM " + BaseConfig.TABLE_TRANSACTIONS_INTERNAL + " WHERE " + FIELD_USER_ID +
                 " = ? ORDER BY " + FIELD_TRANSACTION_TIME + " DESC";
 
-        DatabaseHelper.query(TAG, statement, parameters,(resultSet) -> {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters,(resultSet) -> {
 
             while (resultSet.next()) {
 

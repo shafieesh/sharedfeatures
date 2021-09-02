@@ -2,7 +2,7 @@ package com.chainedminds.api.store;
 
 import com.chainedminds.BaseConfig;
 import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -268,11 +268,11 @@ public class BaseIPGSubscriptionPurchasesManager<IPGTransactionData extends Base
 
         if (connection != null) {
 
-            return DatabaseHelper.update(connection, TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
 
         } else {
 
-            return DatabaseHelper.update(TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
         }
     }
 
@@ -286,7 +286,7 @@ public class BaseIPGSubscriptionPurchasesManager<IPGTransactionData extends Base
         parameters.put(1, expirationDate == 0 ? null : new Timestamp(expirationDate));
         parameters.put(2, id);
 
-        return DatabaseHelper.update(TAG, updateStatement, parameters);
+        return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
     }
 
     /*private IPGTransactionData readTransaction(ResultSet resultSet) throws Exception {

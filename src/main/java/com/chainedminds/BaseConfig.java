@@ -1,6 +1,6 @@
 package com.chainedminds;
 
-import com.chainedminds.utilities.ConnectionManager;
+import com.chainedminds.utilities.BaseConnectionManagerOld;
 
 public class BaseConfig {
 
@@ -419,7 +419,7 @@ public class BaseConfig {
             DATABASE_URL = "jdbc:mysql://" + "db.fandoghapps.com" + "/" + DATABASE_NAME + "?useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true";
         }
 
-        ConnectionManager.config();
+        BaseConnectionManagerOld.config();
     }
 
     //-------------------------------------------------------------//

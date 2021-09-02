@@ -10,7 +10,7 @@ import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
 import com.chainedminds.dataClasses.payment.PasargadData;
 import com.chainedminds.dataClasses.payment.ZarinPalData;
 import com.chainedminds.utilities.*;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.json.JsonHelper;
 
 import java.sql.Connection;
@@ -235,7 +235,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
                 return data;
             }
 
-            Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
             boolean wasSuccessful = onConsuming(connection, transaction, originalProduct);
 
@@ -243,16 +243,16 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
             if (wasSuccessful) {
 
-                ConnectionManager.commit(connection);
+                BaseConnectionManagerOld.commit(connection);
 
                 transaction.state = PURCHASE_STATE_APPLIED;
 
             } else {
 
-                ConnectionManager.rollback(connection);
+                BaseConnectionManagerOld.rollback(connection);
             }
 
-            ConnectionManager.close(connection);
+            BaseConnectionManagerOld.close(connection);
 
             if (wasSuccessful) {
 
@@ -671,7 +671,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         parameters.put(7, sku);
         parameters.put(8, amount);
 
-        return DatabaseHelper.insert(TAG, statement, parameters);
+        return BaseDatabaseHelperOld.insert(TAG, statement, parameters);
     }
 
     public int addArbitraryData(String gateway, Map<String, String> arbitraryData) {
@@ -705,7 +705,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         String statement = "INSERT INTO " + table + " (" + fields + ") VALUES (" + values + ")";
 
-        DatabaseHelper.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
+        BaseDatabaseHelperOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
 
             if (wasSuccessful) {
 
@@ -726,7 +726,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         parameters.put(1, orderID);
 
-        DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -757,7 +757,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         parameters.put(1, transactionID);
 
-        DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -798,7 +798,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
                 " JOIN " + table + " AS T2 ON T1." + FIELD_TRANSACTION_ID + " = T2." + FIELD_ID +
                 " WHERE " + condition;
 
-        DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -823,11 +823,11 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         if (connection != null) {
 
-            return DatabaseHelper.update(connection, TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
 
         } else {
 
-            return DatabaseHelper.update(TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
         }
     }
 

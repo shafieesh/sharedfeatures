@@ -2,7 +2,7 @@ package com.chainedminds.utilities;
 
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class Log {
         parameters.put(2, section);
         parameters.put(3, action);
 
-        return DatabaseHelper.insert(connection, TAG, statement, parameters);
+        return BaseDatabaseHelperOld.insert(connection, TAG, statement, parameters);
     }
 
     public static void manage(String tag, String payload) {

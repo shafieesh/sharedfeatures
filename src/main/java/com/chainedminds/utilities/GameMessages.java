@@ -1,7 +1,7 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds.BaseConfig;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class GameMessages {
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_GAME_MESSAGES;
 
-        DatabaseHelper.query(TAG, selectStatement, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, resultSet -> {
 
             Utilities.lock(TAG, LOCK.writeLock(), () -> {
 

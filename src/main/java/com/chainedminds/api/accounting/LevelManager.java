@@ -3,7 +3,7 @@ package com.chainedminds.api.accounting;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -41,7 +41,7 @@ public class LevelManager {
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_LEVELS + " ORDER BY " + FIELD_LEVEL;
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Map<String, List<Integer>> levelScores = new HashMap<>();
 

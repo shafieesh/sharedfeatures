@@ -1,7 +1,7 @@
 package com.chainedminds.api.accounting;
 
 import com.chainedminds.BaseConfig;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class BaseProfileManager {
         parameters.put(1, value);
         parameters.put(2, userID);
 
-        return DatabaseHelper.update(TAG, statement, parameters);
+        return BaseDatabaseHelperOld.update(TAG, statement, parameters);
     }
 
     public final boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
@@ -38,6 +38,6 @@ public class BaseProfileManager {
         parameters.put(1, value);
         parameters.put(2, userID);
 
-        return DatabaseHelper.update(connection, TAG, statement, parameters);
+        return BaseDatabaseHelperOld.update(connection, TAG, statement, parameters);
     }
 }

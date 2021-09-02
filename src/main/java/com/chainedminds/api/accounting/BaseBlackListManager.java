@@ -4,7 +4,7 @@ import com.chainedminds.BaseConfig;
 import com.chainedminds.dataClasses.BlockClass;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -70,7 +70,7 @@ public class BaseBlackListManager {
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_BLACK_LIST +
                 " ORDER BY " + FIELD_LAST_BLOCK_TIME + " DESC LIMIT 2000";
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final List<BlockClass> blocks = new ArrayList<>();
             private final Set<String> propertyIdx = new HashSet<>();
@@ -220,7 +220,7 @@ public class BaseBlackListManager {
         parameters.put(4, payload);
         parameters.put(5, reporterID);
 
-        DatabaseHelper.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             BlockClass block = findBlock(ipAddress, TYPE_IP_ADDRESS, reason);
 
@@ -267,7 +267,7 @@ public class BaseBlackListManager {
         parameters.put(4, payload);
         parameters.put(5, reporterID);
 
-        DatabaseHelper.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             AtomicReference<BlockClass> block = new AtomicReference<>();
 
@@ -326,7 +326,7 @@ public class BaseBlackListManager {
         parameters.put(4, payload);
         parameters.put(5, reporterID);
 
-        DatabaseHelper.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             BlockClass block = findBlock(property + "", type, reason);
 

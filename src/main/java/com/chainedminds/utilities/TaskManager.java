@@ -2,7 +2,7 @@ package com.chainedminds.utilities;
 
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseMonitor;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -91,7 +91,7 @@ public class TaskManager extends Thread {
         parameters.put(1, task.name);
         parameters.put(2, new Timestamp(task.time));
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -141,7 +141,7 @@ public class TaskManager extends Thread {
         parameters.put(1, task.name);
         parameters.put(2, new Timestamp(System.currentTimeMillis()));
 
-        DatabaseHelper.insert(TAG, insertStatement, parameters);
+        BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters);
     }
 
     @Override

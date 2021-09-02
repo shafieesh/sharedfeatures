@@ -11,7 +11,7 @@ import com.chainedminds.utilities.BackendHelper;
 import com.chainedminds.utilities.BaseManager;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -101,7 +101,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
         parameters.put(1, timestamp.toString());
         parameters.put(2, appName);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, new TwoStepQueryCallback() {
 
             private final List<LeaderboardData> leaderboardData = new ArrayList<>();
 
@@ -230,7 +230,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
         parameters.put(1, appName);
         parameters.put(2, gameName);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             while (resultSet.next()) {
 
@@ -314,7 +314,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
             parameters.put(1, firstDayOfTheWeekTimestamp.toString());
             parameters.put(2, appName);
 
-            DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 
@@ -405,7 +405,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
             parameters.put(1, todayTimestamp.toString());
             parameters.put(2, appName);
 
-            DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 
@@ -543,7 +543,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
             parameters.put(1, firstDayOfTheWeekTimestamp.toString());
             parameters.put(2, appName);
 
-            DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 
@@ -691,7 +691,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
             parameters.put(1, todayTimestamp.toString());
             parameters.put(2, appName);
 
-            DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 

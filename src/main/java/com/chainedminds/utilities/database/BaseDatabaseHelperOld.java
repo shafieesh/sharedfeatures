@@ -1,6 +1,6 @@
 package com.chainedminds.utilities.database;
 
-import com.chainedminds.utilities.ConnectionManager;
+import com.chainedminds.utilities.BaseConnectionManagerOld;
 import com.chainedminds.utilities.Log;
 import com.chainedminds.utilities.Utilities;
 
@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class DatabaseHelper {
+@Deprecated
+public class BaseDatabaseHelperOld {
 
     private static int queriesCount = 0;
     private static int updatesCount = 0;
@@ -51,11 +52,11 @@ public class DatabaseHelper {
 
     public static boolean query(String tag, String statement, Map<Integer, Object> parameters) {
 
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = BaseConnectionManagerOld.getConnection();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters);
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return wasSuccessful;
     }
@@ -76,22 +77,22 @@ public class DatabaseHelper {
 
     public static boolean query(String tag, String statement, Map<Integer, Object> parameters, QueryCallback queryCallback) {
 
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = BaseConnectionManagerOld.getConnection();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return wasSuccessful;
     }
 
     public static boolean query(String tag, String statement, Map<Integer, Object> parameters, TwoStepQueryCallback queryCallback) {
 
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = BaseConnectionManagerOld.getConnection();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return wasSuccessful;
     }
@@ -307,11 +308,11 @@ public class DatabaseHelper {
 
     public static boolean update(String tag, String statement, Map<Integer, Object> parameters, UpdateCallback updateCallback) {
 
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = BaseConnectionManagerOld.getConnection();
 
         boolean wasSuccessful = update(connection, tag, statement, parameters, updateCallback);
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return wasSuccessful;
     }
@@ -421,11 +422,11 @@ public class DatabaseHelper {
 
     public static boolean insert(String tag, String statement, Map<Integer, Object> parameters, InsertCallback insertCallback) {
 
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = BaseConnectionManagerOld.getConnection();
 
         boolean wasSuccessful = insert(connection, tag, statement, parameters, insertCallback);
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return wasSuccessful;
     }

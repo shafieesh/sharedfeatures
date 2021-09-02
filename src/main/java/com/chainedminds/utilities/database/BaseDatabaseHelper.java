@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class DatabaseHelperNew {
+public abstract class BaseDatabaseHelper {
 
-    private static int queriesCount = 0;
-    private static int updatesCount = 0;
-    private static int insertsCount = 0;
+    private int queriesCount = 0;
+    private int updatesCount = 0;
+    private int insertsCount = 0;
 
     protected Connection getConnection() {
 

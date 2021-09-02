@@ -7,9 +7,9 @@ import com.chainedminds.BaseResources;
 import com.chainedminds.dataClasses.market.CafeBazaarClass;
 import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
 import com.chainedminds.network.DataTransportManager;
-import com.chainedminds.utilities.ConnectionManager;
+import com.chainedminds.utilities.BaseConnectionManagerOld;
 import com.chainedminds.utilities.DynamicConfig;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 import com.chainedminds.utilities.json.JsonHelper;
 
@@ -66,7 +66,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
                 " WHERE " + FIELD_STATE + " != " + BaseIABPaymentManager.PURCHASE_STATE_REJECTED +
                 " AND " + FIELD_EXPIRATION_DATE + " > DATE_SUB(NOW(), INTERVAL 7 DAY)";
 
-        DatabaseHelper.query(TAG, selectStatement, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, resultSet -> {
 
             while (resultSet.next()) {
 
@@ -117,7 +117,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
         parameters.put(5, token);
         parameters.put(6, expirationDate.getTime() == 0 ? null : expirationDate);
 
-        DatabaseHelper.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> transactionID.set(generatedID));
+        BaseDatabaseHelperOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> transactionID.set(generatedID));
 
         return transactionID.get();
     }
@@ -133,7 +133,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
 
         parameters.put(1, transactionID);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -157,7 +157,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
 
         parameters.put(1, userID);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             while (resultSet.next()) {
 
@@ -180,7 +180,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
                 " = " + BaseIABPaymentManager.PURCHASE_STATE_APPLIED + " AND " +
                 FIELD_EXPIRATION_DATE + " > NOW()";
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Set<Integer> fetchingUserIDs = new HashSet<>();
 
@@ -227,7 +227,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
         parameters.put(1, market);
         parameters.put(2, token);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -248,7 +248,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
                 " WHERE " + FIELD_STATE + " = " + BaseIABPaymentManager.PURCHASE_STATE_PENDING +
                 " OR " + FIELD_STATE + " = " + BaseIABPaymentManager.PURCHASE_STATE_VERIFIED;
 
-        DatabaseHelper.query(TAG, selectStatement, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, resultSet -> {
 
             while (resultSet.next()) {
 
@@ -278,11 +278,11 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
 
         if (connection != null) {
 
-            return DatabaseHelper.update(connection, TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
 
         } else {
 
-            return DatabaseHelper.update(TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
         }
     }
 
@@ -296,7 +296,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
         parameters.put(1, expirationDate == 0 ? null : new Timestamp(expirationDate));
         parameters.put(2, id);
 
-        return DatabaseHelper.update(TAG, updateStatement, parameters);
+        return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
     }
 
     private IABTransactionData readTransaction(ResultSet resultSet) throws Exception {
@@ -369,7 +369,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
             return null;
         }
 
-        Connection connection = ConnectionManager.getConnection();
+        Connection connection = BaseConnectionManagerOld.getConnection();
 
         if (connection == null) {
 
@@ -386,7 +386,7 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
             //BaseResources.getInstance().iabPaymentManager.updateIABTransaction(connection, transaction);
         }
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return canceled;
     }

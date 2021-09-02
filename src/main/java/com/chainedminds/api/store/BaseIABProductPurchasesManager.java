@@ -4,7 +4,7 @@ import com.chainedminds.BaseClasses;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -52,7 +52,7 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
         parameters.put(4, sku);
         parameters.put(5, token);
 
-        DatabaseHelper.insert(TAG, statement, parameters,
+        BaseDatabaseHelperOld.insert(TAG, statement, parameters,
                 (wasSuccessful, generatedID, error) -> transactionID.set(generatedID));
 
         return transactionID.get();
@@ -69,7 +69,7 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
 
         parameters.put(1, transactionID);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -93,7 +93,7 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
 
         parameters.put(1, userID);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             while (resultSet.next()) {
 
@@ -118,7 +118,7 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
         parameters.put(1, market);
         parameters.put(2, token);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -139,7 +139,7 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
                 " WHERE " + FIELD_STATE + " = " + BaseIABPaymentManager.PURCHASE_STATE_PENDING +
                 " OR " + FIELD_STATE + " = " + BaseIABPaymentManager.PURCHASE_STATE_VERIFIED;
 
-        DatabaseHelper.query(TAG, selectStatement, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, resultSet -> {
 
             while (resultSet.next()) {
 
@@ -164,11 +164,11 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
 
         if (connection != null) {
 
-            return DatabaseHelper.update(connection, TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
 
         } else {
 
-            return DatabaseHelper.update(TAG, updateStatement, parameters);
+            return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
         }
     }
 

@@ -11,7 +11,7 @@ import com.chainedminds.utilities.BaseNotificationManager;
 import com.chainedminds.utilities.Messages;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -67,7 +67,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_FRIENDS_LIST;
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Set<Friendship> relations = new HashSet<>();
 
@@ -165,7 +165,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
         parameters.put(2, newerID);
         parameters.put(3, relationshipState);
 
-        boolean wasSuccessful = DatabaseHelper.insert(TAG, statement, parameters);
+        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -266,7 +266,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
         parameters.put(2, newerID);
         parameters.put(3, relationshipState);
 
-        boolean wasSuccessful = DatabaseHelper.update(TAG, statement, parameters);
+        boolean wasSuccessful = BaseDatabaseHelperOld.update(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -340,7 +340,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
         parameters.put(1, olderID);
         parameters.put(2, newerID);
 
-        boolean wasSuccessful = DatabaseHelper.update(TAG, statement, parameters);
+        boolean wasSuccessful = BaseDatabaseHelperOld.update(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -402,7 +402,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
         parameters.put(2, newerID);
         parameters.put(3, relationshipState);
 
-        boolean wasSuccessful = DatabaseHelper.insert(TAG, statement, parameters);
+        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 

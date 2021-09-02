@@ -14,7 +14,7 @@ import com.chainedminds.dataClasses.account.BaseAccountData;
 import com.chainedminds.dataClasses.advertisements.AdData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.*;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
@@ -150,7 +150,7 @@ public class BaseAccountManager<Data extends BaseData> {
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " +
                 FIELD_GAMER_TAG + " FROM " + BaseConfig.TABLE_ACCOUNTS_USERS;
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Map<Integer, String> gamerTags = new HashMap<>();
 
@@ -216,7 +216,7 @@ public class BaseAccountManager<Data extends BaseData> {
         String selectStatement = "SELECT " + FIELD_USER_ID + " FROM " +
                 BaseConfig.TABLE_ACCOUNTS_USERS + " WHERE " + FIELD_PREMIUM_PASS + " = TRUE";
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final List<Integer> premiumUserIDs = new ArrayList<>();
 
@@ -253,7 +253,7 @@ public class BaseAccountManager<Data extends BaseData> {
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
                 " + 20 WHERE " + FIELD_PREMIUM_PASS + " = FALSE AND " + FIELD_COINS + " < 100";
 
-        DatabaseHelper.update(TAG, updateStatement);
+        BaseDatabaseHelperOld.update(TAG, updateStatement);
     }
 
     protected void chargePremiumCoins() {
@@ -262,7 +262,7 @@ public class BaseAccountManager<Data extends BaseData> {
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
                 " + 20 WHERE " + FIELD_PREMIUM_PASS + " = TRUE AND " + FIELD_COINS + " < 100";
 
-        DatabaseHelper.update(TAG, updateStatement);
+        BaseDatabaseHelperOld.update(TAG, updateStatement);
     }
 
     private CoinChargeSettings getCoinChargeSettings() {
@@ -327,7 +327,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         parameters.put(1, userID);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -447,7 +447,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
     public boolean setPassword(int userID, String newPassword) {
 
-        Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+        Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
         String oldPassword = getPassword(connection, userID);
 
@@ -457,14 +457,14 @@ public class BaseAccountManager<Data extends BaseData> {
 
         if (wasSuccessful) {
 
-            ConnectionManager.commit(connection);
+            BaseConnectionManagerOld.commit(connection);
 
         } else {
 
-            ConnectionManager.rollback(connection);
+            BaseConnectionManagerOld.rollback(connection);
         }
 
-        ConnectionManager.close(connection);
+        BaseConnectionManagerOld.close(connection);
 
         return wasSuccessful;
     }
@@ -564,11 +564,11 @@ public class BaseAccountManager<Data extends BaseData> {
 
         if (connection != null) {
 
-            DatabaseHelper.query(connection, TAG, statement, parameters, queryCallback);
+            BaseDatabaseHelperOld.query(connection, TAG, statement, parameters, queryCallback);
 
         } else {
 
-            DatabaseHelper.query(TAG, statement, parameters, queryCallback);
+            BaseDatabaseHelperOld.query(TAG, statement, parameters, queryCallback);
         }
 
         if (value.get() == null) {
@@ -599,11 +599,11 @@ public class BaseAccountManager<Data extends BaseData> {
 
         if (connection != null) {
 
-            return DatabaseHelper.update(connection, TAG, statement, parameters);
+            return BaseDatabaseHelperOld.update(connection, TAG, statement, parameters);
 
         } else {
 
-            return DatabaseHelper.update(TAG, statement, parameters);
+            return BaseDatabaseHelperOld.update(TAG, statement, parameters);
         }
     }
 
@@ -696,7 +696,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
                     String credential = BackendHelper.generateCredential();
 
-                    Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+                    Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
                     boolean wasSuccessful = BaseResources.getInstance().accountPropertyManager.setCredential(connection, userID, appName, credential);
 
@@ -712,14 +712,14 @@ public class BaseAccountManager<Data extends BaseData> {
 
                     if (wasSuccessful) {
 
-                        ConnectionManager.commit(connection);
+                        BaseConnectionManagerOld.commit(connection);
 
                     } else {
 
-                        ConnectionManager.rollback(connection);
+                        BaseConnectionManagerOld.rollback(connection);
                     }
 
-                    ConnectionManager.close(connection);
+                    BaseConnectionManagerOld.close(connection);
 
                 } else {
 
@@ -945,7 +945,7 @@ public class BaseAccountManager<Data extends BaseData> {
         parameters.put(1, gamerTag);
         parameters.put(2, password);
 
-        DatabaseHelper.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             userID.set(generatedID);
 
@@ -961,7 +961,7 @@ public class BaseAccountManager<Data extends BaseData> {
             parameters.put(5, market);
             parameters.put(6, firebaseID);
 
-            DatabaseHelper.insert(TAG, insertStatement2, parameters);
+            BaseDatabaseHelperOld.insert(TAG, insertStatement2, parameters);
 
             Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
@@ -1041,7 +1041,7 @@ public class BaseAccountManager<Data extends BaseData> {
         parameters.put(9, uuid);
         parameters.put(10, country);
 
-        boolean wasSuccessful = DatabaseHelper.insert(TAG, statement, parameters);
+        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
 
         statement = "INSERT INTO " + BaseConfig.TABLE_DEVICES_PROPERTIES +
 
@@ -1079,7 +1079,7 @@ public class BaseAccountManager<Data extends BaseData> {
         parameters.put(11, product);
         parameters.put(12, uuid);
 
-        wasSuccessful &= DatabaseHelper.insert(TAG, statement, parameters);
+        wasSuccessful &= BaseDatabaseHelperOld.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 

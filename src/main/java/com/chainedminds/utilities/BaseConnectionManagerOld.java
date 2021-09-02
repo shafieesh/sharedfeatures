@@ -1,5 +1,7 @@
 package com.chainedminds.utilities;
 
+import com.chainedminds.BaseConfig;
+
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -7,9 +9,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-public abstract class ConnectionManagerNew {
+@Deprecated
+public class BaseConnectionManagerOld {
 
-    private static final String TAG = ConnectionManagerNew.class.getSimpleName();
+    private static final String TAG = BaseConnectionManagerOld.class.getSimpleName();
 
     public static final int DEFAULT_OPTIONS = 0;
     public static final int MANUAL_COMMIT = 1;
@@ -17,25 +20,10 @@ public abstract class ConnectionManagerNew {
     private static ConnectionPool automaticConnections = null;
     private static ConnectionPool manualConnections = null;
 
-    protected String getAddress() {
+    public static void config() {
 
-        return null;
-    }
-
-    protected String getUsername() {
-
-        return null;
-    }
-
-    protected String getPassword() {
-
-        return null;
-    }
-
-    public final void config(int autoCommitConnectionsPoolSize, int manualCommitConnectionsPoolSize) {
-
-        automaticConnections = new ConnectionPool("auto", autoCommitConnectionsPoolSize);
-        manualConnections = new ConnectionPool("manual", manualCommitConnectionsPoolSize);
+        automaticConnections = new ConnectionPool("auto", 30);
+        manualConnections = new ConnectionPool("manual", 15);
 
         ConnectionPool.ConnectionChecker connectionChecker = connection -> {
 
@@ -50,12 +38,12 @@ public abstract class ConnectionManagerNew {
         manualConnections.setConnectionChecker(connectionChecker);
     }
 
-    public final Connection getConnection() {
+    public static Connection getConnection() {
 
         return getConnection(DEFAULT_OPTIONS);
     }
 
-    public final Connection getConnection(int options) {
+    public static Connection getConnection(int options) {
 
         Connection connection = null;
 
@@ -65,20 +53,12 @@ public abstract class ConnectionManagerNew {
 
                 if (options == DEFAULT_OPTIONS) {
 
-                    String address = getAddress();
-                    String username = getUsername();
-                    String password = getPassword();
-
-                    connection = automaticConnections.getConnection(address, username, password);
+                    connection = automaticConnections.getConnection();
                 }
 
                 if (options == MANUAL_COMMIT) {
 
-                    String address = getAddress();
-                    String username = getUsername();
-                    String password = getPassword();
-
-                    connection = manualConnections.getConnection(address, username, password);
+                    connection = manualConnections.getConnection();
 
                     if (connection != null) {
 
@@ -100,7 +80,7 @@ public abstract class ConnectionManagerNew {
         return connection;
     }
 
-    public final boolean close(Connection connection) {
+    public static boolean close(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -126,7 +106,7 @@ public abstract class ConnectionManagerNew {
         return wasSuccessful;
     }
 
-    public final boolean commit(Connection connection) {
+    public static boolean commit(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -147,7 +127,7 @@ public abstract class ConnectionManagerNew {
         return wasSuccessful;
     }
 
-    public final boolean rollback(Connection connection) {
+    public static boolean rollback(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -168,7 +148,7 @@ public abstract class ConnectionManagerNew {
         return wasSuccessful;
     }
 
-    public final boolean commitOrRollback(Connection connection) {
+    public static boolean commitOrRollback(Connection connection) {
 
         boolean wasSuccessful = commit(connection);
 
@@ -180,7 +160,7 @@ public abstract class ConnectionManagerNew {
         return wasSuccessful;
     }
 
-    public static final class ConnectionPool {
+    public static class ConnectionPool {
 
         private static final String TAG = ConnectionPool.class.getSimpleName();
 
@@ -207,7 +187,7 @@ public abstract class ConnectionManagerNew {
             this.connections = new CustomConnection[capacity];
         }
 
-        public Connection getConnection(String address, String username, String password) {
+        public Connection getConnection() {
 
             long currentTime = System.currentTimeMillis();
 
@@ -245,7 +225,7 @@ public abstract class ConnectionManagerNew {
 
             if (connection.get() == null) {
 
-                connection.set(CustomConnection.create(name, address, username, password));
+                connection.set(CustomConnection.create(name));
             }
 
             if (connection.get() != null) {
@@ -348,13 +328,16 @@ public abstract class ConnectionManagerNew {
         private final Connection connection;
         private long lastCheckTime;
 
-        public static CustomConnection create(String name, String address, String username, String password) {
+        public static CustomConnection create(String name) {
 
             //System.out.println("NEW CONNECTION");
 
             try {
 
-                Connection connection = DriverManager.getConnection(address, username, password);
+                Connection connection = DriverManager.getConnection(
+                        BaseConfig.DATABASE_URL,
+                        BaseConfig.DATABASE_USERNAME,
+                        BaseConfig.DATABASE_PASSWORD);
 
                 return new CustomConnection(name, connection);
 

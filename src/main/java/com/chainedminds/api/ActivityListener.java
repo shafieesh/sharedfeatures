@@ -4,7 +4,7 @@ import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
 import com.chainedminds.utilities.BaseNotificationManager;
 import com.chainedminds.utilities.TaskManager;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class ActivityListener {
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_ACTIVITY_FINDER;
 
-        DatabaseHelper.query(TAG, selectStatement, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, resultSet -> {
 
             Map<Integer, Integer> relations = new HashMap<>();
 

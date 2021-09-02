@@ -1,7 +1,5 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.BaseConfig;
-
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -9,20 +7,35 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ConnectionManager {
+public abstract class BaseConnectionManager {
 
-    private static final String TAG = ConnectionManager.class.getSimpleName();
+    private static final String TAG = BaseConnectionManager.class.getSimpleName();
 
     public static final int DEFAULT_OPTIONS = 0;
     public static final int MANUAL_COMMIT = 1;
 
-    private static ConnectionPool automaticConnections = null;
-    private static ConnectionPool manualConnections = null;
+    private ConnectionPool automaticConnections = null;
+    private ConnectionPool manualConnections = null;
 
-    public static void config() {
+    protected String getAddress() {
 
-        automaticConnections = new ConnectionPool("auto", 30);
-        manualConnections = new ConnectionPool("manual", 15);
+        return null;
+    }
+
+    protected String getUsername() {
+
+        return null;
+    }
+
+    protected String getPassword() {
+
+        return null;
+    }
+
+    public final void config(int autoCommitConnectionsPoolSize, int manualCommitConnectionsPoolSize) {
+
+        automaticConnections = new ConnectionPool("auto", autoCommitConnectionsPoolSize);
+        manualConnections = new ConnectionPool("manual", manualCommitConnectionsPoolSize);
 
         ConnectionPool.ConnectionChecker connectionChecker = connection -> {
 
@@ -37,12 +50,12 @@ public class ConnectionManager {
         manualConnections.setConnectionChecker(connectionChecker);
     }
 
-    public static Connection getConnection() {
+    public final Connection getConnection() {
 
         return getConnection(DEFAULT_OPTIONS);
     }
 
-    public static Connection getConnection(int options) {
+    public final Connection getConnection(int options) {
 
         Connection connection = null;
 
@@ -52,12 +65,20 @@ public class ConnectionManager {
 
                 if (options == DEFAULT_OPTIONS) {
 
-                    connection = automaticConnections.getConnection();
+                    String address = getAddress();
+                    String username = getUsername();
+                    String password = getPassword();
+
+                    connection = automaticConnections.getConnection(address, username, password);
                 }
 
                 if (options == MANUAL_COMMIT) {
 
-                    connection = manualConnections.getConnection();
+                    String address = getAddress();
+                    String username = getUsername();
+                    String password = getPassword();
+
+                    connection = manualConnections.getConnection(address, username, password);
 
                     if (connection != null) {
 
@@ -79,7 +100,7 @@ public class ConnectionManager {
         return connection;
     }
 
-    public static boolean close(Connection connection) {
+    public final boolean close(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -105,7 +126,7 @@ public class ConnectionManager {
         return wasSuccessful;
     }
 
-    public static boolean commit(Connection connection) {
+    public final boolean commit(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -126,7 +147,7 @@ public class ConnectionManager {
         return wasSuccessful;
     }
 
-    public static boolean rollback(Connection connection) {
+    public final boolean rollback(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -147,7 +168,7 @@ public class ConnectionManager {
         return wasSuccessful;
     }
 
-    public static boolean commitOrRollback(Connection connection) {
+    public final boolean commitOrRollback(Connection connection) {
 
         boolean wasSuccessful = commit(connection);
 
@@ -159,7 +180,7 @@ public class ConnectionManager {
         return wasSuccessful;
     }
 
-    public static class ConnectionPool {
+    public static final class ConnectionPool {
 
         private static final String TAG = ConnectionPool.class.getSimpleName();
 
@@ -186,7 +207,7 @@ public class ConnectionManager {
             this.connections = new CustomConnection[capacity];
         }
 
-        public Connection getConnection() {
+        public Connection getConnection(String address, String username, String password) {
 
             long currentTime = System.currentTimeMillis();
 
@@ -224,7 +245,7 @@ public class ConnectionManager {
 
             if (connection.get() == null) {
 
-                connection.set(CustomConnection.create(name));
+                connection.set(CustomConnection.create(name, address, username, password));
             }
 
             if (connection.get() != null) {
@@ -327,16 +348,13 @@ public class ConnectionManager {
         private final Connection connection;
         private long lastCheckTime;
 
-        public static CustomConnection create(String name) {
+        public static CustomConnection create(String name, String address, String username, String password) {
 
             //System.out.println("NEW CONNECTION");
 
             try {
 
-                Connection connection = DriverManager.getConnection(
-                        BaseConfig.DATABASE_URL,
-                        BaseConfig.DATABASE_USERNAME,
-                        BaseConfig.DATABASE_PASSWORD);
+                Connection connection = DriverManager.getConnection(address, username, password);
 
                 return new CustomConnection(name, connection);
 

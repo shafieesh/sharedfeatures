@@ -3,7 +3,7 @@ package com.chainedminds.api.accounting;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.Connection;
@@ -50,7 +50,7 @@ public class AccountPermissionsManager {
                 BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
                 " WHERE " + FIELD_FINISH_TIME + " > NOW()";
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final List<Permission> permissions = new ArrayList<>();
             private final Set<Integer> userIDs = new HashSet<>();
@@ -98,7 +98,7 @@ public class AccountPermissionsManager {
                 BaseConfig.TABLE_RUBIKA_ACCOUNTS_PERMISSIONS +
                 " WHERE " + FIELD_FINISH_TIME + " > NOW()";
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final List<Permission> permissions = new ArrayList<>();
             private final Set<Integer> userIDs = new HashSet<>();
@@ -165,7 +165,7 @@ public class AccountPermissionsManager {
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, userID);
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -225,7 +225,7 @@ public class AccountPermissionsManager {
         parameters.put(3, permission);
         parameters.put(4, new Timestamp(finishTime));
 
-        return DatabaseHelper.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        return BaseDatabaseHelperOld.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             Permission permissionData = new Permission();
 
@@ -386,7 +386,7 @@ public class AccountPermissionsManager {
         parameters.put(2, appName);
         parameters.put(3, permission);
 
-        return DatabaseHelper.update(connection, TAG, deleteStatement, parameters, (wasSuccessful, error) -> {
+        return BaseDatabaseHelperOld.update(connection, TAG, deleteStatement, parameters, (wasSuccessful, error) -> {
 
             Utilities.lock(TAG, LOCK.writeLock(), () -> {
 

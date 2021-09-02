@@ -704,7 +704,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
                         return;
                     }
 
-                    Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+                    Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
                     boolean wasSuccessful = onConsuming(connection, transaction, originalProduct);
 
@@ -723,16 +723,16 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
                     if (wasSuccessful) {
 
-                        ConnectionManager.commit(connection);
+                        BaseConnectionManagerOld.commit(connection);
 
                         transaction.state = PURCHASE_STATE_APPLIED;
 
                     } else {
 
-                        ConnectionManager.rollback(connection);
+                        BaseConnectionManagerOld.rollback(connection);
                     }
 
-                    ConnectionManager.close(connection);
+                    BaseConnectionManagerOld.close(connection);
 
                     if (wasSuccessful) {
 

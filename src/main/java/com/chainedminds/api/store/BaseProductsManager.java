@@ -7,7 +7,7 @@ import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.dataClasses.BaseProductData;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -68,7 +68,7 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
         parameters.put(2, "video_ad");
         parameters.put(3, "subscription");
 
-        DatabaseHelper.query(TAG, selectStatement, parameters, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, new TwoStepQueryCallback() {
 
             private final List<ProductData> products = new ArrayList<>();
 
@@ -343,7 +343,7 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
                     " = Values(" + FIELD_AVAILABILITY + ")";
         }
 
-        return DatabaseHelper.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
+        return BaseDatabaseHelperOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
 
             if (wasSuccessful) {
 
@@ -395,7 +395,7 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
         String statement = "DELETE FROM " + BaseConfig.TABLE_PRODUCTS + " WHERE " + FIELD_APP_NAME +
                 " = ? AND " + FIELD_SKU + " = ?";
 
-        return DatabaseHelper.update(TAG, statement, parameters, (wasSuccessful, error) -> {
+        return BaseDatabaseHelperOld.update(TAG, statement, parameters, (wasSuccessful, error) -> {
 
             if (wasSuccessful) {
 

@@ -9,7 +9,7 @@ import com.chainedminds.dataClasses.BaseFileData;
 import com.chainedminds.dataClasses.account.BaseAccountData;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.DBResult;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.Connection;
@@ -47,7 +47,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " + FIELD_APP_NAME +
                 ", " + FIELD_LAST_UPDATE + " FROM " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS;
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -186,7 +186,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
                     FIELD_BLOCKED + " = FALSE AND " + FIELD_UUID +
                     " IN (" + questionMarksArray + ")";
 
-            DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 
@@ -228,7 +228,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
                     FIELD_BLOCKED + " = FALSE AND " + FIELD_FIREBASE_ID +
                     " IN (" + questionMarksArray + ")";
 
-            DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 
@@ -270,7 +270,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
                     FIELD_BLOCKED + " = FALSE AND " + FIELD_IP_ADDRESS +
                     " IN (" + questionMarksArray + ")";
 
-            DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+            BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
                 while (resultSet.next()) {
 
@@ -292,7 +292,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(1, userID);
         parameters.put(2, firebaseID);
 
-        return DatabaseHelper.update(TAG, updateStatement, parameters);
+        return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
     }
 
     public boolean setCredential(int userID, String credential) {
@@ -305,7 +305,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(1, credential);
         parameters.put(2, userID);
 
-        return DatabaseHelper.update(TAG, statement, parameters, (wasSuccessful, error) -> {
+        return BaseDatabaseHelperOld.update(TAG, statement, parameters, (wasSuccessful, error) -> {
 
             if (wasSuccessful) {
 
@@ -354,7 +354,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(1, block);
         parameters.put(2, userID);
 
-        return DatabaseHelper.update(TAG, statement, parameters);
+        return BaseDatabaseHelperOld.update(TAG, statement, parameters);
     }
 
     //------------------------------------------------------------------------------------
@@ -373,7 +373,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(1, userID);
         parameters.put(2, appName);
 
-        DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -405,7 +405,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(1, userID);
         parameters.put(2, appName);
 
-        DatabaseHelper.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
 
             private T value = null;
 
@@ -457,7 +457,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         parameters.put(1, userID);
 
-        DatabaseHelper.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -499,7 +499,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(2, appName);
         parameters.put(3, value);
 
-        return DatabaseHelper.update(TAG, updateStatement, parameters);
+        return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
     }
 
     public boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
@@ -514,7 +514,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(2, appName);
         parameters.put(3, value);
 
-        return DatabaseHelper.update(connection, TAG, updateStatement, parameters);
+        return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
     }
 
     //------------------------------------------------------------------------------------
@@ -739,7 +739,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(1, userID);
         parameters.put(2, appName);
 
-        DatabaseHelper.query(TAG, statement, parameters, resultSet -> {
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
 
             if (resultSet.next()) {
 
@@ -795,7 +795,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
             int newScore = score + currentScore;
 
-            Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
             wasSuccessful &= setScore(connection, userID, appName, newScore);
 
@@ -806,17 +806,17 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
             if (wasSuccessful) {
 
-                ConnectionManager.commit(connection);
+                BaseConnectionManagerOld.commit(connection);
 
             } else {
 
-                ConnectionManager.rollback(connection);
+                BaseConnectionManagerOld.rollback(connection);
 
                 Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
                         addScore(userID, appName, gameName, score, playTime, wonGame));
             }
 
-            ConnectionManager.close(connection);
+            BaseConnectionManagerOld.close(connection);
         }
     }
 
@@ -840,23 +840,23 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         synchronized (userID) {
 
-            Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
-            boolean wasSuccessful = DatabaseHelper.insert(connection, TAG, statement, parameters);
+            boolean wasSuccessful = BaseDatabaseHelperOld.insert(connection, TAG, statement, parameters);
 
             if (wasSuccessful) {
 
-                ConnectionManager.commit(connection);
+                BaseConnectionManagerOld.commit(connection);
 
             } else {
 
-                ConnectionManager.rollback(connection);
+                BaseConnectionManagerOld.rollback(connection);
 
                 Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
                         addScore(userID, appName, gameName, score));
             }
 
-            ConnectionManager.close(connection);
+            BaseConnectionManagerOld.close(connection);
         }
     }
 
@@ -881,23 +881,23 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         synchronized (userID) {
 
-            Connection connection = ConnectionManager.getConnection(ConnectionManager.MANUAL_COMMIT);
+            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
-            boolean wasSuccessful = DatabaseHelper.insert(connection, TAG, statement, parameters);
+            boolean wasSuccessful = BaseDatabaseHelperOld.insert(connection, TAG, statement, parameters);
 
             if (wasSuccessful) {
 
-                ConnectionManager.commit(connection);
+                BaseConnectionManagerOld.commit(connection);
 
             } else {
 
-                ConnectionManager.rollback(connection);
+                BaseConnectionManagerOld.rollback(connection);
 
                 Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
                         setRecord(userID, appName, gameName, score));
             }
 
-            ConnectionManager.close(connection);
+            BaseConnectionManagerOld.close(connection);
         }
     }
 
@@ -925,7 +925,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         parameters.put(6, wonGame);
         parameters.put(7, leagueID);
 
-        DatabaseHelper.insert(TAG, statement, parameters);
+        BaseDatabaseHelperOld.insert(TAG, statement, parameters);
     }
 
     protected boolean setScore(Connection connection, int userID, String appName, int score) {

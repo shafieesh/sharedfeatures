@@ -1,7 +1,7 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds.BaseConfig;
-import com.chainedminds.utilities.database.DatabaseHelper;
+import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public class DynamicConfig {
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_DYNAMIC_CONFIGS;
 
-        DatabaseHelper.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Map<String, String> maps = new HashMap<>();
             private final Map<String, ArrayList<String>> lists = new HashMap<>();
