@@ -180,7 +180,7 @@ public abstract class BaseConnectionManager {
         return wasSuccessful;
     }
 
-    public static final class ConnectionPool {
+    private static final class ConnectionPool {
 
         private static final String TAG = ConnectionPool.class.getSimpleName();
 
