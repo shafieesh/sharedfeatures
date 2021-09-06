@@ -404,6 +404,8 @@ public class BaseConfig {
     public static boolean DEBUG_MODE = true;
     public static String DATABASE_URL;
 
+    public static boolean FEATURE_PURCHASING = false;
+
     //-------------------------------------------------------------//
 
     public static void setDebugMode(boolean debugMode) {
