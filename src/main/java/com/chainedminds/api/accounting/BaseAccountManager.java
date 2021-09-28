@@ -624,7 +624,7 @@ public class BaseAccountManager<Data extends BaseData> {
 //        }
 
         if (data.account == null ||
-                data.account.gamerTag == null ||
+                (data.account.username == null && data.account.gamerTag == null) ||
                 data.account.password == null) {
 
             data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
@@ -633,7 +633,7 @@ public class BaseAccountManager<Data extends BaseData> {
         }
 
         String appName = data.client.appName;
-        String username = data.account.gamerTag;
+        String username = data.account.username != null ? data.account.username : data.account.gamerTag;
         String password = data.account.password;
         String language = data.client.language;
         String address = data.client.address;
@@ -655,7 +655,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
             //BaseNotificationManager.reportBruteForce(address, username, password);
 
-            data.response = BaseCodes.RESPONSE_INVALID_GAMER_TAG_OR_PASSWORD;
+            data.response = BaseCodes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
 
             data.message = Messages.get("SYSTEM_GENERAL",
                     Messages.General.TOO_MANY_ATTEMPTS, language);
@@ -723,19 +723,19 @@ public class BaseAccountManager<Data extends BaseData> {
 
                 } else {
 
-                    data.response = BaseCodes.RESPONSE_INVALID_GAMER_TAG_OR_PASSWORD;
+                    data.response = BaseCodes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
 
                     data.message = Messages.get("SYSTEM_GENERAL",
-                            Messages.General.INVALID_GAMER_TAG_OR_PASSWORD, language);
+                            Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
                 }
             }
 
         } else {
 
-            data.response = BaseCodes.RESPONSE_INVALID_GAMER_TAG_OR_PASSWORD;
+            data.response = BaseCodes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
 
             data.message = Messages.get("SYSTEM_GENERAL",
-                    Messages.General.INVALID_GAMER_TAG_OR_PASSWORD, language);
+                    Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
         }
 
         return data;
@@ -848,8 +848,8 @@ public class BaseAccountManager<Data extends BaseData> {
         data.response = BaseCodes.RESPONSE_NOK;
 
         if (data.account == null ||
-                data.account.gamerTag == null ||
-                data.account.gamerTag.length() < 3) {
+                data.account.username == null ||
+                data.account.username.length() < 3) {
 
             data.message = Messages.get("SYSTEM_GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
@@ -858,7 +858,7 @@ public class BaseAccountManager<Data extends BaseData> {
         }
 
         String language = data.client.language;
-        String lowerCasedGamerTag = data.account.gamerTag.toLowerCase();
+        String lowerCasedGamerTag = data.account.username.toLowerCase();
 
         if (lowerCasedGamerTag.contains("dev") ||
                 lowerCasedGamerTag.contains("developer") ||
@@ -879,17 +879,17 @@ public class BaseAccountManager<Data extends BaseData> {
         String platform = data.client.platform;
         String market = data.client.market;
         String firebaseID = data.client.firebaseID;
-        String gamerTag = data.account.gamerTag;
+        String username = data.account.username;
         String password = data.account.password;
 
-        gamerTag = Utilities.replaceLocalizedNumbers(gamerTag);
+        username = Utilities.replaceLocalizedNumbers(username);
 
         if (password != null) {
 
             password = Utilities.replaceLocalizedNumbers(password);
         }
 
-        if (!checkIfUsernameRegistered(gamerTag)) {
+        if (!checkIfUsernameRegistered(username)) {
 
             /*if (BaseBlackListManager.isBlocked(ipAddress, BaseBlackListManager.TYPE_IP_ADDRESS,
                     BaseBlackListManager.REASON_ADMIN_KICK) == BaseBlackListManager.STATE_KICKED ||
@@ -904,7 +904,7 @@ public class BaseAccountManager<Data extends BaseData> {
                 return data;
             }*/
 
-            int userID = registerAccount(appName, appVersion, platform, market, firebaseID, gamerTag, password);
+            int userID = registerAccount(appName, appVersion, platform, market, firebaseID, username, password);
 
             if (userID != -1) {
 

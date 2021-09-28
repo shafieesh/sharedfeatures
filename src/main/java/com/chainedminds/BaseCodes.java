@@ -16,7 +16,7 @@ public class BaseCodes {
     public static final int RESPONSE_IS_NOT_REGISTERED = -100001;
     public static final int RESPONSE_CREDENTIAL_EXPIRED = -100002;
     public static final int RESPONSE_IS_REGISTERED_BEFORE = -100003;
-    public static final int RESPONSE_INVALID_GAMER_TAG_OR_PASSWORD = -100004;
+    public static final int RESPONSE_INVALID_USERNAME_OR_PASSWORD = -100004;
 
     public static final int REQUEST_BASIC_DATA = 1;
     public static final int REQUEST_FILE_INFO = 2;

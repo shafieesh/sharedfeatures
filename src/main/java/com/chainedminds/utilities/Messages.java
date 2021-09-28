@@ -183,7 +183,7 @@ public class Messages {
         public static String SERVERS_ARE_NOT_AVAILABLE = "SERVERS_ARE_NOT_AVAILABLE";
         public static String MISSING_DATA = "MISSING_DATA";
         public static String MISSING_PERMISSION = "MISSING_PERMISSION";
-        public static String INVALID_GAMER_TAG_OR_PASSWORD = "INVALID_GAMER_TAG_OR_PASSWORD";
+        public static String INVALID_USERNAME_OR_PASSWORD = "INVALID_GAMER_TAG_OR_PASSWORD";
         public static String SOMETHING_WENT_WRONG = "SOMETHING_WENT_WRONG";
         public static String SOMETHING_WENT_WRONG_TRY_AGAIN = "SOMETHING_WENT_WRONG_TRY_AGAIN";
         public static String TOO_MANY_ATTEMPTS = "TOO_MANY_ATTEMPTS";
