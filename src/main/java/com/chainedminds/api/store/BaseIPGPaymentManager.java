@@ -741,34 +741,37 @@ public class BaseIPGPaymentManager<Data extends BaseData,
             }
         });
 
-        int transactionID = ipgTransactionHolder.get().id;
-        String gateway = ipgTransactionHolder.get().gateway;
-        String table = "";
+        if (ipgTransactionHolder.get() != null) {
 
-        switch (gateway) {
+            int transactionID = ipgTransactionHolder.get().id;
+            String gateway = ipgTransactionHolder.get().gateway;
+            String table = "";
 
-            case "Pasargad":
+            switch (gateway) {
 
-                table = BaseConfig.TABLE_PURCHASES_IPG_PASARGAD;
-                break;
+                case "Pasargad":
 
-            case "ZarinPal":
+                    table = BaseConfig.TABLE_PURCHASES_IPG_PASARGAD;
+                    break;
 
-                table = BaseConfig.TABLE_PURCHASES_IPG_ZARINPAL;
-                break;
-        }
+                case "ZarinPal":
 
-        statement = "SELECT * FROM " + table + " WHERE " + FIELD_ID + " = ?";
-
-        parameters.put(1, transactionID);
-
-        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
-
-            if (resultSet.next()) {
-
-                ipgTransactionHolder.get().arbitraryData = readArbitraryTransaction(gateway, resultSet);
+                    table = BaseConfig.TABLE_PURCHASES_IPG_ZARINPAL;
+                    break;
             }
-        });
+
+            statement = "SELECT * FROM " + table + " WHERE " + FIELD_ID + " = ?";
+
+            parameters.put(1, transactionID);
+
+            BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
+
+                if (resultSet.next()) {
+
+                    ipgTransactionHolder.get().arbitraryData = readArbitraryTransaction(gateway, resultSet);
+                }
+            });
+        }
 
         return ipgTransactionHolder.get();
     }
