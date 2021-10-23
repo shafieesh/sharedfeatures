@@ -184,9 +184,9 @@ public abstract class BaseConnectionManager {
 
         private static final String TAG = ConnectionPool.class.getSimpleName();
 
-        private static final int NOT_AVAILABLE = 0;
-        private static final int AVAILABLE = 1;
-        private static final int IN_USE = 2;
+        private static final int EMPTY_SLOT = 0;
+        private static final int READY_SLOT = 1;
+        private static final int BUSY_SLOT = 2;
 
         private static final int BUSY_ITEM_TIMEOUT = 20_000;
 
@@ -211,17 +211,17 @@ public abstract class BaseConnectionManager {
 
             long currentTime = System.currentTimeMillis();
 
-            AtomicReference<CustomConnection> connection = new AtomicReference<>();
+            AtomicReference<CustomConnection> connectionHolder = new AtomicReference<>();
 
             Utilities.lock(TAG, LOCK, () -> {
 
                 for (int index = 0; index < capacity; index++) {
 
-                    if (flags[index] != NOT_AVAILABLE && currentTime - lastUses[index] >= BUSY_ITEM_TIMEOUT) {
+                    if (flags[index] == BUSY_SLOT && currentTime - lastUses[index] >= BUSY_ITEM_TIMEOUT) {
 
-                        //System.out.println(index + " is removing from pool");
+                        //System.out.println(index + " is being moved out from pool");
 
-                        flags[index] = NOT_AVAILABLE;
+                        flags[index] = EMPTY_SLOT;
 
                         connections[index].setPosition(-1);
                     }
@@ -229,41 +229,40 @@ public abstract class BaseConnectionManager {
 
                 for (int index = 0; index < capacity; index++) {
 
-                    if (flags[index] == AVAILABLE) {
+                    if (flags[index] == READY_SLOT) {
 
                         //System.out.println(index + " is reused from pool");
 
-                        flags[index] = IN_USE;
+                        flags[index] = BUSY_SLOT;
                         lastUses[index] = currentTime;
 
-                        connection.set(connections[index]);
+                        connectionHolder.set(connections[index]);
 
                         break;
                     }
                 }
             });
 
-            if (connection.get() == null) {
+            if (connectionHolder.get() == null) {
 
-                connection.set(CustomConnection.create(name, address, username, password));
+                connectionHolder.set(CustomConnection.create(name, address, username, password));
             }
 
-            if (connection.get() != null) {
+            if (connectionHolder.get() != null) {
 
-                if (connection.get().getPosition() == -1) {
+                if (connectionHolder.get().getPosition() == -1) {
 
                     Utilities.lock(TAG, LOCK, () -> {
 
                         for (int index = 0; index < capacity; index++) {
 
-                            if (flags[index] == NOT_AVAILABLE) {
+                            if (flags[index] == EMPTY_SLOT) {
 
-                                flags[index] = IN_USE;
+                                flags[index] = BUSY_SLOT;
                                 lastUses[index] = currentTime;
-                                connections[index] = connection.get();
+                                connections[index] = connectionHolder.get();
 
-                                connection.get().setPosition(index);
-
+                                connectionHolder.get().setPosition(index);
                                 break;
                             }
                         }
@@ -272,13 +271,13 @@ public abstract class BaseConnectionManager {
 
                 boolean wasSuccessful = false;
 
-                if (System.currentTimeMillis() - connection.get().getLastCheckTime() > 15_000) {
+                if (System.currentTimeMillis() - connectionHolder.get().getLastCheckTime() > 15_000) {
 
                     try {
 
-                        wasSuccessful = connectionChecker == null || connectionChecker.check(connection.get());
+                        wasSuccessful = connectionChecker == null || connectionChecker.check(connectionHolder.get());
 
-                        connection.get().setLastCheckTime();
+                        connectionHolder.get().setLastCheckTime();
 
                     } catch (SQLException e) {
 
@@ -292,25 +291,25 @@ public abstract class BaseConnectionManager {
 
                 if (!wasSuccessful) {
 
-                    Utilities.tryAndIgnore(() -> connection.get().close());
-
-                    int position = connection.get().getPosition();
+                    int position = connectionHolder.get().getPosition();
 
                     if (position != -1) {
 
                         Utilities.lock(TAG, LOCK, () -> {
 
-                            flags[position] = NOT_AVAILABLE;
+                            flags[position] = EMPTY_SLOT;
 
                             connections[position] = null;
                         });
                     }
 
+                    Utilities.tryAndIgnore(() -> connectionHolder.get().close());
+
                     return null;
                 }
             }
 
-            return connection.get();
+            return connectionHolder.get();
         }
 
         public void freeConnection(CustomConnection connection) {
@@ -321,7 +320,7 @@ public abstract class BaseConnectionManager {
 
                 Utilities.lock(TAG, LOCK, () -> {
 
-                    flags[position] = AVAILABLE;
+                    flags[position] = READY_SLOT;
                 });
 
             } else {
