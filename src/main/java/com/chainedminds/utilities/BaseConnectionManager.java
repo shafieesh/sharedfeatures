@@ -273,7 +273,7 @@ public abstract class BaseConnectionManager {
 
                     } catch (SQLException e) {
 
-                        Log.error(TAG, e);
+                        //Log.error(TAG, e);
                     }
 
                 } else {
