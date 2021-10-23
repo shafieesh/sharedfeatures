@@ -59,42 +59,34 @@ public abstract class BaseConnectionManager {
 
         Connection connection = null;
 
-        for (int count = 0; count < 3; count++) {
+        try {
 
-            try {
+            if (options == DEFAULT_OPTIONS) {
 
-                if (options == DEFAULT_OPTIONS) {
+                String address = getAddress();
+                String username = getUsername();
+                String password = getPassword();
 
-                    String address = getAddress();
-                    String username = getUsername();
-                    String password = getPassword();
+                connection = automaticConnections.getConnection(address, username, password);
+            }
 
-                    connection = automaticConnections.getConnection(address, username, password);
-                }
+            if (options == MANUAL_COMMIT) {
 
-                if (options == MANUAL_COMMIT) {
+                String address = getAddress();
+                String username = getUsername();
+                String password = getPassword();
 
-                    String address = getAddress();
-                    String username = getUsername();
-                    String password = getPassword();
-
-                    connection = manualConnections.getConnection(address, username, password);
-
-                    if (connection != null) {
-
-                        connection.setAutoCommit(false);
-                    }
-                }
+                connection = manualConnections.getConnection(address, username, password);
 
                 if (connection != null) {
 
-                    break;
+                    connection.setAutoCommit(false);
                 }
-
-            } catch (Exception e) {
-
-                Log.error(TAG, e);
             }
+
+        } catch (Exception e) {
+
+            Log.error(TAG, e);
         }
 
         return connection;
