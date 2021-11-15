@@ -357,6 +357,13 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return BaseDatabaseHelperOld.update(TAG, statement, parameters);
     }
 
+    public Set<Integer> getUserIDs(String appName) {
+
+        DBResult<Set<Integer>> result = getProperties(appName, FIELD_USER_ID, new HashSet<>(), Integer.class);
+
+        return result.value;
+    }
+
     //------------------------------------------------------------------------------------
 
     @Deprecated
@@ -439,6 +446,50 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
                 result.value = (T) (Integer) BaseConfig.NOT_FOUND;
             }
         }
+
+        return result;
+    }
+
+    public  <T, E extends Collection<T>> DBResult<E> getProperties(String appName, String field,
+                                                                   E values,
+                                                                   Class<T> type) {
+
+        DBResult<E> result = new DBResult<>();
+
+        String statement = "SELECT " + field + " FROM " +
+                BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+                " WHERE " + FIELD_APP_NAME + " = ?";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+
+        parameters.put(1, appName);
+
+        BaseDatabaseHelperOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+
+            @Override
+            public void onFetchingData(ResultSet resultSet) throws Exception {
+
+                while (resultSet.next()) {
+
+                    T value = resultSet.getObject(field, type);
+
+                    values.add(value);
+                }
+            }
+
+            @Override
+            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+
+                if (wasSuccessful) {
+
+                    result.value = values;
+
+                } else {
+
+                    result.error = error;
+                }
+            }
+        });
 
         return result;
     }

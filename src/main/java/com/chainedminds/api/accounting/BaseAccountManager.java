@@ -152,7 +152,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
-            private final Map<Integer, String> gamerTags = new HashMap<>();
+            private final Map<Integer, String> usernames = new HashMap<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -162,7 +162,7 @@ public class BaseAccountManager<Data extends BaseData> {
                     int userID = resultSet.getInt(FIELD_USER_ID);
                     String gamerTag = resultSet.getString(FIELD_GAMER_TAG);
 
-                    gamerTags.put(userID, gamerTag);
+                    usernames.put(userID, gamerTag);
                 }
             }
 
@@ -174,12 +174,11 @@ public class BaseAccountManager<Data extends BaseData> {
                     Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
                         MAPPING_USERNAME.clear();
-
-                        MAPPING_USERNAME.putAll(gamerTags);
+                        MAPPING_USERNAME.putAll(usernames);
 
                         INDEX_USERNAME.clear();
 
-                        MAPPING_USERNAME.values().forEach(gamerTag ->{
+                        MAPPING_USERNAME.values().forEach(gamerTag -> {
 
                             if (gamerTag != null) {
 
@@ -1333,6 +1332,39 @@ public class BaseAccountManager<Data extends BaseData> {
 
             data.accounts = data.accounts.subList(0, 99);
         }
+
+        data.response = BaseCodes.RESPONSE_OK;
+
+        return data;
+    }
+
+    public Data getUsernames(Data data) {
+
+        data.response = BaseCodes.RESPONSE_NOK;
+
+        if (data.account == null) {
+
+            return data;
+        }
+
+        String appName = data.client.appName;
+
+        Set<Integer> userIDs = BaseResources.getInstance().accountPropertyManager.getUserIDs(appName);
+
+        data.accounts = new ArrayList<>();
+
+        getUsernameMap(TAG, gamerTags -> userIDs.forEach(userID -> {
+
+            BaseAccountData account = new BaseAccountData();
+            account.id = userID;
+            account.username = gamerTags.get(userID);
+
+            data.accounts.add(account);
+        }));
+
+        Comparator<BaseAccountData> comparator = Comparator.comparing(account -> account.username);
+
+        data.accounts.sort(comparator);
 
         data.response = BaseCodes.RESPONSE_OK;
 

@@ -48,7 +48,7 @@ public class AccountPermissionsManager {
 
         String selectStatement = "SELECT * FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
-                " WHERE " + FIELD_FINISH_TIME + " > NOW()";
+                " WHERE " + FIELD_START_TIME + " < NOW() AND " + FIELD_FINISH_TIME + " > NOW()";
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -402,8 +402,6 @@ public class AccountPermissionsManager {
                 }
             });
         });
-
-
     }
 
     private static class Permission {
@@ -413,4 +411,3 @@ public class AccountPermissionsManager {
         String permission;
     }
 }
-
