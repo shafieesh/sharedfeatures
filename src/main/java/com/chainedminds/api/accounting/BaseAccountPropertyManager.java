@@ -7,6 +7,7 @@ import com.chainedminds.BaseResources;
 import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.dataClasses.BaseFileData;
 import com.chainedminds.dataClasses.account.BaseAccountData;
+import com.chainedminds.dataClasses.account.BaseFriendData;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.DBResult;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
@@ -23,6 +24,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     private static final String FIELD_USER_ID = "UserID";
     private static final String FIELD_APP_NAME = "AppName";
+    private static final String FIELD_PLATFORM = "Platform";
     private static final String FIELD_CREDENTIAL = "Credential";
     private static final String FIELD_PLAY_TIME = "PlayTime";
     private static final String FIELD_RESULT = "Result";
@@ -86,32 +88,30 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         });
     }
 
-    public String getCredential(int userID, String appName) {
+    public boolean getCredential(int userID, String appName, String platform, AtomicReference<String> credential) {
 
         if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName)) {
 
-            return CREDENTIALS_CACHE.get(userID, () -> {
+            credential.set(CREDENTIALS_CACHE.get(userID, () -> {
 
-                DBResult<String> result = getProperty(userID, appName, FIELD_CREDENTIAL, String.class);
+                DBResult<String> result = getProperty(userID, appName, platform, FIELD_CREDENTIAL, String.class);
 
-                if (result.isSuccessful() && result.value == null) {
+                if (result.isSuccessful()) {
 
-                    return BaseConfig.SCRAMBLED_PASSWORD;
+                    return result.value;
                 }
 
-                return result.value;
-            });
+                return null;
+            }));
+
+            return true;
 
         } else {
 
-            DBResult<String> result = getProperty(userID, appName, FIELD_CREDENTIAL, String.class);
+            DBResult<String> result = getProperty(userID, appName, platform, FIELD_CREDENTIAL, String.class);
 
-            if (result.isSuccessful() && result.value == null) {
-
-                return BaseConfig.SCRAMBLED_PASSWORD;
-            }
-
-            return result.value;
+            credential.set(result.value);
+            return result.isSuccessful();
         }
     }
 
@@ -314,9 +314,9 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         });
     }
 
-    public boolean setCredential(int userID, String appName, String credential) {
+    public boolean setCredential(int userID, String appName, String platform, String credential) {
 
-        boolean wasSuccessful = setProperty(userID, appName, FIELD_CREDENTIAL, credential);
+        boolean wasSuccessful = setProperty(userID, appName, platform, FIELD_CREDENTIAL, credential);
 
         if (wasSuccessful) {
 
@@ -329,9 +329,10 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return wasSuccessful;
     }
 
-    public boolean setCredential(Connection connection, int userID, String appName, String credential) {
+    public boolean setCredential(Connection connection, int userID,
+                                 String appName, String platform, String credential) {
 
-        boolean wasSuccessful = setProperty(connection, userID, appName, FIELD_CREDENTIAL, credential);
+        boolean wasSuccessful = setProperty(connection, userID, appName, platform, FIELD_CREDENTIAL, credential);
 
         if (wasSuccessful) {
 
@@ -399,18 +400,19 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return value.get();
     }
 
-    public  <T> DBResult<T> getProperty(int userID, String appName, String field, Class<T> T) {
+    public <T> DBResult<T> getProperty(int userID, String appName, String platform, String field, Class<T> T) {
 
         DBResult<T> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " WHERE " +
-                FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ?";
+                FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ? AND " + FIELD_PLATFORM + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
         parameters.put(1, userID);
         parameters.put(2, appName);
+        parameters.put(3, platform);
 
         BaseDatabaseHelperOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
 
@@ -450,11 +452,10 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return result;
     }
 
-    public  <T, E extends Collection<T>> DBResult<E> getProperties(String appName, String field,
-                                                                   E values,
-                                                                   Class<T> type) {
+    public <Type, Series extends Collection<Type>> DBResult<Series> getProperties(
+            String appName, String field, Series values, Class<Type> type) {
 
-        DBResult<E> result = new DBResult<>();
+        DBResult<Series> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
@@ -471,7 +472,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
                 while (resultSet.next()) {
 
-                    T value = resultSet.getObject(field, type);
+                    Type value = resultSet.getObject(field, type);
 
                     values.add(value);
                 }
@@ -494,11 +495,10 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return result;
     }
 
-    public  <T, E extends Collection<T>> DBResult<E> getProperties(int userID, String field,
-                                                                   E values,
-                                                                   Class<T> type) {
+    public <Type, Series extends Collection<Type>> DBResult<Series> getProperties(
+            int userID, String field, Series collection, Class<Type> type) {
 
-        DBResult<E> result = new DBResult<>();
+        DBResult<Series> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
@@ -515,9 +515,9 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
                 while (resultSet.next()) {
 
-                    T value = resultSet.getObject(field, type);
+                    Type value = resultSet.getObject(field, type);
 
-                    values.add(value);
+                    collection.add(value);
                 }
             }
 
@@ -526,7 +526,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
                 if (wasSuccessful) {
 
-                    result.value = values;
+                    result.value = collection;
 
                 } else {
 
@@ -538,26 +538,43 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return result;
     }
 
-    public boolean setProperty(int userID, String appName, String field, Object value) {
+    public boolean setProperty(int userID, String appName, String platform, String field, Object value) {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
-                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
-                ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
+                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
+                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
         parameters.put(1, userID);
         parameters.put(2, appName);
-        parameters.put(3, value);
+        parameters.put(3, platform);
+        parameters.put(4, value);
 
         return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
+    }
+
+    public boolean setProperty(Connection connection, int userID, String appName, String platform, String field, Object value) {
+
+        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
+                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
+                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+
+        parameters.put(1, userID);
+        parameters.put(2, appName);
+        parameters.put(3, platform);
+        parameters.put(4, value);
+
+        return BaseDatabaseHelperOld.update(connection, TAG, updateStatement, parameters);
     }
 
     public boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
-                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field + ") VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
+                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
+                ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
 
         Map<Integer, Object> parameters = new HashMap<>();
 

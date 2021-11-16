@@ -394,13 +394,21 @@ public class BaseAccountManager<Data extends BaseData> {
         return usernameRegistered.get();
     }
 
-    protected Boolean validateCredential(int userID, String appName, String credential) {
+    protected Boolean validateCredential(int userID, String appName, String platform, String credential) {
 
-        String storedCredential = BaseResources.getInstance().accountPropertyManager.getCredential(userID, appName);
+        if (credential == null) {
 
-        if (storedCredential != null) {
+            return false;
+        }
 
-            return storedCredential.equals(credential);
+        AtomicReference<String> storedCredential = new AtomicReference<>();
+
+        boolean wasSuccessful = BaseResources.getInstance().accountPropertyManager.getCredential(
+                userID, appName, platform, storedCredential);
+
+        if (wasSuccessful) {
+
+            return credential.equals(storedCredential.get());
         }
 
         return null;
@@ -631,9 +639,11 @@ public class BaseAccountManager<Data extends BaseData> {
             return data;
         }
 
-        String appName = data.client.appName;
+
         String username = data.account.username != null ? data.account.username : data.account.gamerTag;
         String password = data.account.password;
+        String appName = data.client.appName;
+        String platform = data.client.platform;
         String language = data.client.language;
         String address = data.client.address;
         int appVersion = data.client.appVersion;
@@ -697,7 +707,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
                     Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
-                    boolean wasSuccessful = BaseResources.getInstance().accountPropertyManager.setCredential(connection, userID, appName, credential);
+                    boolean wasSuccessful = BaseResources.getInstance().accountPropertyManager.setCredential(connection, userID, appName, platform, credential);
 
                     if (wasSuccessful) {
 
@@ -777,6 +787,7 @@ public class BaseAccountManager<Data extends BaseData> {
         int userID = data.account.id;
         String credential = data.account.credential;
         String appName = data.client.appName;
+        String platform = data.client.platform;
         int appVersion = data.client.appVersion;
         String language = data.client.language;
         int subRequest = data.subRequest;
@@ -793,7 +804,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
             //---------CHECK IF CREDENTIAL IS VALID-------
 
-            Boolean credentialIsValid = validateCredential(userID, appName, credential);
+            Boolean credentialIsValid = validateCredential(userID, appName, platform, credential);
 
             if (credentialIsValid == null) {
 
@@ -909,7 +920,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
                 String credential = BackendHelper.generateCredential();
 
-                if (BaseResources.getInstance().accountPropertyManager.setCredential(userID, appName, credential)) {
+                if (BaseResources.getInstance().accountPropertyManager.setCredential(userID, appName, platform, credential)) {
 
                     data.account.id = userID;
                     data.account.credential = credential;
@@ -948,7 +959,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
             userID.set(generatedID);
 
-            String insertStatement2 = "INSERT " + BaseConfig.TABLE_NAME_ACCOUNTS_PROPERTIES_USERS +
+            String insertStatement2 = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
                     " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_APP_VERSION +
                     ", " + FIELD_PLATFORM + ", " + FIELD_MARKET + ", " + FIELD_FIREBASE_ID +
                     ") VALUES (?, ?, ?, ?, ?, ?)";
