@@ -22,8 +22,8 @@ public class BaseConnectionManagerOld {
 
     public static void config() {
 
-        automaticConnections = new ConnectionPool("auto", 30);
-        manualConnections = new ConnectionPool("manual", 15);
+        automaticConnections = new ConnectionPool("auto", 10);
+        manualConnections = new ConnectionPool("manual", 10);
 
         ConnectionPool.ConnectionChecker connectionChecker = connection -> {
 
@@ -31,11 +31,26 @@ public class BaseConnectionManagerOld {
                  ResultSet resultSet = statement.executeQuery("SELECT 1")) {
 
                 return resultSet.next();
+
+            } catch (Exception e) {
+
+                return false;
             }
         };
 
         automaticConnections.setConnectionChecker(connectionChecker);
         manualConnections.setConnectionChecker(connectionChecker);
+
+        TaskManager.addTask(TaskManager.Task.build()
+                .setName("BaseFetchCategories")
+                .setTime(0, 0, 0)
+                .setInterval(0, 0, 0, 10)
+                .setTimingListener(task -> {
+
+                    automaticConnections.pingConnections();
+                    manualConnections.pingConnections();
+                })
+                .startAndSchedule());
     }
 
     public static Connection getConnection() {
@@ -47,34 +62,26 @@ public class BaseConnectionManagerOld {
 
         Connection connection = null;
 
-        for (int count = 0; count < 3; count++) {
+        try {
 
-            try {
+            if (options == DEFAULT_OPTIONS) {
 
-                if (options == DEFAULT_OPTIONS) {
+                connection = automaticConnections.getConnection();
+            }
 
-                    connection = automaticConnections.getConnection();
-                }
+            if (options == MANUAL_COMMIT) {
 
-                if (options == MANUAL_COMMIT) {
-
-                    connection = manualConnections.getConnection();
-
-                    if (connection != null) {
-
-                        connection.setAutoCommit(false);
-                    }
-                }
+                connection = manualConnections.getConnection();
 
                 if (connection != null) {
 
-                    break;
+                    connection.setAutoCommit(false);
                 }
-
-            } catch (Exception e) {
-
-                Log.error(TAG, e);
             }
+
+        } catch (Exception e) {
+
+            Log.error(TAG, e);
         }
 
         return connection;
@@ -162,135 +169,114 @@ public class BaseConnectionManagerOld {
 
     public static class ConnectionPool {
 
-        private static final String TAG = ConnectionPool.class.getSimpleName();
+        private static final int EMPTY_SLOT = 0;
+        private static final int READY_SLOT = 1;
+        private static final int BUSY_SLOT = 2;
 
-        private static final int NOT_AVAILABLE = 0;
-        private static final int AVAILABLE = 1;
-        private static final int IN_USE = 2;
-
-        private static final int BUSY_ITEM_TIMEOUT = 20_000;
+        private static final int SLOW_QUERY_TIME = 30_000;
 
         private final String name;
         private final int capacity;
         private final int[] flags;
-        private final long[] lastUses;
+        private final long[] lastPull;
         private final CustomConnection[] connections;
         private ConnectionChecker connectionChecker;
-        private final ReentrantLock LOCK = new ReentrantLock();
 
         public ConnectionPool(String name, int capacity) {
 
             this.name = name;
             this.capacity = capacity;
             this.flags = new int[capacity];
-            this.lastUses = new long[capacity];
+            this.lastPull = new long[capacity];
             this.connections = new CustomConnection[capacity];
+        }
+
+        public void pingConnections() {
+
+            long currentTime = System.currentTimeMillis();
+
+            for (int index = 0; index < capacity; index++) {
+
+                if (flags[index] == BUSY_SLOT && currentTime - lastPull[index] >= SLOW_QUERY_TIME) {
+
+                    flags[index] = EMPTY_SLOT;
+                    connections[index].setPosition(-1);
+                }
+            }
+
+            for (int index = 0; index < capacity; index++) {
+
+                if (flags[index] == READY_SLOT) {
+
+                    flags[index] = BUSY_SLOT;
+                    Connection connection = connections[index];
+
+                    boolean wasSuccessful = false;
+
+                    if (connection != null) {
+
+                        connections[index].setLastCheckTime();
+                        wasSuccessful = connectionChecker.check(connections[index]);
+                    }
+
+                    if (!wasSuccessful) {
+
+                        flags[index] = EMPTY_SLOT;
+                        connections[index] = null;
+
+                        if (connection != null) {
+
+                            Utilities.tryAndIgnore(connection::close);
+                        }
+
+                    } else {
+
+                        flags[index] = READY_SLOT;
+                    }
+                }
+            }
         }
 
         public Connection getConnection() {
 
-            long currentTime = System.currentTimeMillis();
+            CustomConnection connection = null;
 
-            AtomicReference<CustomConnection> connection = new AtomicReference<>();
+            for (int index = 0; index < capacity; index++) {
 
-            Utilities.lock(TAG, LOCK, () -> {
+                if (flags[index] == READY_SLOT) {
 
-                for (int index = 0; index < capacity; index++) {
+                    //System.out.println(index + " is reused from pool");
 
-                    if (flags[index] != NOT_AVAILABLE && currentTime - lastUses[index] >= BUSY_ITEM_TIMEOUT) {
+                    flags[index] = BUSY_SLOT;
+                    lastPull[index] = System.currentTimeMillis();
 
-                        //System.out.println(index + " is removing from pool");
-
-                        flags[index] = NOT_AVAILABLE;
-
-                        connections[index].setPosition(-1);
-                    }
+                    connection = connections[index];
+                    break;
                 }
+            }
+
+            if (connection == null) {
+
+                connection = CustomConnection.create(name);
+            }
+
+            if (connection != null && connection.getPosition() == -1) {
 
                 for (int index = 0; index < capacity; index++) {
 
-                    if (flags[index] == AVAILABLE) {
+                    if (flags[index] == EMPTY_SLOT) {
 
-                        //System.out.println(index + " is reused from pool");
+                        flags[index] = BUSY_SLOT;
+                        lastPull[index] = System.currentTimeMillis();
+                        connections[index] = connection;
 
-                        flags[index] = IN_USE;
-                        lastUses[index] = currentTime;
-
-                        connection.set(connections[index]);
-
+                        connection.setPosition(index);
                         break;
                     }
                 }
-            });
-
-            if (connection.get() == null) {
-
-                connection.set(CustomConnection.create(name));
             }
 
-            if (connection.get() != null) {
-
-                if (connection.get().getPosition() == -1) {
-
-                    Utilities.lock(TAG, LOCK, () -> {
-
-                        for (int index = 0; index < capacity; index++) {
-
-                            if (flags[index] == NOT_AVAILABLE) {
-
-                                flags[index] = IN_USE;
-                                lastUses[index] = currentTime;
-                                connections[index] = connection.get();
-
-                                connection.get().setPosition(index);
-
-                                break;
-                            }
-                        }
-                    });
-                }
-
-                boolean wasSuccessful = false;
-
-                if (System.currentTimeMillis() - connection.get().getLastCheckTime() > 15_000) {
-
-                    try {
-
-                        wasSuccessful = connectionChecker == null || connectionChecker.check(connection.get());
-
-                        connection.get().setLastCheckTime();
-
-                    } catch (SQLException e) {
-
-                        Log.error(TAG, e);
-                    }
-
-                } else {
-
-                    wasSuccessful = true;
-                }
-
-                if (!wasSuccessful) {
-
-                    Utilities.tryAndIgnore(() -> connection.get().close());
-
-                    int position = connection.get().getPosition();
-
-                    if (position != -1) {
-
-                        Utilities.lock(TAG, LOCK, () -> {
-
-                            flags[position] = NOT_AVAILABLE;
-
-                            connections[position] = null;
-                        });
-                    }
-
-                    return null;
-                }
-            }
-
-            return connection.get();
+            return connection;
         }
 
         public void freeConnection(CustomConnection connection) {
@@ -299,10 +285,7 @@ public class BaseConnectionManagerOld {
 
             if (position != -1) {
 
-                Utilities.lock(TAG, LOCK, () -> {
-
-                    flags[position] = AVAILABLE;
-                });
+                flags[position] = READY_SLOT;
 
             } else {
 
@@ -317,7 +300,7 @@ public class BaseConnectionManagerOld {
 
         public interface ConnectionChecker {
 
-            boolean check(Connection connection) throws SQLException;
+            boolean check(Connection connection);
         }
     }
 
@@ -326,7 +309,7 @@ public class BaseConnectionManagerOld {
         private String name;
         private int position = -1;
         private final Connection connection;
-        private long lastCheckTime;
+        private long lastCheckTime = System.currentTimeMillis();
 
         public static CustomConnection create(String name) {
 

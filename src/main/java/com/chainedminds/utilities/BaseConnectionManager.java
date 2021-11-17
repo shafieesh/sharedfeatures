@@ -43,11 +43,26 @@ public abstract class BaseConnectionManager {
                  ResultSet resultSet = statement.executeQuery("SELECT 1")) {
 
                 return resultSet.next();
+
+            } catch (Exception e) {
+
+                return false;
             }
         };
 
         automaticConnections.setConnectionChecker(connectionChecker);
         manualConnections.setConnectionChecker(connectionChecker);
+
+        TaskManager.addTask(TaskManager.Task.build()
+                .setName("FetchCategories")
+                .setTime(0, 0, 0)
+                .setInterval(0, 0, 0, 10)
+                .setTimingListener(task -> {
+
+                    automaticConnections.pingConnections();
+                    manualConnections.pingConnections();
+                })
+                .startAndSchedule());
     }
 
     public final Connection getConnection() {
@@ -174,134 +189,114 @@ public abstract class BaseConnectionManager {
 
     private static final class ConnectionPool {
 
-        private static final String TAG = ConnectionPool.class.getSimpleName();
-
         private static final int EMPTY_SLOT = 0;
         private static final int READY_SLOT = 1;
         private static final int BUSY_SLOT = 2;
 
-        private static final int BUSY_ITEM_TIMEOUT = 20_000;
+        private static final int SLOW_QUERY_TIME = 30_000;
 
         private final String name;
         private final int capacity;
         private final int[] flags;
-        private final long[] lastUses;
+        private final long[] lastPull;
         private final CustomConnection[] connections;
         private ConnectionChecker connectionChecker;
-        private final ReentrantLock LOCK = new ReentrantLock();
 
         public ConnectionPool(String name, int capacity) {
 
             this.name = name;
             this.capacity = capacity;
             this.flags = new int[capacity];
-            this.lastUses = new long[capacity];
+            this.lastPull = new long[capacity];
             this.connections = new CustomConnection[capacity];
+        }
+
+        public void pingConnections() {
+
+            long currentTime = System.currentTimeMillis();
+
+            for (int index = 0; index < capacity; index++) {
+
+                if (flags[index] == BUSY_SLOT && currentTime - lastPull[index] >= SLOW_QUERY_TIME) {
+
+                    flags[index] = EMPTY_SLOT;
+                    connections[index].setPosition(-1);
+                }
+            }
+
+            for (int index = 0; index < capacity; index++) {
+
+                if (flags[index] == READY_SLOT) {
+
+                    flags[index] = BUSY_SLOT;
+                    Connection connection = connections[index];
+
+                    boolean wasSuccessful = false;
+
+                    if (connection != null) {
+
+                        connections[index].setLastCheckTime();
+                        wasSuccessful = connectionChecker.check(connections[index]);
+                    }
+
+                    if (!wasSuccessful) {
+
+                        flags[index] = EMPTY_SLOT;
+                        connections[index] = null;
+
+                        if (connection != null) {
+
+                            Utilities.tryAndIgnore(connection::close);
+                        }
+
+                    } else {
+
+                        flags[index] = READY_SLOT;
+                    }
+                }
+            }
         }
 
         public Connection getConnection(String address, String username, String password) {
 
-            long currentTime = System.currentTimeMillis();
+            CustomConnection connection = null;
 
-            AtomicReference<CustomConnection> connectionHolder = new AtomicReference<>();
+            for (int index = 0; index < capacity; index++) {
 
-            Utilities.lock(TAG, LOCK, () -> {
+                if (flags[index] == READY_SLOT) {
 
-                for (int index = 0; index < capacity; index++) {
+                    //System.out.println(index + " is reused from pool");
 
-                    if (flags[index] == BUSY_SLOT && currentTime - lastUses[index] >= BUSY_ITEM_TIMEOUT) {
+                    flags[index] = BUSY_SLOT;
+                    lastPull[index] = System.currentTimeMillis();
 
-                        //System.out.println(index + " is being moved out from pool");
-
-                        flags[index] = EMPTY_SLOT;
-
-                        connections[index].setPosition(-1);
-                    }
+                    connection = connections[index];
+                    break;
                 }
+            }
+
+            if (connection == null) {
+
+                connection = CustomConnection.create(name, address, username, password);
+            }
+
+            if (connection != null && connection.getPosition() == -1) {
 
                 for (int index = 0; index < capacity; index++) {
 
-                    if (flags[index] == READY_SLOT) {
-
-                        //System.out.println(index + " is reused from pool");
+                    if (flags[index] == EMPTY_SLOT) {
 
                         flags[index] = BUSY_SLOT;
-                        lastUses[index] = currentTime;
+                        lastPull[index] = System.currentTimeMillis();
+                        connections[index] = connection;
 
-                        connectionHolder.set(connections[index]);
-
+                        connection.setPosition(index);
                         break;
                     }
                 }
-            });
-
-            if (connectionHolder.get() == null) {
-
-                connectionHolder.set(CustomConnection.create(name, address, username, password));
             }
 
-            if (connectionHolder.get() != null) {
-
-                if (connectionHolder.get().getPosition() == -1) {
-
-                    Utilities.lock(TAG, LOCK, () -> {
-
-                        for (int index = 0; index < capacity; index++) {
-
-                            if (flags[index] == EMPTY_SLOT) {
-
-                                flags[index] = BUSY_SLOT;
-                                lastUses[index] = currentTime;
-                                connections[index] = connectionHolder.get();
-
-                                connectionHolder.get().setPosition(index);
-                                break;
-                            }
-                        }
-                    });
-                }
-
-                boolean wasSuccessful = false;
-
-                if (System.currentTimeMillis() - connectionHolder.get().getLastCheckTime() > 15_000) {
-
-                    try {
-
-                        wasSuccessful = connectionChecker == null || connectionChecker.check(connectionHolder.get());
-
-                        connectionHolder.get().setLastCheckTime();
-
-                    } catch (SQLException e) {
-
-                        //Log.error(TAG, e);
-                    }
-
-                } else {
-
-                    wasSuccessful = true;
-                }
-
-                if (!wasSuccessful) {
-
-                    int position = connectionHolder.get().getPosition();
-
-                    if (position != -1) {
-
-                        Utilities.lock(TAG, LOCK, () -> {
-
-                            flags[position] = EMPTY_SLOT;
-
-                            connections[position] = null;
-                        });
-                    }
-
-                    Utilities.tryAndIgnore(() -> connectionHolder.get().close());
-
-                    return null;
-                }
-            }
-
-            return connectionHolder.get();
+            return connection;
         }
 
         public void freeConnection(CustomConnection connection) {
@@ -310,10 +305,7 @@ public abstract class BaseConnectionManager {
 
             if (position != -1) {
 
-                Utilities.lock(TAG, LOCK, () -> {
-
-                    flags[position] = READY_SLOT;
-                });
+                flags[position] = READY_SLOT;
 
             } else {
 
@@ -328,7 +320,7 @@ public abstract class BaseConnectionManager {
 
         public interface ConnectionChecker {
 
-            boolean check(Connection connection) throws SQLException;
+            boolean check(Connection connection);
         }
     }
 
@@ -337,7 +329,7 @@ public abstract class BaseConnectionManager {
         private String name;
         private int position = -1;
         private final Connection connection;
-        private long lastCheckTime;
+        private long lastCheckTime = System.currentTimeMillis();
 
         public static CustomConnection create(String name, String address, String username, String password) {
 
