@@ -219,7 +219,7 @@ public class BaseRequestsManager<Data> {
         }
     }
 
-    private class Wrapper {
+    public class Wrapper {
 
         public ChannelHandlerContext channelContext;
         public String channelID;
