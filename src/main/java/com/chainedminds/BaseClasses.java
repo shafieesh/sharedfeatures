@@ -19,7 +19,7 @@ public class BaseClasses {
         return INSTANCE;
     }
 
-    public Class<? extends BaseData> dataClass;
+    public Class dataClass;
     public Class<? extends BaseAccountData> accountClass;
     public Class<? extends BaseFriendData> friendClass;
     public Class<? extends BaseFileData> fileClass;

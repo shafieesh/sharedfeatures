@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class BaseRequestsManager<Data extends BaseData> {
+public class BaseRequestsManager<Data> {
 
     private static final String TAG = BaseRequestsManager.class.getSimpleName();
 
@@ -88,15 +88,25 @@ public class BaseRequestsManager<Data extends BaseData> {
         return responseData;
     }
 
+    public Object handleRequest(Wrapper wrapper) {
+
+        return null;
+    }
+
     public Object processRequest(ChannelHandlerContext channelContext, InetSocketAddress remoteAddress, Object request) {
 
         try {
 
-            Data bakedRequest = prepareRequest(channelContext, remoteAddress, request);
+            Wrapper bakedRequest = prepareRequest(channelContext, remoteAddress, request);
 
-            Object pendingObject = handleRequest(bakedRequest, null);
+            Object pendingObject = handleRequest(bakedRequest);
 
-            return prepareResponse(request, bakedRequest.client.apiVersion, bakedRequest.client.appVersion, pendingObject);
+            if (pendingObject == null && bakedRequest != null) {
+
+                pendingObject = handleRequest(bakedRequest.data, null);
+            }
+
+            return prepareResponse(request, pendingObject);
 
         } catch (Exception e) {
 
@@ -105,7 +115,7 @@ public class BaseRequestsManager<Data extends BaseData> {
             pendingObject.response = BaseCodes.RESPONSE_NOK;
             pendingObject.message = "The request was not handled.";
 
-            return prepareResponse(request, 1, 0, pendingObject);
+            return prepareResponse(request, pendingObject);
         }
     }
 
@@ -116,10 +126,10 @@ public class BaseRequestsManager<Data extends BaseData> {
         pendingObject.response = BaseCodes.RESPONSE_NOK;
         pendingObject.message = "Server is too busy. Try again later";
 
-        return prepareResponse(request, 1, 0, pendingObject);
+        return prepareResponse(request, pendingObject);
     }
 
-    private Data prepareRequest(ChannelHandlerContext channelContext, InetSocketAddress remoteAddress, Object data) {
+    private Wrapper prepareRequest(ChannelHandlerContext channelContext, InetSocketAddress remoteAddress, Object data) {
 
         Data request = null;
 
@@ -135,24 +145,19 @@ public class BaseRequestsManager<Data extends BaseData> {
 
         if (request != null) {
 
-            if (request.client == null) {
+            Wrapper wrapper = new Wrapper();
+            wrapper.channelContext = channelContext;
+            wrapper.channelID = channelContext.channel().id().asLongText();
+            wrapper.address = remoteAddress.getAddress().getHostAddress();
+            wrapper.data = request;
 
-                request.client = new ClientData();
-            }
-
-            request.client.channelContext = channelContext;
-            //request.client.channelID = channelContext.channel().id().asLongText();
-
-            if (request.client.address == null) {
-
-                request.client.address = remoteAddress.getAddress().getHostAddress();
-            }
+            return wrapper;
         }
 
-        return request;
+        return null;
     }
 
-    private static Object prepareResponse(Object originalRequest, int apiVersion, int appVersion, Object response) {
+    private static Object prepareResponse(Object originalRequest, Object response) {
 
         byte[] bakedResponse;
 
@@ -212,5 +217,13 @@ public class BaseRequestsManager<Data extends BaseData> {
 
             context.pipeline().replace("AUTO_CLOSER", "AUTO_CLOSER", new ReadTimeoutHandler(timeout));
         }
+    }
+
+    private class Wrapper {
+
+        public ChannelHandlerContext channelContext;
+        public String channelID;
+        public String address;
+        public Data data;
     }
 }
