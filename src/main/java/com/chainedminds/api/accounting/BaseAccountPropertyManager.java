@@ -587,7 +587,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     //------------------------------------------------------------------------------------
 
-    public Data getPublicProfile0(Data data) {
+    /*public Data getPublicProfile0(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -618,14 +618,14 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         if (subRequest == BaseCodes.REQUEST_FILE_INFO) {
 
-            /*FileClass file = FileManager.getFileInfo();
+            *//*FileClass file = FileManager.getFileInfo();
 
             if (file != null) {
 
                 data.file = file;
 
                 data.response = BaseCodes.RESPONSE_OK;
-            }*/
+            }*//*
         }
 
         if (subRequest == BaseCodes.REQUEST_FILE_BYTES) {
@@ -672,9 +672,9 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         }
 
         return data;
-    }
+    }*/
 
-    public Data getFullProfile0(Data data) {
+    /*public Data getFullProfile0(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -690,14 +690,14 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         if (lowerSubRequest == BaseCodes.REQUEST_FILE_INFO) {
 
-            /*FileClass file = FileManager.getFileInfo();
+            *//*FileClass file = FileManager.getFileInfo();
 
             if (file != null) {
 
                 data.file = file;
 
                 data.response = BaseCodes.RESPONSE_OK;
-            }*/
+            }*//*
         }
 
         BaseFileManager fileManager = BaseResources.getInstance().fileManager;
@@ -744,7 +744,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         }
 
         return data;
-    }
+    }*/
 
     public Data getFullProfile(int profileID, Data data) {
 

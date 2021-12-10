@@ -25,9 +25,6 @@ public class TestRequestManager extends BaseRequestsManager<BaseData> {
         BaseData responseData = new BaseData();
         responseData.response = BaseCodes.RESPONSE_NOK;
 
-        responseData.file = new BaseFileData();
-        responseData.file.md5 = new byte[300];
-
         return responseData;
     }
 }

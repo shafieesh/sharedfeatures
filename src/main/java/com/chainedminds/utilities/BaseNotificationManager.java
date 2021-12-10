@@ -603,14 +603,11 @@ public class BaseNotificationManager {
     public static void reportBruteForce(String address, String username, String password) {
 
         String notificationTitle = "Brute Force Attempt";
-        String notificationMessage = "IP Address : " + address + "\n" +
-                "Username : " + username + "\n" +
-                "Password : " + password;
+        String notificationMessage = "IP Address : " + address + "\n" + "Username : " + username + "\n" + "Password : " + password;
 
         for (String adminGamerTag : BaseConfig.ADMINS) {
 
-            sendNotification(adminGamerTag, BaseConfig.APP_NAME_CAFE_GAME,
-                    notificationTitle, notificationMessage);
+            sendNotification(adminGamerTag, BaseConfig.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
         }
     }
 
@@ -619,15 +616,11 @@ public class BaseNotificationManager {
         String loginStatus = status != null ? status + "" : "false";
 
         String notificationTitle = "Login Attempt";
-        String notificationMessage = "Username : " + username + "\n" +
-                "Password : " + password + "\n" +
-                "Authenticated : " + loginStatus + "\n" +
-                "IP Address : " + address;
+        String notificationMessage = "Username : " + username + "\n" + "Password : " + password + "\n" + "Authenticated : " + loginStatus + "\n" + "IP Address : " + address;
 
         for (String adminGamerTag : BaseConfig.ADMINS) {
 
-            sendNotification(adminGamerTag, BaseConfig.APP_NAME_CAFE_GAME,
-                    notificationTitle, notificationMessage);
+            sendNotification(adminGamerTag, BaseConfig.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
         }
     }
 

@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class BaseLeaderboardManager<Data extends BaseData, AccountData extends BaseAccountData> extends BaseManager<Data> {
 
-    private static final String TAG = BaseLeaderboardManager.class.getSimpleName();
+    /*private static final String TAG = BaseLeaderboardManager.class.getSimpleName();
 
     private static final String FIELD_USER_ID = "UserID";
     private static final String FIELD_PLAY_TIME = "PlayTime";
@@ -60,7 +60,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
                     });
                 }));
 
-        /*TaskManager.addTask(TaskManager.Task.build()
+        *//*TaskManager.addTask(TaskManager.Task.build()
                 .setName("FetchLeaderboard")
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
@@ -71,7 +71,7 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
 
                     super.setInitialization(true);
                 })
-                .startAsyncAndSchedule());*/
+                .startAsyncAndSchedule());*//*
     }
 
     private static void fetchLeaderboard(LeaderboardType leaderboardType) {
@@ -858,5 +858,5 @@ public class BaseLeaderboardManager<Data extends BaseData, AccountData extends B
     public enum LeaderboardType {
 
         DAILY, WEEKLY
-    }
+    }*/
 }

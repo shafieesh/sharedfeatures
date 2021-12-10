@@ -1245,7 +1245,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
     //------------------------------------------------------------------------------------
 
-    public Data getEntrancePermission(Data data) {
+    /*public Data getEntrancePermission(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -1308,7 +1308,7 @@ public class BaseAccountManager<Data extends BaseData> {
         }
 
         return data;
-    }
+    }*/
 
     public Data searchUsernames(Data data) {
 

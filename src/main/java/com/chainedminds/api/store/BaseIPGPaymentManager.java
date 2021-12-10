@@ -58,7 +58,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
     public static final String FIELD_PASARGAD_INVOICE_NUMBER = "InvoiceNumber";
     public static final String FIELD_PASARGAD_INVOICE_DATE = "InvoiceDate";
 
-    public Data preparePayment(Data data) {
+    /*public Data preparePayment(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -118,7 +118,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         }
 
         return data;
-    }
+    }*/
 
     public BaseIPGTransactionData prepareOrderPayment(IPGTransactionData ipgTransaction) {
 
@@ -174,7 +174,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         return null;
     }
 
-    public Data verifyPayment(Data data) {
+    /*public Data verifyPayment(Data data) {
 
         System.out.println(JsonHelper.getString(data));
 
@@ -274,7 +274,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
         System.out.println(JsonHelper.getString(data));
 
         return data;
-    }
+    }*/
 
     /*public Data verifyOrderPayment(Data data) {
 

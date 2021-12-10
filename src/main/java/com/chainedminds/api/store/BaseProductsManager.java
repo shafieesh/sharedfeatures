@@ -174,7 +174,7 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
         return product.get();
     }
 
-    public Data getStoreProducts(Data data) {
+    /*public Data getStoreProducts(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -193,13 +193,13 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
 
                     switch (product.category) {
 
-                        /*case "ticket":
+                        *//*case "ticket":
 
                             if (appVersion >= BaseConfig.TICKET_APP_VERSION) {
 
                                 data.products.add( product);
                             }
-                            break;*/
+                            break;*//*
 
                         case "subscription":
 
@@ -261,7 +261,7 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
         data.response = BaseCodes.RESPONSE_OK;
 
         return data;
-    }
+    }*/
 
     public boolean replaceProduct(String name, String appName, String market, String sku, String type, String category,
                                   boolean consumable, int tier, int coins, float price, int discount,

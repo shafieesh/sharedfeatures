@@ -234,7 +234,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         }
     }
 
-    public DataClass processIABTransaction(DataClass data) {
+    /*public DataClass processIABTransaction(DataClass data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -339,11 +339,11 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
         if (iabTransaction.state == PURCHASE_STATE_VERIFIED) {
 
-            /*if (BaseProductsManager.CATEGORY_SUBSCRIPTION.equals(category)) {
+            *//*if (BaseProductsManager.CATEGORY_SUBSCRIPTION.equals(category)) {
 
                 BaseResources.getInstance().subscriptionTransactionsManager
                         .updateExpirationDate(iabTransaction.id, iabTransaction.expirationDate);
-            }*/
+            }*//*
 
             data.response = BaseCodes.RESPONSE_OK;
 
@@ -363,7 +363,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         }
 
         return data;
-    }
+    }*/
 
     public Boolean verifyIABTransaction(IABTransactionData transaction) {
 
@@ -757,7 +757,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
     }*/
 
-    public DataClass cancelSubscription(DataClass data) {
+    /*public DataClass cancelSubscription(DataClass data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -809,5 +809,5 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         }
 
         return data;
-    }
+    }*/
 }
