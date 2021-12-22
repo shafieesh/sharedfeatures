@@ -92,51 +92,6 @@ public class AccountPermissionsManager {
         });
     }
 
-    private static void fetchRubika() {
-
-        String selectStatement = "SELECT * FROM " +
-                BaseConfig.TABLE_RUBIKA_ACCOUNTS_PERMISSIONS +
-                " WHERE " + FIELD_FINISH_TIME + " > NOW()";
-
-        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
-
-            private final List<Permission> permissions = new ArrayList<>();
-            private final Set<Integer> userIDs = new HashSet<>();
-
-            @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
-
-                while (resultSet.next()) {
-
-                    int userID = resultSet.getInt(FIELD_USER_ID);
-
-                    userIDs.add(userID);
-
-                    Permission permission = new Permission();
-
-                    permission.userID = userID;
-                    permission.appName = resultSet.getString(FIELD_APP_NAME);
-                    permission.permission = resultSet.getString(FIELD_PERMISSION);
-
-                    permissions.add(permission);
-                }
-            }
-
-            @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
-
-                if (wasSuccessful) {
-
-                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
-
-                        PERMISSIONS.addAll(permissions);
-                        USER_ID_IDX.addAll(userIDs);
-                    });
-                }
-            }
-        });
-    }
-
     public static List<String> getPermissions(int userID) {
 
         List<String> permissions = new ArrayList<>();

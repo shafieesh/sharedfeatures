@@ -5,9 +5,7 @@ import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
 import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.BaseFileData;
 import com.chainedminds.dataClasses.account.BaseAccountData;
-import com.chainedminds.dataClasses.account.BaseFriendData;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.DBResult;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
@@ -47,7 +45,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
     public void fetch() {
 
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " + FIELD_APP_NAME +
-                ", " + FIELD_LAST_UPDATE + " FROM " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS;
+                ", " + FIELD_LAST_UPDATE + " FROM " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES;
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -182,7 +180,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
             String questionMarksArray = String.join(", ", questionMarks);
 
             String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
-                    BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " WHERE " +
+                    BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
                     FIELD_BLOCKED + " = FALSE AND " + FIELD_UUID +
                     " IN (" + questionMarksArray + ")";
 
@@ -224,7 +222,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
             String questionMarksArray = String.join(", ", questionMarks);
 
             String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
-                    BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " WHERE " +
+                    BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
                     FIELD_BLOCKED + " = FALSE AND " + FIELD_FIREBASE_ID +
                     " IN (" + questionMarksArray + ")";
 
@@ -266,7 +264,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
             String questionMarksArray = String.join(", ", questionMarks);
 
             String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
-                    BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " WHERE " +
+                    BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
                     FIELD_BLOCKED + " = FALSE AND " + FIELD_IP_ADDRESS +
                     " IN (" + questionMarksArray + ")";
 
@@ -284,7 +282,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public boolean removeFirebaseID(int userID, String firebaseID) {
 
-        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " SET " +
+        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " SET " +
                 FIELD_FIREBASE_ID + " = NULL WHERE " + FIELD_USER_ID + " = ? AND " + FIELD_FIREBASE_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -297,7 +295,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public boolean setCredential(int userID, String credential) {
 
-        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
                 " SET " + FIELD_CREDENTIAL + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -347,7 +345,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public boolean setBlocked(int userID, boolean block) {
 
-        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
                 " SET " + FIELD_BLOCKED + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -373,7 +371,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         AtomicReference<T> value = new AtomicReference<>();
 
         String statement = "SELECT " + field + " FROM " +
-                BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " WHERE " +
+                BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
                 FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -405,7 +403,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         DBResult<T> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
-                BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " WHERE " +
+                BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
                 FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ? AND " + FIELD_PLATFORM + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -458,7 +456,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         DBResult<Series> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
-                BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+                BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
                 " WHERE " + FIELD_APP_NAME + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -501,7 +499,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         DBResult<Series> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
-                BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+                BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
                 " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -540,7 +538,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public boolean setProperty(int userID, String appName, String platform, String field, Object value) {
 
-        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
+        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
                 ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
 
@@ -556,7 +554,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public boolean setProperty(Connection connection, int userID, String appName, String platform, String field, Object value) {
 
-        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
+        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
                 ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
 
@@ -572,7 +570,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
 
-        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS + " (" +
+        String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
                 ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
 
@@ -799,7 +797,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         AtomicReference<AccountData> account = new AtomicReference<>(basicAccount);
 
-        String statement = "SELECT * FROM " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+        String statement = "SELECT * FROM " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
                 " WHERE " + FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();

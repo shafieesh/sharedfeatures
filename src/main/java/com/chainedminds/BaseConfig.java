@@ -190,17 +190,15 @@ public class BaseConfig {
         TABLE_USERS_OWNED_CUSTOMIZATIONS = DATABASE_NAME + "." + TABLE_NAME_USERS_OWNED_CUSTOMIZATIONS;
         TABLE_ACCOUNTS_CUSTOMIZATIONS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_CUSTOMIZATIONS;
         TABLE_ACCOUNTS_PERMISSIONS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PERMISSIONS;
-        TABLE_ACCOUNTS_PROPERTIES_USERS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PROPERTIES_USERS;
+        TABLE_ACCOUNTS_PROPERTIES = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PROPERTIES;
         TABLE_ACCOUNTS_PROFILES = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PROFILE;
-        TABLE_ACCOUNTS_USERS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_USERS;
+        TABLE_ACCOUNTS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS;
         TABLE_TRANSACTIONS_INTERNAL = DATABASE_NAME + "." + TABLE_NAME_TRANSACTIONS_INTERNAL;
         TABLE_MAPPING = DATABASE_NAME + "." + TABLE_NAME_MAPPING;
         TABLE_BACKEND_LOGS = DATABASE_NAME + "." + TABLE_NAME_BACKEND_LOGS;
         TABLE_SPINS = DATABASE_NAME + "." + TABLE_NAME_SPINS;
         TABLE_DYNAMIC_CONFIGS = DATABASE_NAME + "." + TABLE_NAME_DYNAMIC_CONFIGS;
         TABLE_LOGS = DATABASE_NAME + "." + TABLE_NAME_LOGS;
-
-        TABLE_RUBIKA_ACCOUNTS_PERMISSIONS = "web_game" + "." + TABLE_NAME_ACCOUNTS_PERMISSIONS;
 
         TABLE_LEADERBOARD_DAILY = DATABASE_NAME + "." + TABLE_NAME_LEADERBOARD_DAILY;
     }
@@ -332,14 +330,14 @@ public class BaseConfig {
     public static String TABLE_NAME_TRANSACTIONS_INTERNAL = "transactions_internal";
     public static String TABLE_TRANSACTIONS_INTERNAL;
     //----------------------------------------------------------------------------------------------------------------//
-    public static String TABLE_NAME_ACCOUNTS_USERS = "accounts";
-    public static String TABLE_ACCOUNTS_USERS;
+    public static String TABLE_NAME_ACCOUNTS = "accounts";
+    public static String TABLE_ACCOUNTS;
     //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_ACCOUNTS_PROFILE = "accounts_profiles";
     public static String TABLE_ACCOUNTS_PROFILES;
     //----------------------------------------------------------------------------------------------------------------//
-    public static String TABLE_NAME_ACCOUNTS_PROPERTIES_USERS = "accounts_properties";
-    public static String TABLE_ACCOUNTS_PROPERTIES_USERS;
+    public static String TABLE_NAME_ACCOUNTS_PROPERTIES = "accounts_properties";
+    public static String TABLE_ACCOUNTS_PROPERTIES;
     //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_ACCOUNTS_PERMISSIONS = "accounts_permissions";
     public static String TABLE_ACCOUNTS_PERMISSIONS;

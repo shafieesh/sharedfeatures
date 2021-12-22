@@ -533,30 +533,27 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
             }
         });
 
-        BaseResources.getInstance().accountManager.getUsernameMap(TAG, new Utilities.GrantAccess<Map<Integer, String>>() {
-            @Override
-            public void giveAccess(Map<Integer, String> gamerTags) {
+        BaseResources.getInstance().accountManager.getUsernameMap(TAG, (Utilities.GrantAccess<Map<Integer, String>>) usernames -> {
 
-                for (FriendData friend : pendingRelations) {
+            for (FriendData friend : pendingRelations) {
 
-                    friend.gamerTag = gamerTags.get(friend.id);
-                }
-                for (FriendData friend : waitingRelations) {
+                friend.gamerTag = usernames.get(friend.id);
+            }
+            for (FriendData friend : waitingRelations) {
 
-                    friend.gamerTag = gamerTags.get(friend.id);
-                }
-                for (FriendData friend : onlineFriends) {
+                friend.gamerTag = usernames.get(friend.id);
+            }
+            for (FriendData friend : onlineFriends) {
 
-                    friend.gamerTag = gamerTags.get(friend.id);
-                }
-                for (FriendData friend : awayFriends) {
+                friend.gamerTag = usernames.get(friend.id);
+            }
+            for (FriendData friend : awayFriends) {
 
-                    friend.gamerTag = gamerTags.get(friend.id);
-                }
-                for (FriendData friend : offlineFriends) {
+                friend.gamerTag = usernames.get(friend.id);
+            }
+            for (FriendData friend : offlineFriends) {
 
-                    friend.gamerTag = gamerTags.get(friend.id);
-                }
+                friend.gamerTag = usernames.get(friend.id);
             }
         });
 

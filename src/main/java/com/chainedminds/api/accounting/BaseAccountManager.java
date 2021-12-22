@@ -7,11 +7,8 @@ import com.chainedminds.BaseResources;
 import com.chainedminds.api.ActivityListener;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.ClientData;
 import com.chainedminds.dataClasses.CoinChargeSettings;
-import com.chainedminds.dataClasses.GameSettings;
 import com.chainedminds.dataClasses.account.BaseAccountData;
-import com.chainedminds.dataClasses.advertisements.AdData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
@@ -148,7 +145,7 @@ public class BaseAccountManager<Data extends BaseData> {
     protected void fetch() {
 
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " +
-                FIELD_GAMER_TAG + " FROM " + BaseConfig.TABLE_ACCOUNTS_USERS;
+                FIELD_GAMER_TAG + " FROM " + BaseConfig.TABLE_ACCOUNTS;
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -213,7 +210,7 @@ public class BaseAccountManager<Data extends BaseData> {
     protected void fetchPremiumUsers() {
 
         String selectStatement = "SELECT " + FIELD_USER_ID + " FROM " +
-                BaseConfig.TABLE_ACCOUNTS_USERS + " WHERE " + FIELD_PREMIUM_PASS + " = TRUE";
+                BaseConfig.TABLE_ACCOUNTS + " WHERE " + FIELD_PREMIUM_PASS + " = TRUE";
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -248,7 +245,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
     protected void chargeCoins() {
 
-        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_USERS + " SET " + FIELD_COINS + " = " +
+        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
                 " + 20 WHERE " + FIELD_PREMIUM_PASS + " = FALSE AND " + FIELD_COINS + " < 100";
 
@@ -257,7 +254,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
     protected void chargePremiumCoins() {
 
-        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_USERS + " SET " + FIELD_COINS + " = " +
+        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
                 " + 20 WHERE " + FIELD_PREMIUM_PASS + " = TRUE AND " + FIELD_COINS + " < 100";
 
@@ -319,7 +316,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         AtomicReference<AccountData> account = new AtomicReference<>();
 
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_ACCOUNTS_USERS +
+        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_ACCOUNTS +
                 " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -554,7 +551,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         AtomicReference<T> value = new AtomicReference<>();
 
-        String statement = "SELECT " + field + " FROM " + BaseConfig.TABLE_ACCOUNTS_USERS +
+        String statement = "SELECT " + field + " FROM " + BaseConfig.TABLE_ACCOUNTS +
                 " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -596,7 +593,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
     protected final boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
 
-        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_USERS + " SET " +
+        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS + " SET " +
                 fieldName + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -870,7 +867,7 @@ public class BaseAccountManager<Data extends BaseData> {
         String language = data.client.language;
         String lowerCasedGamerTag = data.account.username.toLowerCase();
 
-        if (lowerCasedGamerTag.contains("dev") ||
+        /*if (lowerCasedGamerTag.contains("dev") ||
                 lowerCasedGamerTag.contains("developer") ||
                 lowerCasedGamerTag.contains("admin") ||
                 lowerCasedGamerTag.contains("cafegame") ||
@@ -880,17 +877,13 @@ public class BaseAccountManager<Data extends BaseData> {
                     Messages.General.ILLEGAL_GAMER_TAG, language);
 
             return data;
-        }
+        }*/
 
-        String ipAddress = data.client.address;
-        String uuid = data.client.uuid;
-        String appName = data.client.appName;
-        int appVersion = data.client.appVersion;
-        String platform = data.client.platform;
-        String market = data.client.market;
-        String firebaseID = data.client.firebaseID;
         String username = data.account.username;
         String password = data.account.password;
+        String name = data.account.name;
+        String appName = data.client.appName;
+        String platform = data.client.platform;
 
         username = Utilities.replaceLocalizedNumbers(username);
 
@@ -914,7 +907,7 @@ public class BaseAccountManager<Data extends BaseData> {
                 return data;
             }*/
 
-            int userID = registerAccount(appName, appVersion, platform, market, firebaseID, username, password);
+            int userID = registerAccount(username, password, name, appName, platform);
 
             if (userID != -1) {
 
@@ -940,44 +933,37 @@ public class BaseAccountManager<Data extends BaseData> {
         return data;
     }
 
-    protected int registerAccount(String appName, int appVersion,
-                                  String platform, String market,
-                                  String firebaseID, String gamerTag,
-                                  String password) {
+    protected int registerAccount(String username, String password, String name, String appName, String platform) {
 
         AtomicInteger userID = new AtomicInteger(BaseConfig.NOT_FOUND);
 
-        String insertStatement = "INSERT " + BaseConfig.TABLE_ACCOUNTS_USERS +
-                " (" + FIELD_GAMER_TAG + ", " + FIELD_PASSWORD + ") VALUES (?, ?)";
+        String insertStatement = "INSERT " + BaseConfig.TABLE_ACCOUNTS +
+                " (" + FIELD_GAMER_TAG + ", " + FIELD_PASSWORD + ", " + FIELD_NAME + ") VALUES (?, ?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
-        parameters.put(1, gamerTag);
+        parameters.put(1, username);
         parameters.put(2, password);
+        parameters.put(3, name);
 
         BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             userID.set(generatedID);
 
-            String insertStatement2 = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
-                    " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_APP_VERSION +
-                    ", " + FIELD_PLATFORM + ", " + FIELD_MARKET + ", " + FIELD_FIREBASE_ID +
-                    ") VALUES (?, ?, ?, ?, ?, ?)";
+            String insertStatement2 = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
+                    " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM +
+                    ") VALUES (?, ?, ?)";
 
             parameters.put(1, generatedID);
             parameters.put(2, appName);
-            parameters.put(3, appVersion);
-            parameters.put(4, platform);
-            parameters.put(5, market);
-            parameters.put(6, firebaseID);
+            parameters.put(3, platform);
 
             BaseDatabaseHelperOld.insert(TAG, insertStatement2, parameters);
 
             Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                MAPPING_USERNAME.put(userID.get(), gamerTag);
-
-                INDEX_USERNAME.add(gamerTag.toLowerCase());
+                MAPPING_USERNAME.put(userID.get(), username);
+                INDEX_USERNAME.add(username.toLowerCase());
             });
         });
 
@@ -1019,7 +1005,7 @@ public class BaseAccountManager<Data extends BaseData> {
             uuid = Hash.md5(System.currentTimeMillis());
         }
 
-        String statement = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES_USERS +
+        String statement = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
 
                 " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_APP_VERSION +
                 ", " + FIELD_PLATFORM + ", " + FIELD_MARKET + ", " + FIELD_LANGUAGE +
@@ -1323,7 +1309,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         data.accounts = new ArrayList<>();
 
-        getUsernameMap(TAG, gamerTags -> gamerTags.forEach((userID, username) -> {
+        getUsernameMap(TAG, usernames -> usernames.forEach((userID, username) -> {
 
             if (username.toLowerCase().contains(query)) {
 
@@ -1364,11 +1350,11 @@ public class BaseAccountManager<Data extends BaseData> {
 
         data.accounts = new ArrayList<>();
 
-        getUsernameMap(TAG, gamerTags -> userIDs.forEach(userID -> {
+        getUsernameMap(TAG, usernames -> userIDs.forEach(userID -> {
 
             BaseAccountData account = new BaseAccountData();
             account.id = userID;
-            account.username = gamerTags.get(userID);
+            account.username = usernames.get(userID);
 
             data.accounts.add(account);
         }));
