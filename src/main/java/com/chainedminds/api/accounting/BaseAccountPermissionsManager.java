@@ -15,13 +15,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class AccountPermissionsManager {
+public class BaseAccountPermissionsManager {
 
     public static final String PREMIUM = "PREMIUM";
 
     public static final String ADMIN = "ADMIN";
     public static final String MODERATOR = "MODERATOR";
-    private static final String TAG = AccountPermissionsManager.class.getSimpleName();
+    private static final String TAG = BaseAccountPermissionsManager.class.getSimpleName();
 
     private static final String FIELD_USER_ID = "UserID";
     private static final String FIELD_APP_NAME = "AppName";
@@ -223,35 +223,6 @@ public class AccountPermissionsManager {
         return permissions;
     }
 
-    public static boolean setPermission(Connection connection, int userID, String appName, String permission, long finishTime) {
-
-        String insertStatement = "REPLACE " + BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
-                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PERMISSION +
-                ", " + FIELD_FINISH_TIME + ") VALUES (?, ?, ?, ?)";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, permission);
-        parameters.put(4, new Timestamp(finishTime));
-
-        return BaseDatabaseHelperOld.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
-
-            Permission permissionData = new Permission();
-
-            permissionData.userID = userID;
-            permissionData.appName = appName;
-            permissionData.permission = permission;
-
-            Utilities.lock(TAG, LOCK.writeLock(), () -> {
-
-                USER_ID_IDX.add(userID);
-                USER_PERMISSIONS.add(permissionData);
-            });
-        });
-    }
-
     @Deprecated
     public static boolean hasPermissions(int userID) {
 
@@ -371,19 +342,26 @@ public class AccountPermissionsManager {
         return hasPermission.get();
     }
 
-    static void addCafeChatPermission(int userID) {
+    public static boolean setPermission(Connection connection, int userID, String appName, String permission, long finishTime) {
 
-        Set<String> permissions = getRealPermissions(userID, "CafeGame");
+        String insertStatement = "REPLACE " + BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
+                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PERMISSION +
+                ", " + FIELD_FINISH_TIME + ") VALUES (?, ?, ?, ?)";
 
-        for (String permission : permissions) {
+        Map<Integer, Object> parameters = new HashMap<>();
 
-            Permission permissionData = new Permission();
-            permissionData.appName = "CafeChat";
-            permissionData.userID = userID;
-            permissionData.permission = permission;
+        parameters.put(1, userID);
+        parameters.put(2, appName);
+        parameters.put(3, permission);
+        parameters.put(4, new Timestamp(finishTime));
 
-            USER_PERMISSIONS.add(permissionData);
-        }
+        return BaseDatabaseHelperOld.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+
+            if (wasSuccessful) {
+
+                fetchUserPermissions();
+            }
+        });
     }
 
     public static boolean removePermission(Connection connection, int userID, String appName, String permission) {
@@ -399,19 +377,10 @@ public class AccountPermissionsManager {
 
         return BaseDatabaseHelperOld.update(connection, TAG, deleteStatement, parameters, (wasSuccessful, error) -> {
 
-            Utilities.lock(TAG, LOCK.writeLock(), () -> {
+            if (wasSuccessful) {
 
-                for (int index = USER_PERMISSIONS.size()-1; index >= 0 ; index--) {
-
-                    Permission loopingPermission = USER_PERMISSIONS.get(index);
-
-                    if (loopingPermission.userID == userID && loopingPermission.appName.equals(appName) &&
-                            loopingPermission.permission.equals(permission)) {
-
-                        USER_PERMISSIONS.remove(index);
-                    }
-                }
-            });
+                fetchUserPermissions();
+            }
         });
     }
 

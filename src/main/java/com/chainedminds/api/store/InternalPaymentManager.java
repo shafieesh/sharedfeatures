@@ -2,7 +2,7 @@ package com.chainedminds.api.store;
 
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
-import com.chainedminds.api.accounting.AccountPermissionsManager;
+import com.chainedminds.api.accounting.BaseAccountPermissionsManager;
 import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.dataClasses.payment.BaseTransactionData;
 import com.chainedminds.utilities.BackendHelper;
@@ -107,7 +107,7 @@ public class InternalPaymentManager {
         int userID = data.account.id;
         String appName = data.client.appName;
 
-        data.account.subscriptions = new ArrayList<>(AccountPermissionsManager.getPermissions(userID, appName));
+        data.account.subscriptions = new ArrayList<>(BaseAccountPermissionsManager.getPermissions(userID, appName));
 
         data.response = BaseCodes.RESPONSE_OK;
 

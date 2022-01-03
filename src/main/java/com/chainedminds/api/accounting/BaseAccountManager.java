@@ -682,9 +682,9 @@ public class BaseAccountManager<Data extends BaseData> {
 
             Boolean passwordValidated = validatePassword(userID, password);
 
-            if (AccountPermissionsManager.hasPermission(userID, "*", "MANAGEMENT") ||
-                    AccountPermissionsManager.hasPermission(userID, "*", "ADMIN") ||
-                    AccountPermissionsManager.hasPermission(userID, "*", "MODERATOR")) {
+            if (BaseAccountPermissionsManager.hasPermission(userID, "*", "MANAGEMENT") ||
+                    BaseAccountPermissionsManager.hasPermission(userID, "*", "ADMIN") ||
+                    BaseAccountPermissionsManager.hasPermission(userID, "*", "MODERATOR")) {
 
                 //BaseNotificationManager.reportLogin(username, password, passwordValidated, address);
 

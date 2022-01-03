@@ -5,6 +5,7 @@ import com.chainedminds.api.BaseRequestsManager;
 import com.chainedminds.network.netty.ChannelListeners;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
@@ -23,7 +24,7 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext context) throws Exception {
+    public void channelActive(@NotNull ChannelHandlerContext context) throws Exception {
 
         super.channelActive(context);
 
@@ -38,7 +39,7 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext context, Object message) {
+    public void channelRead(ChannelHandlerContext context, @NotNull Object message) {
 
         byte[] requestData = (byte[]) message;
 
