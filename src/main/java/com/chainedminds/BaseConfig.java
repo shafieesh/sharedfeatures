@@ -189,6 +189,7 @@ public class BaseConfig {
         TABLE_LEAGUE_TICKETS = DATABASE_NAME + "." + TABLE_NAME_LEAGUE_TICKETS;
         TABLE_USERS_OWNED_CUSTOMIZATIONS = DATABASE_NAME + "." + TABLE_NAME_USERS_OWNED_CUSTOMIZATIONS;
         TABLE_ACCOUNTS_CUSTOMIZATIONS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_CUSTOMIZATIONS;
+        TABLE_PERMISSIONS = DATABASE_NAME + "." + TABLE_NAME_PERMISSIONS;
         TABLE_ACCOUNTS_PERMISSIONS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PERMISSIONS;
         TABLE_ACCOUNTS_PROPERTIES = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PROPERTIES;
         TABLE_ACCOUNTS_PROFILES = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PROFILE;
@@ -338,6 +339,9 @@ public class BaseConfig {
     //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_ACCOUNTS_PROPERTIES = "accounts_properties";
     public static String TABLE_ACCOUNTS_PROPERTIES;
+    //----------------------------------------------------------------------------------------------------------------//
+    public static String TABLE_NAME_PERMISSIONS = "permissions";
+    public static String TABLE_PERMISSIONS;
     //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_ACCOUNTS_PERMISSIONS = "accounts_permissions";
     public static String TABLE_ACCOUNTS_PERMISSIONS;

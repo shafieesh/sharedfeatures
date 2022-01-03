@@ -28,8 +28,11 @@ public class AccountPermissionsManager {
     private static final String FIELD_PERMISSION = "Permission";
     private static final String FIELD_START_TIME = "StartTime";
     private static final String FIELD_FINISH_TIME = "FinishTime";
+    private static final String FIELD_TITLE = "Title";
+    private static final String FIELD_DESCRIPTION = "Description";
 
     private static final List<Permission> PERMISSIONS = new ArrayList<>();
+    private static final List<Permission> USER_PERMISSIONS = new ArrayList<>();
     private static final Set<Integer> USER_ID_IDX = new HashSet<>();
 
     private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
@@ -41,10 +44,51 @@ public class AccountPermissionsManager {
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .startAndSchedule()
-                .setTimingListener(task -> fetch()));
+                .setTimingListener(task -> {
+                    fetchPermissions();
+                    fetchUserPermissions();
+                }));
     }
 
-    private static void fetch() {
+    private static void fetchPermissions() {
+
+        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PERMISSIONS;
+
+        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+
+            private final List<Permission> permissions = new ArrayList<>();
+
+            @Override
+            public void onFetchingData(ResultSet resultSet) throws Exception {
+
+                while (resultSet.next()) {
+
+                    Permission permission = new Permission();
+                    permission.appName = resultSet.getString(FIELD_APP_NAME);
+                    permission.permission = resultSet.getString(FIELD_PERMISSION);
+                    permission.title = resultSet.getString(FIELD_TITLE);
+                    permission.description = resultSet.getString(FIELD_DESCRIPTION);
+
+                    permissions.add(permission);
+                }
+            }
+
+            @Override
+            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+
+                if (wasSuccessful) {
+
+                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
+
+                        PERMISSIONS.clear();
+                        PERMISSIONS.addAll(permissions);
+                    });
+                }
+            }
+        });
+    }
+
+    private static void fetchUserPermissions() {
 
         String selectStatement = "SELECT * FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
@@ -81,10 +125,10 @@ public class AccountPermissionsManager {
 
                     Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                        PERMISSIONS.clear();
+                        USER_PERMISSIONS.clear();
                         USER_ID_IDX.clear();
 
-                        PERMISSIONS.addAll(permissions);
+                        USER_PERMISSIONS.addAll(permissions);
                         USER_ID_IDX.addAll(userIDs);
                     });
                 }
@@ -92,13 +136,25 @@ public class AccountPermissionsManager {
         });
     }
 
-    public static List<String> getPermissions(int userID) {
+    public static List<Permission> getPermissions() {
 
-        List<String> permissions = new ArrayList<>();
+        List<Permission> permissions = new ArrayList<>();
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            permissions.addAll(PERMISSIONS);
+        });
+
+        return permissions;
+    }
+
+    public static Set<String> getPermissions(int userID) {
+
+        Set<String> permissions = new HashSet<>();
+
+        Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID) {
 
@@ -131,13 +187,13 @@ public class AccountPermissionsManager {
         return userPermission.get();
     }
 
-    public static List<String> getPermissions(int userID, String appName) {
+    public static Set<String> getPermissions(int userID, String appName) {
 
-        List<String> permissions = new ArrayList<>();
+        Set<String> permissions = new HashSet<>();
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID && ("*".equals(appName) || appName.equals(permission.appName))) {
 
@@ -149,13 +205,13 @@ public class AccountPermissionsManager {
         return permissions;
     }
 
-    public static List<String> getRealPermissions(int userID, String appName) {
+    public static Set<String> getRealPermissions(int userID, String appName) {
 
-        List<String> permissions = new ArrayList<>();
+        Set<String> permissions = new HashSet<>();
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID && ("*".equals(appName) || appName.equals(permission.appName))) {
 
@@ -191,7 +247,7 @@ public class AccountPermissionsManager {
             Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
                 USER_ID_IDX.add(userID);
-                PERMISSIONS.add(permissionData);
+                USER_PERMISSIONS.add(permissionData);
             });
         });
     }
@@ -212,7 +268,7 @@ public class AccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID && permissionName.equals(permission.permission)) {
 
@@ -232,7 +288,7 @@ public class AccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -254,7 +310,7 @@ public class AccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -276,7 +332,7 @@ public class AccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -299,7 +355,7 @@ public class AccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : PERMISSIONS) {
+            for (Permission permission : USER_PERMISSIONS) {
 
                 if ((userID == permission.userID || userID2 == permission.userID) &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -317,7 +373,7 @@ public class AccountPermissionsManager {
 
     static void addCafeChatPermission(int userID) {
 
-        List<String> permissions = getRealPermissions(userID, "CafeGame");
+        Set<String> permissions = getRealPermissions(userID, "CafeGame");
 
         for (String permission : permissions) {
 
@@ -326,7 +382,7 @@ public class AccountPermissionsManager {
             permissionData.userID = userID;
             permissionData.permission = permission;
 
-            PERMISSIONS.add(permissionData);
+            USER_PERMISSIONS.add(permissionData);
         }
     }
 
@@ -345,14 +401,14 @@ public class AccountPermissionsManager {
 
             Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                for (int index = PERMISSIONS.size()-1; index >= 0 ; index--) {
+                for (int index = USER_PERMISSIONS.size()-1; index >= 0 ; index--) {
 
-                    Permission loopingPermission = PERMISSIONS.get(index);
+                    Permission loopingPermission = USER_PERMISSIONS.get(index);
 
                     if (loopingPermission.userID == userID && loopingPermission.appName.equals(appName) &&
                             loopingPermission.permission.equals(permission)) {
 
-                        PERMISSIONS.remove(index);
+                        USER_PERMISSIONS.remove(index);
                     }
                 }
             });
@@ -364,5 +420,7 @@ public class AccountPermissionsManager {
         int userID;
         String appName;
         String permission;
+        String title;
+        String description;
     }
 }
