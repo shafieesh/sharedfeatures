@@ -5,6 +5,7 @@ import com.chainedminds.dataClasses.Customization;
 import com.chainedminds.dataClasses.payment.BaseTransactionData;
 
 import java.util.List;
+import java.util.Set;
 
 public class BaseAccountData<FriendData extends BaseFriendData> {
 
@@ -29,8 +30,6 @@ public class BaseAccountData<FriendData extends BaseFriendData> {
     public int coins;
     public int tickets;
 
-    public int qwTeamID;
-
     @Deprecated
     public BaseAccountData<? extends BaseFriendData> account;
 
@@ -40,8 +39,8 @@ public class BaseAccountData<FriendData extends BaseFriendData> {
 
     public FriendData friendship;
 
-    public List<String> permissions;
-    public List<String> subscriptions;
+    public Set<String> permissions;
+    public Set<String> subscriptions;
     public Customization customizations;
 
     public int onlineStatus;

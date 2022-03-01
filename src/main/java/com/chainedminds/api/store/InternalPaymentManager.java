@@ -107,7 +107,7 @@ public class InternalPaymentManager {
         int userID = data.account.id;
         String appName = data.client.appName;
 
-        data.account.subscriptions = new ArrayList<>(BaseAccountPermissionsManager.getPermissions(userID, appName));
+        data.account.subscriptions = BaseAccountPermissionsManager.getPermissions(userID, appName);
 
         data.response = BaseCodes.RESPONSE_OK;
 
