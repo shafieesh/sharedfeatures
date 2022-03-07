@@ -303,6 +303,11 @@ public class BaseIPGPaymentManager<Data extends BaseData,
             return data;
         }
 
+        if (transaction.arbitraryData == null) {
+
+            transaction.arbitraryData = new HashMap<>();
+        }
+
         transaction.arbitraryData.putAll(arbitraryData);
 
         System.out.println("VERIFYING TRANSACTION : " + JsonHelper.getString(transaction));

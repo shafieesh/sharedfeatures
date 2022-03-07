@@ -753,7 +753,7 @@ public class BaseAccountManager<Data extends BaseData> {
         setProperty(connection, userID, FIELD_LAST_TICKET_CHARGE_AMOUNT, 0);
     }
 
-    private boolean isBruteForcing(String address) {
+    public boolean isBruteForcing(String address) {
 
         int attemptsTimes = LOGIN_ATTEMPTS_CACHE.get(address, () -> 1);
 
