@@ -261,7 +261,7 @@ public class BaseAccountManager<Data extends BaseData> {
         BaseDatabaseHelperOld.update(TAG, updateStatement);
     }
 
-    private CoinChargeSettings getCoinChargeSettings() {
+    CoinChargeSettings getCoinChargeSettings() {
 
         CoinChargeSettings coinChargeSettings = new CoinChargeSettings();
 

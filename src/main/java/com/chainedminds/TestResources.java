@@ -29,7 +29,7 @@ class TestResources extends BaseResources<
         BaseIPGProductPurchasesManager<BaseIPGTransactionData>,
         BaseIABSubscriptionPurchasesManager<BaseIABTransactionData>,
         BaseIPGSubscriptionPurchasesManager<BaseIPGTransactionData>,
-        BaseProductsManager<BaseData, BaseProductData>,
+        BaseProductsManager<BaseProductData>,
         BaseBlackListManager,
         BaseLeaderboardManager<BaseData, BaseAccountData>> {
 

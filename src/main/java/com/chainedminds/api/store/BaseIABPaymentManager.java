@@ -675,7 +675,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         return null;
     }
 
-    private void consumeIABTransaction(IABTransactionData transaction) {
+    void consumeIABTransaction(IABTransactionData transaction) {
 
         new Thread(() -> {
 

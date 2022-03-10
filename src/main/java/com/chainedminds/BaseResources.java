@@ -29,7 +29,7 @@ public class BaseResources<
         IPGPurchasesManager extends BaseIPGProductPurchasesManager<? extends BaseIPGTransactionData>,
         IABSubscriptionPurchasesManager extends BaseIABSubscriptionPurchasesManager<? extends BaseIABTransactionData>,
         IPGSubscriptionPurchasesManager extends BaseIPGSubscriptionPurchasesManager<? extends BaseIPGTransactionData>,
-        ProductManager extends BaseProductsManager<? extends BaseData, ? extends BaseProductData>,
+        ProductManager extends BaseProductsManager<? extends BaseProductData>,
         BlackListManager extends BaseBlackListManager,
         LeaderboardManager extends BaseLeaderboardManager<? extends BaseData, ? extends BaseAccountData>> {
 

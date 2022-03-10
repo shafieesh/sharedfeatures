@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class BaseProductsManager<Data extends BaseData, ProductData extends BaseProductData> {
+public class BaseProductsManager<ProductData extends BaseProductData> {
 
     private static final String TAG = BaseProductsManager.class.getSimpleName();
 
@@ -42,9 +42,9 @@ public class BaseProductsManager<Data extends BaseData, ProductData extends Base
     private static final String FIELD_SKU = "SKU";
     private static final String FIELD_APP_NAME = "AppName";
 
-    private final List<ProductData> PRODUCTS = new ArrayList<>();
+    final List<ProductData> PRODUCTS = new ArrayList<>();
 
-    private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public void start() {
 
