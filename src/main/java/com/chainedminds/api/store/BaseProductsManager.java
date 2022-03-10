@@ -42,9 +42,9 @@ public class BaseProductsManager<ProductData extends BaseProductData> {
     private static final String FIELD_SKU = "SKU";
     private static final String FIELD_APP_NAME = "AppName";
 
-    final List<ProductData> PRODUCTS = new ArrayList<>();
+    protected final List<ProductData> PRODUCTS = new ArrayList<>();
 
-    static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public void start() {
 
