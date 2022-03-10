@@ -3,6 +3,7 @@ package com.chainedminds.utilities;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
+import com.chainedminds.api.BaseApis;
 import com.chainedminds.dataClasses.BaseMessageData;
 import com.chainedminds.dataClasses.firebase.FirebaseMessageData;
 import com.chainedminds.dataClasses.notification.Action;
@@ -10,6 +11,8 @@ import com.chainedminds.dataClasses.notification.BaseNotificationData;
 import com.chainedminds.dataClasses.notification.FirebaseResponseData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.json.JsonHelper;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -326,7 +329,7 @@ public class BaseNotificationManager {
         sendNotification(userID, appName, null, title, message);
     }
 
-    public static boolean notifyUser(int userID, String appName, String title, String content) {
+    public static void notifyUser(int userID, String appName, String title, String content) {
 
         String firebaseID = BaseResources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
 
@@ -349,10 +352,8 @@ public class BaseNotificationManager {
             notificationContent.data.put("type", "NOTIFICATION");
             notificationContent.data.put("notification", JsonHelper.getString(notification));
 
-            return sendToFirebase(userID, notificationContent);
+            sendToFirebase(userID, notificationContent);
         }
-
-        return false;
     }
 
     public static void sendNotification(int userID, String appName, String tag, String title, String message) {
@@ -528,7 +529,7 @@ public class BaseNotificationManager {
 //        });
 //    }
 
-    protected static boolean sendToFirebase(int userID, FirebaseMessageData content) {
+    /*protected static boolean sendToFirebase(int userID, FirebaseMessageData content) {
 
         boolean wasSuccessful = false;
 
@@ -598,6 +599,51 @@ public class BaseNotificationManager {
         }
 
         return wasSuccessful;
+    }*/
+
+    protected static void sendToFirebase(int userID, FirebaseMessageData content) {
+
+        String url = "https://fcm.googleapis.com/fcm/send";
+
+        String json = JsonHelper.getString(content);
+
+        RequestBody requestBody = RequestBody.create(json, null);
+
+        Request.Builder builder = new Request.Builder();
+        builder.addHeader("project_id", BaseConfig.FIREBASE_PROJECT_ID);
+        builder.addHeader("Authorization", "key=" + BaseConfig.FIREBASE_KEY);
+        builder.addHeader("Content-Type", "application/json");
+        builder.url(url);
+        builder.post(requestBody);
+
+        BaseApis.callAsync(builder, new BaseApis.ApiCallback() {
+            @Override
+            public void onError(String error) {
+
+                System.err.println(error);
+            }
+
+            @Override
+            public void onResponse(String response) {
+
+                System.out.println(response);
+
+                FirebaseResponseData responseData = JsonHelper.getObject(response, FirebaseResponseData.class);
+
+                if (responseData != null) {
+
+                    if (responseData.results != null && responseData.results.size() > 0) {
+
+                        String error = responseData.results.get(0).error;
+
+                        if ("NotRegistered".equals(error) || "InvalidRegistration".equals(error)) {
+
+                            BaseResources.getInstance().accountPropertyManager.removeFirebaseID(userID, content.to);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public static void reportBruteForce(String address, String username, String password) {
