@@ -826,12 +826,19 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         return account.get();
     }
 
-    public int getScore(int userID, String appName) {
+    public int getScore(int userID, String appName, String platform) {
 
-        return getPropertyOld(userID, appName, FIELD_SCORE, Integer.class);
+        DBResult<Integer> result = getProperty(userID, appName, platform, FIELD_SCORE, Integer.class);
+
+        if (result.isSuccessful()) {
+
+            return result.value;
+        }
+
+        return BaseCodes.NOT_FOUND;
     }
 
-    public void addScore(Integer userID, String appName, String gameName, int score, int playTime, boolean wonGame) {
+    public void addScore(Integer userID, String appName, String platform, String gameName, int score, int playTime, boolean wonGame) {
 
         /*String statement = "INSERT " + BaseConfig.TABLE_GAME_SESSIONS + " (" + FIELD_USER_ID +
                 ", " + FIELD_APP_NAME + ", " + FIELD_GAME_NAME + ", " + FIELD_PLAY_TIME +
@@ -855,7 +862,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
         synchronized (userID) {
 
-            int currentScore = getScore(userID, appName);
+            int currentScore = getScore(userID, appName, platform);
 
             boolean wasSuccessful = currentScore != BaseCodes.NOT_FOUND;
 
@@ -863,7 +870,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
             Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
 
-            wasSuccessful &= setScore(connection, userID, appName, newScore);
+            wasSuccessful &= setScore(connection, userID, appName, platform, newScore);
 
             if (wasSuccessful) {
 
@@ -879,7 +886,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
                 BaseConnectionManagerOld.rollback(connection);
 
                 Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
-                        addScore(userID, appName, gameName, score, playTime, wonGame));
+                        addScore(userID, appName, platform,  gameName, score, playTime, wonGame));
             }
 
             BaseConnectionManagerOld.close(connection);
@@ -994,9 +1001,9 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
         BaseDatabaseHelperOld.insert(TAG, statement, parameters);
     }
 
-    protected boolean setScore(Connection connection, int userID, String appName, int score) {
+    protected boolean setScore(Connection connection, int userID, String appName, String platform, int score) {
 
-        return setProperty(connection, userID, appName, FIELD_SCORE, score);
+        return setProperty(connection, userID, appName, platform, FIELD_SCORE, score);
     }
 
     public boolean isCafeChatDataTransferred(int userID, String appName) {
