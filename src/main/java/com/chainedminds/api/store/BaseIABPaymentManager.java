@@ -1,6 +1,5 @@
 package com.chainedminds.api.store;
 
-import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
 import com.chainedminds.dataClasses.BaseData;
@@ -158,7 +157,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         try {
@@ -184,7 +183,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
     }
 
@@ -741,7 +740,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
                 } catch (Exception e) {
 
-                    Log.error(TAG, e);
+                    BaseLogs.error(TAG, e);
                 }
             }
 

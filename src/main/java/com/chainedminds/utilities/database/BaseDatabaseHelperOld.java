@@ -1,7 +1,7 @@
 package com.chainedminds.utilities.database;
 
 import com.chainedminds.utilities.BaseConnectionManagerOld;
-import com.chainedminds.utilities.Log;
+import com.chainedminds.utilities.BaseLogs;
 import com.chainedminds.utilities.Utilities;
 
 import java.sql.Connection;
@@ -166,7 +166,7 @@ public class BaseDatabaseHelperOld {
                 payload = preparedStatement.toString();
             }
 
-            Log.error(tag, exception, payload);
+            BaseLogs.error(tag, exception, payload);
 
             error.set(exception);
 
@@ -251,7 +251,7 @@ public class BaseDatabaseHelperOld {
                 payload = preparedStatement.toString();
             }
 
-            Log.error(tag, error, payload);
+            BaseLogs.error(tag, error, payload);
 
         } finally {
 
@@ -358,7 +358,7 @@ public class BaseDatabaseHelperOld {
                 payload = preparedStatement.toString();
             }
 
-            Log.error(tag, exception, payload);
+            BaseLogs.error(tag, exception, payload);
 
             error.set(exception);
 
@@ -483,7 +483,7 @@ public class BaseDatabaseHelperOld {
                 payload = preparedStatement.toString();
             }
 
-            Log.error(tag, exception, payload);
+            BaseLogs.error(tag, exception, payload);
 
             error.set(exception);
 

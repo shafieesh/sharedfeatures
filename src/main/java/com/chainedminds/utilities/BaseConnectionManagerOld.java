@@ -6,8 +6,6 @@ import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Deprecated
 public class BaseConnectionManagerOld {
@@ -81,7 +79,7 @@ public class BaseConnectionManagerOld {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return connection;
@@ -127,7 +125,7 @@ public class BaseConnectionManagerOld {
 
             } catch (Exception e) {
 
-                Log.error(TAG, e);
+                BaseLogs.error(TAG, e);
             }
         }
 
@@ -148,7 +146,7 @@ public class BaseConnectionManagerOld {
 
             } catch (Exception e) {
 
-                Log.error(TAG, e);
+                BaseLogs.error(TAG, e);
             }
         }
 
@@ -328,7 +326,7 @@ public class BaseConnectionManagerOld {
 
                 e.printStackTrace();
 
-                Log.error(TAG, e);
+                BaseLogs.error(TAG, e);
             }
 
             return null;

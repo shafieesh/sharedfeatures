@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
@@ -221,7 +220,7 @@ public class Utilities {
 
             e.printStackTrace();
 
-            Log.error("HttpConnection", e);
+            BaseLogs.error("HttpConnection", e);
         }
 
         return wasSuccessful;
@@ -289,7 +288,7 @@ public class Utilities {
 
             e.printStackTrace();
 
-            Log.error("HttpConnection", e);
+            BaseLogs.error("HttpConnection", e);
         }
 
         return wasSuccessful;
@@ -297,7 +296,7 @@ public class Utilities {
 
     /**
      * Helper method for doing a full try catch in a nested method.<br>
-     * This will also catches any uncaught exceptions and saves the exception with {@link Log} utility.
+     * This will also catches any uncaught exceptions and saves the exception with {@link BaseLogs} utility.
      *
      * @param Tag The class name which is requesting this try-catch. This will be used when logging the exceptions.
      * @param job The nested job that needs to be completed inside a try-catch.
@@ -310,7 +309,7 @@ public class Utilities {
 
         } catch (Exception e) {
 
-            Log.error(Tag, e);
+            BaseLogs.error(Tag, e);
         }
     }
 
@@ -336,7 +335,7 @@ public class Utilities {
 
         } catch (Exception e) {
 
-            Log.error(Tag, e);
+            BaseLogs.error(Tag, e);
 
         } finally {
 

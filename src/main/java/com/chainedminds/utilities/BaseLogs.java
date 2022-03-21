@@ -12,19 +12,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Log {
+public class BaseLogs {
 
-    private static final String TAG = Log.class.getSimpleName();
+    private static final String TAG = BaseLogs.class.getSimpleName();
 
-    private static final ExecutorService LOGGER_THREADS = Executors.newCachedThreadPool();
-
-    private static final List<LogData2> PENDING_LOGS = new ArrayList<>();
-
-    private static final String FIELD_USER_ID = "UserID";
-    private static final String FIELD_SECTION = "Section";
-    private static final String FIELD_ACTION = "Action";
-    private static final String FIELD_CRASH_LOG = "CrashLog";
-    private static final String FIELD_PAYLOAD = "Payload";
+    protected static final String FIELD_USER_ID = "UserID";
+    protected static final String FIELD_SECTION = "Section";
+    protected static final String FIELD_ACTION = "Action";
+    protected static final String FIELD_CRASH_LOG = "CrashLog";
+    protected static final String FIELD_PAYLOAD = "Payload";
 
     public static void error(String tag, String cause) {
 
@@ -89,7 +85,7 @@ public class Log {
         report(tag, null, payload);
     }
 
-    private static void report(String section, String log, String payload) {
+    protected static void report(String section, String log, String payload) {
 
         System.out.println(log + "\n\nPAYLOAD :\n" + payload + "\n");
 
@@ -134,12 +130,5 @@ public class Log {
                 BaseResources.getInstance().fileManager.saveFile(BaseFileManager.SECTION_LOG_ERRORS, fileNameAndExtension, backedLog.getBytes());
             }
         });*/
-    }
-
-    private static class LogData2 {
-
-        public String section;
-        public String log;
-        public String payload;
     }
 }

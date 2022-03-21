@@ -4,7 +4,7 @@ plugins {
 apply plugin: 'maven'
 
 group 'com.chainedminds'
-version '1.0.27'
+version '1.0.28'
 
 repositories {
     mavenCentral()
@@ -17,6 +17,6 @@ dependencies {
     implementation('com.slack.api:slack-api-client:1.20.1')
     implementation('com.squareup.okhttp3:okhttp:4.9.3')
     implementation('com.sun.mail:javax.mail:1.6.2')
-    implementation('io.netty:netty-all:4.1.74.Final')
+    implementation('io.netty:netty-all:4.1.75.Final')
     implementation('mysql:mysql-connector-java:8.0.28')
 }

@@ -6,7 +6,7 @@ import com.chainedminds.dataClasses.account.BaseFriendData;
 import com.chainedminds.dataClasses.notification.BaseNotificationData;
 import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
 import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
-import com.chainedminds.utilities.Log;
+import com.chainedminds.utilities.BaseLogs;
 
 public class BaseClasses {
 
@@ -41,7 +41,7 @@ public class BaseClasses {
 
             e.printStackTrace();
 
-            Log.severe(TAG, e);
+            BaseLogs.severe(TAG, e);
         }
 
         throw new NullPointerException("Cannot construct from class " + mappedClass);

@@ -3,7 +3,7 @@ package com.chainedminds.network;
 import com.chainedminds.*;
 import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.dataClasses.ClientData;
-import com.chainedminds.utilities.Log;
+import com.chainedminds.utilities.BaseLogs;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonHelper;
 
@@ -135,7 +135,7 @@ public class DataTransportManager extends Thread {
 
             e.printStackTrace();
 
-            Log.error("DataTransportManager", e, urlString + "\n" + payload);
+            BaseLogs.error("DataTransportManager", e, urlString + "\n" + payload);
         }
         return receivedData;
     }
@@ -172,7 +172,7 @@ public class DataTransportManager extends Thread {
             inputStream.close();
         } catch (Exception e) {
 
-            Log.error("DataTransportManager", e);
+            BaseLogs.error("DataTransportManager", e);
             e.printStackTrace();
         }
         return byteArrayOutputStream.toByteArray();
@@ -428,7 +428,7 @@ public class DataTransportManager extends Thread {
 
             } catch (Exception e) {
 
-                Log.error("DataTransportManager", e);
+                BaseLogs.error("DataTransportManager", e);
             }
         }
 
@@ -470,7 +470,7 @@ public class DataTransportManager extends Thread {
 
                     if (BaseMonitor.isAppRunning()) {
 
-                        Log.error("WebTransport", e);
+                        BaseLogs.error("WebTransport", e);
                     }
                 }
             }
@@ -479,7 +479,7 @@ public class DataTransportManager extends Thread {
 
             System.out.println("--- Network-> WebTransport failed to start");
 
-            Log.error("DataTransportManager", e);
+            BaseLogs.error("DataTransportManager", e);
         }
     }
 
@@ -501,7 +501,7 @@ public class DataTransportManager extends Thread {
 
                     if (BaseMonitor.isAppRunning()) {
 
-                        Log.error("Network-MainPipe", e);
+                        BaseLogs.error("Network-MainPipe", e);
                     }
                 }
             }
@@ -510,7 +510,7 @@ public class DataTransportManager extends Thread {
 
             System.out.println("--- Network-> MainPipe failed to start");
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
     }
 
@@ -532,7 +532,7 @@ public class DataTransportManager extends Thread {
 
                     if (BaseMonitor.isAppRunning()) {
 
-                        Log.error("Network-MainPipe", e);
+                        BaseLogs.error("Network-MainPipe", e);
                     }
                 }
             }
@@ -541,7 +541,7 @@ public class DataTransportManager extends Thread {
 
             System.out.println("--- Network-> MainPipe failed to start");
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
     }
 
@@ -634,7 +634,7 @@ public class DataTransportManager extends Thread {
 
             } catch (Exception e) {
 
-                Log.error("WebTransportThread", e);
+                BaseLogs.error("WebTransportThread", e);
             }
 
             try {

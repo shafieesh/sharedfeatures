@@ -187,7 +187,7 @@ public class BaseFileManager {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return false;
@@ -216,7 +216,7 @@ public class BaseFileManager {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
     }
 
@@ -263,7 +263,7 @@ public class BaseFileManager {
 
             } catch (Exception e) {
 
-                Log.error(TAG, e);
+                BaseLogs.error(TAG, e);
             }
         }
 
@@ -354,7 +354,7 @@ public class BaseFileManager {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return null;
@@ -391,7 +391,7 @@ public class BaseFileManager {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return null;
@@ -429,7 +429,7 @@ public class BaseFileManager {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return null;
@@ -483,7 +483,7 @@ public class BaseFileManager {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return null;

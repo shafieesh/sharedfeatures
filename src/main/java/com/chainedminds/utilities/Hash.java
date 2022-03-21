@@ -51,7 +51,7 @@ public class Hash {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return hash;
@@ -73,7 +73,7 @@ public class Hash {
 
         } catch (Exception e) {
 
-            Log.error(TAG, e);
+            BaseLogs.error(TAG, e);
         }
 
         return hash;

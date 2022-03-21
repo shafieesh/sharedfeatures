@@ -457,7 +457,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         boolean wasSuccessful = setProperty(connection, userID, FIELD_PASSWORD, newPassword);
 
-        wasSuccessful &= Log.log(connection, userID, "Password", oldPassword + " -> " + newPassword);
+        wasSuccessful &= BaseLogs.log(connection, userID, "Password", oldPassword + " -> " + newPassword);
 
         if (wasSuccessful) {
 
