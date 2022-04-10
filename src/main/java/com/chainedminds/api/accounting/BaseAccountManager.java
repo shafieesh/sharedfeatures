@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class BaseAccountManager<Data extends BaseData> {
 
     protected static final String FIELD_USER_ID = "UserID";
-    protected static final String FIELD_GAMER_TAG = "GamerTag";
+    protected static final String FIELD_USERNAME = "Username";
     protected static final String FIELD_NAME = "Name";
     protected static final String FIELD_IP_ADDRESS = "IPAddress";
     protected static final String FIELD_PHONE_NUMBER = "PhoneNumber";
@@ -145,7 +145,7 @@ public class BaseAccountManager<Data extends BaseData> {
     protected void fetch() {
 
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " +
-                FIELD_GAMER_TAG + " FROM " + BaseConfig.TABLE_ACCOUNTS;
+                FIELD_USERNAME + " FROM " + BaseConfig.TABLE_ACCOUNTS;
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -157,7 +157,7 @@ public class BaseAccountManager<Data extends BaseData> {
                 while (resultSet.next()) {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
-                    String gamerTag = resultSet.getString(FIELD_GAMER_TAG);
+                    String gamerTag = resultSet.getString(FIELD_USERNAME);
 
                     usernames.put(userID, gamerTag);
                 }
@@ -331,7 +331,7 @@ public class BaseAccountManager<Data extends BaseData> {
                         .construct(BaseClasses.getInstance().accountClass);
 
                 foundAccount.id = userID;
-                foundAccount.gamerTag = resultSet.getString(FIELD_GAMER_TAG);
+                foundAccount.gamerTag = resultSet.getString(FIELD_USERNAME);
                 foundAccount.name = resultSet.getString(FIELD_NAME);
                 foundAccount.password = resultSet.getString(FIELD_PASSWORD);
                 foundAccount.phoneNumber = resultSet.getLong(FIELD_PHONE_NUMBER);
@@ -938,7 +938,7 @@ public class BaseAccountManager<Data extends BaseData> {
         AtomicInteger userID = new AtomicInteger(BaseConfig.NOT_FOUND);
 
         String insertStatement = "INSERT " + BaseConfig.TABLE_ACCOUNTS +
-                " (" + FIELD_GAMER_TAG + ", " + FIELD_PASSWORD + ", " + FIELD_NAME + ") VALUES (?, ?, ?)";
+                " (" + FIELD_USERNAME + ", " + FIELD_PASSWORD + ", " + FIELD_NAME + ") VALUES (?, ?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
