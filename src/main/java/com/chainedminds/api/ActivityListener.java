@@ -51,7 +51,7 @@ public class ActivityListener {
 
             for (int targetID : relations.keySet()) {
 
-                targetNames.put(targetID, BaseResources.getInstance().accountManager.getGamerTag(targetID));
+                targetNames.put(targetID, BaseResources.getInstance().accountManager.getUsername(targetID));
             }
 
             for (int targetID : RELATIONS.keySet()) {

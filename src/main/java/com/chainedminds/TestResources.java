@@ -1,6 +1,5 @@
 package com.chainedminds;
 
-import com.chainedminds.api.BaseLeaderboardManager;
 import com.chainedminds.api.accounting.BaseAccountManager;
 import com.chainedminds.api.accounting.BaseAccountPropertyManager;
 import com.chainedminds.api.accounting.BaseBlackListManager;
@@ -30,8 +29,7 @@ class TestResources extends BaseResources<
         BaseIABSubscriptionPurchasesManager<BaseIABTransactionData>,
         BaseIPGSubscriptionPurchasesManager<BaseIPGTransactionData>,
         BaseProductsManager<BaseProductData>,
-        BaseBlackListManager,
-        BaseLeaderboardManager<BaseData, BaseAccountData>> {
+        BaseBlackListManager> {
 
     private static final TestResources INSTANCE = new TestResources();
 
@@ -56,7 +54,6 @@ class TestResources extends BaseResources<
         super.ipgSubscriptionPurchasesManager = new BaseIPGSubscriptionPurchasesManager<>();
         super.productManager = new BaseProductsManager<>();
         super.blackListManager = new BaseBlackListManager();
-        super.leaderboardManager = new BaseLeaderboardManager<>();
 
         BaseResources baseResources = BaseResources.getInstance();
 
@@ -74,7 +71,6 @@ class TestResources extends BaseResources<
         baseResources.ipgSubscriptionPurchasesManager = super.ipgSubscriptionPurchasesManager;
         baseResources.productManager = super.productManager;
         baseResources.blackListManager = super.blackListManager;
-        baseResources.leaderboardManager = super.leaderboardManager;
 
         BaseClasses baseClasses = BaseClasses.getInstance();
 

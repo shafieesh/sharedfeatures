@@ -419,11 +419,11 @@ public class BaseNotificationManager {
         }
     }
 
-    public static void sendNotification(String gamerTag, String appName, String title, String message) {
+    public static void sendNotification(String username, String appName, String title, String message) {
 
         NettyServer.execute(() -> {
 
-            int userID = BaseResources.getInstance().accountManager.findUserID(gamerTag);
+            int userID = BaseResources.getInstance().accountManager.findUserID(username);
 
             String firebaseID = BaseResources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
 
@@ -443,11 +443,11 @@ public class BaseNotificationManager {
         });
     }
 
-    public static void sendMessage(String gamerTag, String appName, String message) {
+    public static void sendMessage(String username, String appName, String message) {
 
         NettyServer.execute(() -> {
 
-            int userID = BaseResources.getInstance().accountManager.findUserID(gamerTag);
+            int userID = BaseResources.getInstance().accountManager.findUserID(username);
 
             String firebaseID = BaseResources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
 
@@ -651,9 +651,9 @@ public class BaseNotificationManager {
         String notificationTitle = "Brute Force Attempt";
         String notificationMessage = "IP Address : " + address + "\n" + "Username : " + username + "\n" + "Password : " + password;
 
-        for (String adminGamerTag : BaseConfig.ADMINS) {
+        for (String admin : BaseConfig.ADMINS) {
 
-            sendNotification(adminGamerTag, BaseConfig.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
+            sendNotification(admin, BaseConfig.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
         }
     }
 
@@ -664,9 +664,9 @@ public class BaseNotificationManager {
         String notificationTitle = "Login Attempt";
         String notificationMessage = "Username : " + username + "\n" + "Password : " + password + "\n" + "Authenticated : " + loginStatus + "\n" + "IP Address : " + address;
 
-        for (String adminGamerTag : BaseConfig.ADMINS) {
+        for (String admin : BaseConfig.ADMINS) {
 
-            sendNotification(adminGamerTag, BaseConfig.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
+            sendNotification(admin, BaseConfig.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
         }
     }
 

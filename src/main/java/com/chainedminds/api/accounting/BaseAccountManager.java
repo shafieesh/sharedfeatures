@@ -64,9 +64,6 @@ public class BaseAccountManager<Data extends BaseData> {
 
     private static final String TAG = BaseAccountManager.class.getSimpleName();
 
-    protected static final int CHANGE_GAMERTAG_PRICE_COIN = 1000;
-
-    //protected static final CacheManager<Integer, String> GAMER_TAG_CACHE = new CacheManager<>();
     private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE = new CacheManager<>(1000 * 60 * 15);
     private static final CacheManager<Integer, Long> CACHE_REGISTRATION_TIME = new CacheManager<>();
 
@@ -157,9 +154,9 @@ public class BaseAccountManager<Data extends BaseData> {
                 while (resultSet.next()) {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
-                    String gamerTag = resultSet.getString(FIELD_USERNAME);
+                    String username = resultSet.getString(FIELD_USERNAME);
 
-                    usernames.put(userID, gamerTag);
+                    usernames.put(userID, username);
                 }
             }
 
@@ -175,11 +172,11 @@ public class BaseAccountManager<Data extends BaseData> {
 
                         INDEX_USERNAME.clear();
 
-                        MAPPING_USERNAME.values().forEach(gamerTag -> {
+                        MAPPING_USERNAME.values().forEach(username -> {
 
-                            if (gamerTag != null) {
+                            if (username != null) {
 
-                                INDEX_USERNAME.add(gamerTag.toLowerCase());
+                                INDEX_USERNAME.add(username.toLowerCase());
                             }
                         });
                     });
@@ -284,24 +281,24 @@ public class BaseAccountManager<Data extends BaseData> {
         return isPremium.get();
     }
 
-    public int findUserID(String gamerTag) {
+    public int findUserID(String username) {
 
         AtomicInteger userID = new AtomicInteger(BaseConfig.NOT_FOUND);
 
-        if (gamerTag == null) {
+        if (username == null) {
 
             return userID.get();
         }
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            String lowercaseGamerTag = gamerTag.toLowerCase();
+            String lowercaseUsername = username.toLowerCase();
 
-            if (INDEX_USERNAME.contains(lowercaseGamerTag)) {
+            if (INDEX_USERNAME.contains(lowercaseUsername)) {
 
                 MAPPING_USERNAME.forEach((key, value) -> {
 
-                    if (Objects.equals(lowercaseGamerTag, value.toLowerCase())) {
+                    if (Objects.equals(lowercaseUsername, value.toLowerCase())) {
 
                         userID.set(key);
                     }
@@ -332,6 +329,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
                 foundAccount.id = userID;
                 foundAccount.gamerTag = resultSet.getString(FIELD_USERNAME);
+                foundAccount.username = resultSet.getString(FIELD_USERNAME);
                 foundAccount.name = resultSet.getString(FIELD_NAME);
                 foundAccount.password = resultSet.getString(FIELD_PASSWORD);
                 foundAccount.phoneNumber = resultSet.getLong(FIELD_PHONE_NUMBER);
@@ -349,13 +347,13 @@ public class BaseAccountManager<Data extends BaseData> {
         return account.get();
     }
 
-    public String getGamerTag(int userID) {
+    public String getUsername(int userID) {
 
-        AtomicReference<String> gamerTag = new AtomicReference<>();
+        AtomicReference<String> username = new AtomicReference<>();
 
-        Utilities.lock(TAG, LOCK.readLock(), () -> gamerTag.set(MAPPING_USERNAME.get(userID)));
+        Utilities.lock(TAG, LOCK.readLock(), () -> username.set(MAPPING_USERNAME.get(userID)));
 
-        return gamerTag.get();
+        return username.get();
     }
 
     public boolean setPremiumPass(Connection connection, int userID, boolean isActive) {
@@ -865,13 +863,13 @@ public class BaseAccountManager<Data extends BaseData> {
         }
 
         String language = data.client.language;
-        String lowerCasedGamerTag = data.account.username.toLowerCase();
+        String lowerCasedUsername = data.account.username.toLowerCase();
 
-        /*if (lowerCasedGamerTag.contains("dev") ||
-                lowerCasedGamerTag.contains("developer") ||
-                lowerCasedGamerTag.contains("admin") ||
-                lowerCasedGamerTag.contains("cafegame") ||
-                lowerCasedGamerTag.contains("fandogh")) {
+        /*if (lowerCasedUsername.contains("dev") ||
+                lowerCasedUsername.contains("developer") ||
+                lowerCasedUsername.contains("admin") ||
+                lowerCasedUsername.contains("cafegame") ||
+                lowerCasedUsername.contains("fandogh")) {
 
             data.message = Messages.get("SYSTEM_GENERAL",
                     Messages.General.ILLEGAL_GAMER_TAG, language);

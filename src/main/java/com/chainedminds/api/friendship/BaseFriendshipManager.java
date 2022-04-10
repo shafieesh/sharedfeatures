@@ -205,7 +205,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
                 int receiverID = friendID;
                 int senderID = userID;
 
-                String requestingUserName = BaseResources.getInstance().accountManager.getGamerTag(senderID);
+                String requestingUserName = BaseResources.getInstance().accountManager.getUsername(senderID);
                 String receiverLanguage = BaseResources.getInstance()
                         .accountPropertyManager.getLanguage(receiverID, appName);
 
@@ -290,7 +290,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
                 int receiverID = friendID;
                 int acceptingUserID = userID;
 
-                String requestingUserName = BaseResources.getInstance().accountManager.getGamerTag(acceptingUserID);
+                String requestingUserName = BaseResources.getInstance().accountManager.getUsername(acceptingUserID);
                 String receiverLanguage = BaseResources.getInstance()
                         .accountPropertyManager.getLanguage(receiverID, appName);
 
@@ -734,7 +734,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
             } else {
 
                 String gamerTag = BaseResources.getInstance()
-                        .accountManager.getGamerTag(onlineFriendIDs.get(0));
+                        .accountManager.getUsername(onlineFriendIDs.get(0));
 
                 String message = Messages.get("FRIENDSHIP", Messages.Friendship.
                         GAMERTAG_IS_ONLINE, receiverLanguage, gamerTag);
@@ -743,7 +743,7 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
             }
         }
 
-        String gamerTag = BaseResources.getInstance().accountManager.getGamerTag(userID);
+        String gamerTag = BaseResources.getInstance().accountManager.getUsername(userID);
 
         for (int friendID : onlineFriendIDs) {
 

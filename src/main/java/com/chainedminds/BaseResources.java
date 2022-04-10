@@ -1,6 +1,5 @@
 package com.chainedminds;
 
-import com.chainedminds.api.BaseLeaderboardManager;
 import com.chainedminds.api.BaseRequestsManager;
 import com.chainedminds.api.accounting.BaseAccountManager;
 import com.chainedminds.api.accounting.BaseAccountPropertyManager;
@@ -10,7 +9,6 @@ import com.chainedminds.api.friendship.BaseFriendshipManager;
 import com.chainedminds.api.store.*;
 import com.chainedminds.dataClasses.BaseData;
 import com.chainedminds.dataClasses.BaseProductData;
-import com.chainedminds.dataClasses.account.BaseAccountData;
 import com.chainedminds.dataClasses.account.BaseFriendData;
 import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
 import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
@@ -30,8 +28,7 @@ public class BaseResources<
         IABSubscriptionPurchasesManager extends BaseIABSubscriptionPurchasesManager<? extends BaseIABTransactionData>,
         IPGSubscriptionPurchasesManager extends BaseIPGSubscriptionPurchasesManager<? extends BaseIPGTransactionData>,
         ProductManager extends BaseProductsManager<? extends BaseProductData>,
-        BlackListManager extends BaseBlackListManager,
-        LeaderboardManager extends BaseLeaderboardManager<? extends BaseData, ? extends BaseAccountData>> {
+        BlackListManager extends BaseBlackListManager> {
 
     private static final String TAG = BaseResources.class.getSimpleName();
 
@@ -60,5 +57,4 @@ public class BaseResources<
     public IPGSubscriptionPurchasesManager ipgSubscriptionPurchasesManager;
     public ProductManager productManager;
     public BlackListManager blackListManager;
-    public LeaderboardManager leaderboardManager;
 }
