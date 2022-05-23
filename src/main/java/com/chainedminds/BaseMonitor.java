@@ -1,6 +1,6 @@
 package com.chainedminds;
 
-import com.chainedminds.dataClasses.BaseData;
+import com.chainedminds.models.BaseData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;

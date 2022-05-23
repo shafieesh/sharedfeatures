@@ -6,12 +6,12 @@ import com.chainedminds.api.accounting.BaseBlackListManager;
 import com.chainedminds.api.accounting.BaseProfileManager;
 import com.chainedminds.api.friendship.BaseFriendshipManager;
 import com.chainedminds.api.store.*;
-import com.chainedminds.dataClasses.*;
-import com.chainedminds.dataClasses.account.BaseAccountData;
-import com.chainedminds.dataClasses.account.BaseFriendData;
-import com.chainedminds.dataClasses.notification.BaseNotificationData;
-import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
-import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
+import com.chainedminds.models.*;
+import com.chainedminds.models.account.BaseAccountData;
+import com.chainedminds.models.account.BaseFriendData;
+import com.chainedminds.models.notification.BaseNotificationData;
+import com.chainedminds.models.payment.BaseIABTransactionData;
+import com.chainedminds.models.payment.BaseIPGTransactionData;
 import com.chainedminds.samples.TestRequestManager;
 import com.chainedminds.utilities.BaseFileManager;
 

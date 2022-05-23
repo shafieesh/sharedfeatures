@@ -2,8 +2,7 @@ package com.chainedminds.samples;
 
 import com.chainedminds.BaseCodes;
 import com.chainedminds.api.BaseRequestsManager;
-import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.BaseFileData;
+import com.chainedminds.models.BaseData;
 import com.chainedminds.utilities.json.JsonHelper;
 
 import java.net.Socket;

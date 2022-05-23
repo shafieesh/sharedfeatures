@@ -1,7 +1,7 @@
 package com.chainedminds.api.accounting;
 
 import com.chainedminds.BaseConfig;
-import com.chainedminds.dataClasses.BlockClass;
+import com.chainedminds.models.BlockClass;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;

@@ -1,6 +1,6 @@
 package com.chainedminds.api.store;
 
-import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
+import com.chainedminds.models.payment.BaseIPGTransactionData;
 
 public class BaseIPGProductPurchasesManager<IPGTransactionData extends BaseIPGTransactionData> {
 

@@ -1,11 +1,11 @@
 package com.chainedminds;
 
-import com.chainedminds.dataClasses.*;
-import com.chainedminds.dataClasses.account.BaseAccountData;
-import com.chainedminds.dataClasses.account.BaseFriendData;
-import com.chainedminds.dataClasses.notification.BaseNotificationData;
-import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
-import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
+import com.chainedminds.models.*;
+import com.chainedminds.models.account.BaseAccountData;
+import com.chainedminds.models.account.BaseFriendData;
+import com.chainedminds.models.notification.BaseNotificationData;
+import com.chainedminds.models.payment.BaseIABTransactionData;
+import com.chainedminds.models.payment.BaseIPGTransactionData;
 import com.chainedminds.utilities.BaseLogs;
 
 public class BaseClasses {

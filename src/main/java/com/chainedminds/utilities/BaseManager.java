@@ -1,7 +1,7 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds.BaseCodes;
-import com.chainedminds.dataClasses.BaseData;
+import com.chainedminds.models.BaseData;
 
 public class BaseManager<Data extends BaseData> {
 

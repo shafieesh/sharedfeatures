@@ -2,7 +2,7 @@ package com.chainedminds.utilities;
 
 import com.chainedminds.BaseClasses;
 import com.chainedminds.BaseConfig;
-import com.chainedminds.dataClasses.BaseFileData;
+import com.chainedminds.models.BaseFileData;
 
 import java.io.File;
 import java.io.FileInputStream;

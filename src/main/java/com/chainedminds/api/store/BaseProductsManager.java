@@ -1,10 +1,8 @@
 package com.chainedminds.api.store;
 
 import com.chainedminds.BaseClasses;
-import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
-import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.BaseProductData;
+import com.chainedminds.models.BaseProductData;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;

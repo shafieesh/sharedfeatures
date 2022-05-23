@@ -1,6 +1,6 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.dataClasses.BaseData;
+import com.chainedminds.models.BaseData;
 
 public class BackendManager {
 

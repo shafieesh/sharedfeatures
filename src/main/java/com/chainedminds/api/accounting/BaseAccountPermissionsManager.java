@@ -1,6 +1,7 @@
 package com.chainedminds.api.accounting;
 
 import com.chainedminds.BaseConfig;
+import com.chainedminds.models.BasePermissionData;
 import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
@@ -27,8 +28,8 @@ public class BaseAccountPermissionsManager {
     private static final String FIELD_TITLE = "Title";
     private static final String FIELD_DESCRIPTION = "Description";
 
-    private static final List<Permission> PERMISSIONS = new ArrayList<>();
-    private static final List<Permission> USER_PERMISSIONS = new ArrayList<>();
+    private static final List<BasePermissionData> PERMISSIONS = new ArrayList<>();
+    private static final List<BasePermissionData> USER_PERMISSIONS = new ArrayList<>();
 
     private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
@@ -51,14 +52,14 @@ public class BaseAccountPermissionsManager {
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
-            private final List<Permission> permissions = new ArrayList<>();
+            private final List<BasePermissionData> permissions = new ArrayList<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
-                    Permission permission = new Permission();
+                    BasePermissionData permission = new BasePermissionData();
                     permission.appName = resultSet.getString(FIELD_APP_NAME);
                     permission.permission = resultSet.getString(FIELD_PERMISSION);
                     permission.title = resultSet.getString(FIELD_TITLE);
@@ -91,8 +92,7 @@ public class BaseAccountPermissionsManager {
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
-            private final List<Permission> permissions = new ArrayList<>();
-            private final Set<Integer> userIDs = new HashSet<>();
+            private final List<BasePermissionData> permissions = new ArrayList<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -101,9 +101,7 @@ public class BaseAccountPermissionsManager {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
 
-                    userIDs.add(userID);
-
-                    Permission permission = new Permission();
+                    BasePermissionData permission = new BasePermissionData();
 
                     permission.userID = userID;
                     permission.appName = resultSet.getString(FIELD_APP_NAME);
@@ -128,9 +126,9 @@ public class BaseAccountPermissionsManager {
         });
     }
 
-    public static List<Permission> getPermissions() {
+    public static List<BasePermissionData> getPermissions() {
 
-        List<Permission> permissions = new ArrayList<>();
+        List<BasePermissionData> permissions = new ArrayList<>();
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
@@ -146,7 +144,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID) {
 
@@ -185,7 +183,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID && ("*".equals(appName) || appName.equals(permission.appName))) {
 
@@ -203,7 +201,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID && ("*".equals(appName) || appName.equals(permission.appName))) {
 
@@ -222,7 +220,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID) {
 
@@ -241,7 +239,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID && permissionName.equals(permission.permission)) {
 
@@ -261,7 +259,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -283,7 +281,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -305,7 +303,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if (userID == permission.userID &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -328,7 +326,7 @@ public class BaseAccountPermissionsManager {
 
         Utilities.lock(TAG, LOCK.readLock(), () -> {
 
-            for (Permission permission : USER_PERMISSIONS) {
+            for (BasePermissionData permission : USER_PERMISSIONS) {
 
                 if ((userID == permission.userID || userID2 == permission.userID) &&
                         ("*".equals(appName) || appName.equals(permission.appName)) &&
@@ -384,14 +382,5 @@ public class BaseAccountPermissionsManager {
                 fetchUserPermissions();
             }
         });
-    }
-
-    private static class Permission {
-
-        int userID;
-        String appName;
-        String permission;
-        String title;
-        String description;
     }
 }

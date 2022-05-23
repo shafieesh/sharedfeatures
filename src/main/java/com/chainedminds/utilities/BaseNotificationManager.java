@@ -4,25 +4,18 @@ import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
 import com.chainedminds.api.BaseApis;
-import com.chainedminds.dataClasses.BaseMessageData;
-import com.chainedminds.dataClasses.firebase.FirebaseMessageData;
-import com.chainedminds.dataClasses.notification.Action;
-import com.chainedminds.dataClasses.notification.BaseNotificationData;
-import com.chainedminds.dataClasses.notification.FirebaseResponseData;
+import com.chainedminds.models.BaseMessageData;
+import com.chainedminds.models.firebase.FirebaseMessageData;
+import com.chainedminds.models.notification.Action;
+import com.chainedminds.models.notification.BaseNotificationData;
+import com.chainedminds.models.notification.FirebaseResponseData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.json.JsonHelper;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class BaseNotificationManager {
 

@@ -3,7 +3,7 @@ package com.chainedminds.api.store;
 import com.chainedminds.BaseClasses;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
-import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
+import com.chainedminds.models.payment.BaseIABTransactionData;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;

@@ -1,7 +1,7 @@
 package com.chainedminds.api.store;
 
 import com.chainedminds.BaseConfig;
-import com.chainedminds.dataClasses.payment.BaseIPGTransactionData;
+import com.chainedminds.models.payment.BaseIPGTransactionData;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 
 import java.sql.Connection;

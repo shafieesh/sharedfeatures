@@ -1,7 +1,7 @@
 package com.chainedminds.api.store;
 
-import com.chainedminds.dataClasses.BaseProductData;
-import com.chainedminds.dataClasses.payment.BaseTransactionData;
+import com.chainedminds.models.BaseProductData;
+import com.chainedminds.models.payment.BaseTransactionData;
 
 import java.sql.Connection;
 

@@ -1,8 +1,8 @@
 package com.chainedminds.network;
 
 import com.chainedminds.*;
-import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.ClientData;
+import com.chainedminds.models.BaseData;
+import com.chainedminds.models.ClientData;
 import com.chainedminds.utilities.BaseLogs;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonHelper;

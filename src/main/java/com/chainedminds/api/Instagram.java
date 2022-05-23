@@ -1,9 +1,9 @@
 package com.chainedminds.api;
 
 import com.chainedminds.BaseCodes;
-import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.InstagramData;
-import com.chainedminds.dataClasses.account.BaseAccountData;
+import com.chainedminds.models.BaseData;
+import com.chainedminds.models.InstagramData;
+import com.chainedminds.models.account.BaseAccountData;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonHelper;
 

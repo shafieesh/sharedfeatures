@@ -2,12 +2,12 @@ package com.chainedminds.api.store;
 
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
-import com.chainedminds.dataClasses.BaseData;
-import com.chainedminds.dataClasses.BaseProductData;
-import com.chainedminds.dataClasses.market.CafeBazaarClass;
-import com.chainedminds.dataClasses.market.JhoobinClass;
-import com.chainedminds.dataClasses.market.MarketData;
-import com.chainedminds.dataClasses.payment.BaseIABTransactionData;
+import com.chainedminds.models.BaseData;
+import com.chainedminds.models.BaseProductData;
+import com.chainedminds.models.market.CafeBazaarClass;
+import com.chainedminds.models.market.JhoobinClass;
+import com.chainedminds.models.market.MarketData;
+import com.chainedminds.models.payment.BaseIABTransactionData;
 import com.chainedminds.network.DataTransportManager;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.json.JsonHelper;
