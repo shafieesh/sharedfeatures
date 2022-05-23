@@ -17,10 +17,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class BaseAccountPermissionsManager {
 
-    public static final String PREMIUM = "PREMIUM";
-
-    public static final String ADMIN = "ADMIN";
-    public static final String MODERATOR = "MODERATOR";
     private static final String TAG = BaseAccountPermissionsManager.class.getSimpleName();
 
     private static final String FIELD_USER_ID = "UserID";
@@ -33,7 +29,6 @@ public class BaseAccountPermissionsManager {
 
     private static final List<Permission> PERMISSIONS = new ArrayList<>();
     private static final List<Permission> USER_PERMISSIONS = new ArrayList<>();
-    private static final Set<Integer> USER_ID_IDX = new HashSet<>();
 
     private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
@@ -126,10 +121,7 @@ public class BaseAccountPermissionsManager {
                     Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
                         USER_PERMISSIONS.clear();
-                        USER_ID_IDX.clear();
-
                         USER_PERMISSIONS.addAll(permissions);
-                        USER_ID_IDX.addAll(userIDs);
                     });
                 }
             }
@@ -228,7 +220,17 @@ public class BaseAccountPermissionsManager {
 
         AtomicBoolean hasPermissions = new AtomicBoolean(false);
 
-        Utilities.lock(TAG, LOCK.readLock(), () -> hasPermissions.set(USER_ID_IDX.contains(userID)));
+        Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+            for (Permission permission : USER_PERMISSIONS) {
+
+                if (userID == permission.userID) {
+
+                    hasPermissions.set(true);
+                    break;
+                }
+            }
+        });
 
         return hasPermissions.get();
     }

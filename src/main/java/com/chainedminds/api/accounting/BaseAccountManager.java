@@ -1294,7 +1294,7 @@ public class BaseAccountManager<Data extends BaseData> {
         return data;
     }*/
 
-    public Data searchUsernames(Data data) {
+    public Data searchUsers(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -1333,7 +1333,7 @@ public class BaseAccountManager<Data extends BaseData> {
         return data;
     }
 
-    public Data getUsernames(Data data) {
+    public Data getUsers(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
@@ -1364,5 +1364,22 @@ public class BaseAccountManager<Data extends BaseData> {
         data.response = BaseCodes.RESPONSE_OK;
 
         return data;
+    }
+
+    public BaseAccountData getUser(int userID, String appName, int targetUserID) {
+
+        AtomicReference<BaseAccountData> accountHolder = new AtomicReference<>();
+
+        if (BaseAccountPermissionsManager.hasPermission(userID, appName, "USER_MANAGEMENT")) {
+
+            BaseAccountData account = getAccount(targetUserID);
+
+            account.password = null;
+            account.permissions = BaseAccountPermissionsManager.getPermissions(targetUserID, appName);
+
+            accountHolder.set(account);
+        }
+
+        return accountHolder.get();
     }
 }
