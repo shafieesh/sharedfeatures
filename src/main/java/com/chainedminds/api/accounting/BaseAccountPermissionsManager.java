@@ -20,18 +20,18 @@ public class BaseAccountPermissionsManager {
 
     private static final String TAG = BaseAccountPermissionsManager.class.getSimpleName();
 
-    private static final String FIELD_USER_ID = "UserID";
-    private static final String FIELD_APP_NAME = "AppName";
-    private static final String FIELD_PERMISSION = "Permission";
-    private static final String FIELD_START_TIME = "StartTime";
-    private static final String FIELD_FINISH_TIME = "FinishTime";
-    private static final String FIELD_TITLE = "Title";
-    private static final String FIELD_DESCRIPTION = "Description";
+    protected static final String FIELD_USER_ID = "UserID";
+    protected static final String FIELD_APP_NAME = "AppName";
+    protected static final String FIELD_PERMISSION = "Permission";
+    protected static final String FIELD_START_TIME = "StartTime";
+    protected static final String FIELD_FINISH_TIME = "FinishTime";
+    protected static final String FIELD_TITLE = "Title";
+    protected static final String FIELD_DESCRIPTION = "Description";
 
-    private static final List<BasePermissionData> PERMISSIONS = new ArrayList<>();
-    private static final List<BasePermissionData> USER_PERMISSIONS = new ArrayList<>();
+    protected static final List<BasePermissionData> PERMISSIONS = new ArrayList<>();
+    protected static final List<BasePermissionData> USER_PERMISSIONS = new ArrayList<>();
 
-    private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public static void start() {
 
@@ -46,7 +46,7 @@ public class BaseAccountPermissionsManager {
                 }));
     }
 
-    private static void fetchPermissions() {
+    protected static void fetchPermissions() {
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PERMISSIONS;
 
@@ -84,7 +84,7 @@ public class BaseAccountPermissionsManager {
         });
     }
 
-    private static void fetchUserPermissions() {
+    protected static void fetchUserPermissions() {
 
         String selectStatement = "SELECT * FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
