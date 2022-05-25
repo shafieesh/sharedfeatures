@@ -88,7 +88,7 @@ public class BaseAccountPermissionsManager {
 
         String selectStatement = "SELECT * FROM " +
                 BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
-                " WHERE " + FIELD_START_TIME + " < NOW() AND " + FIELD_FINISH_TIME + " > NOW()";
+                " WHERE " + FIELD_START_TIME + " <= NOW() AND NOW() <= " + FIELD_FINISH_TIME;
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -354,6 +354,31 @@ public class BaseAccountPermissionsManager {
         parameters.put(2, appName);
         parameters.put(3, permission);
         parameters.put(4, new Timestamp(finishTime));
+
+        return BaseDatabaseHelperOld.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+
+            if (wasSuccessful) {
+
+                fetchUserPermissions();
+            }
+        });
+    }
+
+    public static boolean setPermission(Connection connection, int userID,
+                                        String appName, String permission,
+                                        long startTime, long finishTime) {
+
+        String insertStatement = "REPLACE " + BaseConfig.TABLE_ACCOUNTS_PERMISSIONS +
+                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PERMISSION +
+                ", " + FIELD_START_TIME + ", " + FIELD_FINISH_TIME + ") VALUES (?, ?, ?, ?, ?)";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+
+        parameters.put(1, userID);
+        parameters.put(2, appName);
+        parameters.put(3, permission);
+        parameters.put(4, new Timestamp(startTime));
+        parameters.put(5, new Timestamp(finishTime));
 
         return BaseDatabaseHelperOld.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
