@@ -298,7 +298,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
                 MAPPING_USERNAME.forEach((key, value) -> {
 
-                    if (Objects.equals(lowercaseUsername, value.toLowerCase())) {
+                    if (value != null && Objects.equals(lowercaseUsername, value.toLowerCase())) {
 
                         userID.set(key);
                     }
