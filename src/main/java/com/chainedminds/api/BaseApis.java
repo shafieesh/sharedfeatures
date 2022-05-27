@@ -15,7 +15,7 @@ public class BaseApis {
         buildHttpClient();
     }
 
-    public static synchronized void buildHttpClient() {
+    private static synchronized void buildHttpClient() {
 
         if (OK_HTTP_CLIENT != null) {
 
