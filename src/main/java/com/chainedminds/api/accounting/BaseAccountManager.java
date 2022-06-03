@@ -946,23 +946,32 @@ public class BaseAccountManager<Data extends BaseData> {
 
         BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
-            userID.set(generatedID);
+            if (wasSuccessful) {
 
-            String insertStatement2 = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
-                    " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM +
-                    ") VALUES (?, ?, ?)";
+                userID.set(generatedID);
 
-            parameters.put(1, generatedID);
-            parameters.put(2, appName);
-            parameters.put(3, platform);
+                if (appName != null && platform != null) {
 
-            BaseDatabaseHelperOld.insert(TAG, insertStatement2, parameters);
+                    String insertStatement2 = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
+                            " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM +
+                            ") VALUES (?, ?, ?)";
 
-            Utilities.lock(TAG, LOCK.writeLock(), () -> {
+                    parameters.put(1, generatedID);
+                    parameters.put(2, appName);
+                    parameters.put(3, platform);
 
-                MAPPING_USERNAME.put(userID.get(), username);
-                INDEX_USERNAME.add(username.toLowerCase());
-            });
+                    wasSuccessful = BaseDatabaseHelperOld.insert(TAG, insertStatement2, parameters);
+                }
+
+                if (wasSuccessful) {
+
+                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
+
+                        MAPPING_USERNAME.put(userID.get(), username);
+                        INDEX_USERNAME.add(username.toLowerCase());
+                    });
+                }
+            }
         });
 
         return userID.get();
