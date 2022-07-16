@@ -925,7 +925,7 @@ public class BaseAccountManager<Data extends BaseData> {
             data.response = BaseCodes.RESPONSE_IS_REGISTERED_BEFORE;
 
             data.message = Messages.get("SYSTEM_GENERAL",
-                    Messages.General.GAMER_TAG_HAS_REGISTERED_BEFORE, language);
+                    Messages.General.USERNAME_HAS_REGISTERED_BEFORE, language);
         }
 
         return data;

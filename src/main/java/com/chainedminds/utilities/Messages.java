@@ -183,15 +183,15 @@ public class Messages {
         public static String SERVERS_ARE_NOT_AVAILABLE = "SERVERS_ARE_NOT_AVAILABLE";
         public static String MISSING_DATA = "MISSING_DATA";
         public static String MISSING_PERMISSION = "MISSING_PERMISSION";
-        public static String INVALID_USERNAME_OR_PASSWORD = "INVALID_GAMER_TAG_OR_PASSWORD";
+        public static String INVALID_USERNAME_OR_PASSWORD = "INVALID_USERNAME_OR_PASSWORD";
         public static String SOMETHING_WENT_WRONG = "SOMETHING_WENT_WRONG";
         public static String SOMETHING_WENT_WRONG_TRY_AGAIN = "SOMETHING_WENT_WRONG_TRY_AGAIN";
         public static String TOO_MANY_ATTEMPTS = "TOO_MANY_ATTEMPTS";
 
         public static String PREMIUM_IS_ALREADY_ACTIVE = "PREMIUM_IS_ALREADY_ACTIVE";
 
-        public static String GAMER_TAG_HAS_REGISTERED_BEFORE = "GAMER_TAG_HAS_REGISTERED_BEFORE";
-        public static String ILLEGAL_GAMER_TAG = "ILLEGAL_GAMER_TAG";
+        public static String USERNAME_HAS_REGISTERED_BEFORE = "USERNAME_HAS_REGISTERED_BEFORE";
+        public static String ILLEGAL_USERNAME = "ILLEGAL_USERNAME";
         public static String PAYMENT_INFO_IS_NOT_VALID = "PAYMENT_INFO_IS_NOT_VALID";
         public static String THANK_YOU_FOR_YOUR_PURCHASE = "THANK_YOU_FOR_YOUR_PURCHASE";
         public static String YOU_ARE_BLOCKED_FOR_SOME_TIMES = "YOU_ARE_BLOCKED_FOR_SOME_TIMES";
