@@ -141,12 +141,12 @@ public class BaseConfig {
     public static final int MEDIA_AUDIO = 3;
     public static final int MEDIA_APK = 4;
 
-    public static final int OKHTTP_DISPATCHER_MAX_REQUESTS = 250;
-    public static final int OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST = 50;
-    public static final int OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS = 50;
-    public static final int OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION = 60;
-    public static final long OKHTTP_CALL_TIMEOUT = 3_000;
-    public static final long OKHTTP_READ_TIMEOUT = 10_000;
+    public static int OKHTTP_DISPATCHER_MAX_REQUESTS = 250;
+    public static int OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST = 50;
+    public static int OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS = 50;
+    public static int OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION = 60;
+    public static long OKHTTP_CALL_TIMEOUT = 3_000;
+    public static long OKHTTP_READ_TIMEOUT = 10_000;
 
     protected static void config() {
 
