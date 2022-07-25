@@ -1,5 +1,6 @@
 package com.chainedminds.api;
 
+import com.chainedminds.BaseConfig;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,10 +26,13 @@ public class BaseApis {
         //Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("vpn.fandoghapps.com", 65001));
 
         Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(250);
-        dispatcher.setMaxRequestsPerHost(50);
+        dispatcher.setMaxRequests(BaseConfig.OKHTTP_DISPATCHER_MAX_REQUESTS);
+        dispatcher.setMaxRequestsPerHost(BaseConfig.OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST);
 
-        ConnectionPool connectionPool = new ConnectionPool(50, 1, TimeUnit.MINUTES);
+        ConnectionPool connectionPool = new ConnectionPool(
+                BaseConfig.OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS,
+                BaseConfig.OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION,
+                TimeUnit.SECONDS);
 
         OK_HTTP_CLIENT = new OkHttpClient.Builder()
                 //.addNetworkInterceptor(new LoggingInterceptor())
@@ -36,8 +40,8 @@ public class BaseApis {
                 .cache(null)
                 .dispatcher(dispatcher)
                 .connectionPool(connectionPool)
-                .callTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
+                .callTimeout(BaseConfig.OKHTTP_CALL_TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(BaseConfig.OKHTTP_READ_TIMEOUT, TimeUnit.MILLISECONDS)
                 .build();
     }
 
