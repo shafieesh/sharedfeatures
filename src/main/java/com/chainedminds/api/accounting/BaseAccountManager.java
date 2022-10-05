@@ -645,7 +645,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         if (BaseConfig.APP_NAME_CAFE_CHAT.equals(appName)) {
 
-            data.message = "برای ورود به حساب از 'کافه گیم' بجای 'کافه چت' استفاده کن. 'کافه گیم' رو میتونی از طریق گوگل پلی، کافه بازار و یا مایکت نصب کنی.";
+            data.message = "Please install CafeGame to continue";
 
             return data;
         }
@@ -679,20 +679,6 @@ public class BaseAccountManager<Data extends BaseData> {
             }
 
             Boolean passwordValidated = validatePassword(userID, password);
-
-            if (BaseAccountPermissionsManager.hasPermission(userID, "*", "MANAGEMENT") ||
-                    BaseAccountPermissionsManager.hasPermission(userID, "*", "ADMIN") ||
-                    BaseAccountPermissionsManager.hasPermission(userID, "*", "MODERATOR")) {
-
-                //BaseNotificationManager.reportLogin(username, password, passwordValidated, address);
-
-                if (BaseConfig.APP_NAME_CAFE_CHAT.equals(appName)) {
-
-                    data.message = "این حساب فقط از طریق 'کافه گیم' مجاز به ورود می باشد";
-
-                    return data;
-                }
-            }
 
             if (passwordValidated != null) {
 

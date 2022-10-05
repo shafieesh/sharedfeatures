@@ -16,6 +16,8 @@ import okhttp3.RequestBody;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BaseNotificationManager {
 
@@ -617,7 +619,7 @@ public class BaseNotificationManager {
             }
 
             @Override
-            public void onResponse(String response) {
+            public void onResponse(Map<String, List<String>> headers, String response) {
 
                 System.out.println(response);
 
@@ -871,8 +873,8 @@ public class BaseNotificationManager {
 
         BaseNotificationData notification = new BaseNotificationData();
 
-        notification.title = "اختلال سراسری در کافه";
-        notification.content = "متاسفانه اختلالاتی در شبکه به وجود آمده که در حال پیگیری برای حل مشکل هستیم.";
+        notification.title = "";
+        notification.content = "";
         //notification.tag = "friendship_new_friendship_request";
 
         notification.action = new Action();
@@ -919,8 +921,8 @@ public class BaseNotificationManager {
 
         BaseNotificationData notification = new BaseNotificationData();
 
-        notification.title = "برطرف شدن اختلال سراسری";
-        notification.content = "خوشبختانه هم اکنون مشکل سراسری حل شده و کافه گیم بار دیگر در کنار شماست.";
+        notification.title = "";
+        notification.content = "";
         //notification.tag = "friendship_new_friendship_request";
 
         notification.action = new Action();
@@ -963,8 +965,8 @@ public class BaseNotificationManager {
 
         BaseNotificationData notification = new BaseNotificationData();
 
-        notification.title = "یلدایتان مبارک! \uD83C\uDF49\uD83C\uDF49";
-        notification.content = "تا ۷۰ درصد تخفیف در فروشگاه کافه گیم به مناسبت شب یلدا!";
+        notification.title = "";
+        notification.content = "";
         //notification.tag = "friendship_new_friendship_request";
 
         notification.action = new Action();

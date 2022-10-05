@@ -2,9 +2,14 @@ package com.chainedminds.api;
 
 import com.chainedminds.BaseConfig;
 import okhttp3.*;
+import org.brotli.dec.BrotliInputStream;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class BaseApis {
@@ -65,21 +70,36 @@ public class BaseApis {
 
             try (Response response = BaseApis.OK_HTTP_CLIENT.newCall(request).execute()) {
 
-                /*Headers headers = response.headers();
-
-                System.out.println(JsonHelper.getString(headers.toMultimap()));*/
+                Headers headers = response.headers();
 
                 ResponseBody responseBody = response.body();
 
+                //System.out.println(JsonHelper.getString(headers.toMultimap()));
+
                 if (responseBody != null) {
 
-                    String responseString = responseBody.string();
+                    String responseString = null;
+
+                    if ("br".equals(headers.get("content-encoding"))) {
+
+                        InputStreamReader inputStream = new InputStreamReader(
+                                new BrotliInputStream(responseBody.byteStream()));
+
+                        Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+
+                        responseString = scanner.hasNext() ? scanner.next() : "";
+                    }
+
+                    if (responseString == null) {
+
+                        responseString = responseBody.string();
+                    }
 
                     responseBody.close();
 
                     if (apiCallback != null) {
 
-                        apiCallback.onResponse(responseString);
+                        apiCallback.onResponse(headers.toMultimap(), responseString);
                     }
                 }
             }
@@ -128,19 +148,34 @@ public class BaseApis {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
-                /*Headers headers = response.headers();
+                Headers headers = response.headers();
 
-                System.out.println(JsonHelper.getString(headers.toMultimap()));*/
+                //System.out.println(JsonHelper.getString(headers.toMultimap()));
 
                 try (ResponseBody responseBody = response.body()) {
 
                     if (responseBody != null) {
 
-                        String responseString = responseBody.string();
+                        String responseString = null;
+
+                        if ("br".equals(headers.get("content-encoding"))) {
+
+                            InputStreamReader inputStream = new InputStreamReader(
+                                    new BrotliInputStream(responseBody.byteStream()));
+
+                            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+
+                            responseString = scanner.hasNext() ? scanner.next() : "";
+                        }
+
+                        if (responseString == null) {
+
+                            responseString = responseBody.string();
+                        }
 
                         if (apiCallback != null) {
 
-                            apiCallback.onResponse(responseString);
+                            apiCallback.onResponse(headers.toMultimap(), responseString);
                         }
                     }
                 }
@@ -159,7 +194,7 @@ public class BaseApis {
 
         void onError(String error);
 
-        void onResponse(String response);
+        void onResponse(Map<String, List<String>> headers, String response);
     }
 
     static class LoggingInterceptor implements Interceptor {
