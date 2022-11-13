@@ -31,7 +31,7 @@ public class DynamicConfig {
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("DynamicConfig")
                 .setTime(0, 0, 0)
-                .setInterval(0, 0, 10, 0)
+                .setInterval(0, 0, 5, 0)
                 .setTimingListener(task -> fetchRecords())
                 .startAndSchedule());
     }
@@ -80,12 +80,6 @@ public class DynamicConfig {
                         MAPS.putAll(maps);
                         LISTS.putAll(lists);
                     });
-
-                } else {
-
-                    Utilities.sleep(5000);
-
-                    fetchRecords();
                 }
             }
         });
