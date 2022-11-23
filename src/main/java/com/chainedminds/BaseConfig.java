@@ -147,6 +147,9 @@ public class BaseConfig {
     public static int OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION = 60;
     public static long OKHTTP_CALL_TIMEOUT = 3_000;
     public static long OKHTTP_READ_TIMEOUT = 10_000;
+    public static String OKHTTP_PROXY;
+    public static String OKHTTP_PROXY_ADDRESS;
+    public static int OKHTTP_PROXY_PORT;
 
     protected static void config() {
 

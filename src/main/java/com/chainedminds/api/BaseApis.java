@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -28,7 +30,17 @@ public class BaseApis {
             return;
         }
 
-        //Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("vpn.fandoghapps.com", 65001));
+        Proxy proxy = Proxy.NO_PROXY;
+
+        if ("SOCKS".equals(BaseConfig.OKHTTP_PROXY)) {
+
+            proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(BaseConfig.OKHTTP_PROXY_ADDRESS, BaseConfig.OKHTTP_PROXY_PORT));
+        }
+
+        if ("HTTP".equals(BaseConfig.OKHTTP_PROXY)) {
+
+            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(BaseConfig.OKHTTP_PROXY_ADDRESS, BaseConfig.OKHTTP_PROXY_PORT));
+        }
 
         Dispatcher dispatcher = new Dispatcher();
         dispatcher.setMaxRequests(BaseConfig.OKHTTP_DISPATCHER_MAX_REQUESTS);
@@ -41,7 +53,7 @@ public class BaseApis {
 
         OK_HTTP_CLIENT = new OkHttpClient.Builder()
                 //.addNetworkInterceptor(new LoggingInterceptor())
-                //.proxy(proxy)
+                .proxy(proxy)
                 .cache(null)
                 .dispatcher(dispatcher)
                 .connectionPool(connectionPool)
