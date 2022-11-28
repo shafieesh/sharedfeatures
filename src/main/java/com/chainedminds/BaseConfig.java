@@ -151,6 +151,9 @@ public class BaseConfig {
     public static String OKHTTP_PROXY_ADDRESS;
     public static int OKHTTP_PROXY_PORT;
 
+    public static int BRUTE_FORCE_ALLOWED_ATTEMPTS = 20;
+    public static int BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER = FIFTEEN_MINUTES;
+
     protected static void config() {
 
         TABLE_GAME_SESSIONS = DATABASE_NAME + "." + TABLE_NAME_GAME_SESSIONS;

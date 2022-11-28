@@ -64,7 +64,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
     private static final String TAG = BaseAccountManager.class.getSimpleName();
 
-    private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE = new CacheManager<>(1000 * 60 * 15);
+    private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE = new CacheManager<>(BaseConfig.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
     private static final CacheManager<Integer, Long> CACHE_REGISTRATION_TIME = new CacheManager<>();
 
     //protected final Set<Long> INDEX_USER_ID = new HashSet<>();
@@ -741,7 +741,7 @@ public class BaseAccountManager<Data extends BaseData> {
 
         int attemptsTimes = LOGIN_ATTEMPTS_CACHE.get(address, () -> 1);
 
-        if (attemptsTimes > 20) {
+        if (attemptsTimes > BaseConfig.BRUTE_FORCE_ALLOWED_ATTEMPTS) {
 
             return true;
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CacheManager<Key, Value> {
 
@@ -13,8 +12,6 @@ public class CacheManager<Key, Value> {
     private static final List<CacheManager> cacheManagers = new ArrayList<>();
 
     private final Map<Key, Data> cache = new HashMap<>();
-
-    private final ReentrantReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     private long RECORD_LIFETIME = 60 * 60 * 1000;
 
@@ -79,7 +76,7 @@ public class CacheManager<Key, Value> {
 
         if (storedData != null && storedData.value != null) {
 
-            storedData.lastAccess = System.currentTimeMillis();
+            storedData.lastAccessTime = System.currentTimeMillis();
 
             return storedData.value;
 
@@ -99,7 +96,7 @@ public class CacheManager<Key, Value> {
         Data data = cache.getOrDefault(key, new Data());
 
         data.value = value;
-        data.lastAccess = System.currentTimeMillis();
+        data.lastAccessTime = System.currentTimeMillis();
 
         cache.put(key, data);
     }
@@ -112,7 +109,7 @@ public class CacheManager<Key, Value> {
 
         cache.forEach((key, data) -> {
 
-            if (currentTime - extractLastAccess(data) > RECORD_LIFETIME) {
+            if (currentTime - getLastAccessTime(data) > RECORD_LIFETIME) {
 
                 keysToBeRemoved.add(key);
             }
@@ -131,9 +128,9 @@ public class CacheManager<Key, Value> {
         return data != null ? data.value : null;
     }
 
-    private long extractLastAccess(Data data) {
+    private long getLastAccessTime(Data data) {
 
-        return data != null ? data.lastAccess : 0;
+        return data != null ? data.lastAccessTime : 0;
     }
 
     public interface OnNoDataAvailableListener<V> {
@@ -144,6 +141,6 @@ public class CacheManager<Key, Value> {
     class Data {
 
         Value value;
-        long lastAccess;
+        long lastAccessTime;
     }
 }
