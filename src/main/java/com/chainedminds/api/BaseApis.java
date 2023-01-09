@@ -58,7 +58,9 @@ public class BaseApis {
                 .dispatcher(dispatcher)
                 .connectionPool(connectionPool)
                 .callTimeout(BaseConfig.OKHTTP_CALL_TIMEOUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(BaseConfig.OKHTTP_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .readTimeout(BaseConfig.OKHTTP_READ_TIMEOUT, TimeUnit.MILLISECONDS)
+                .writeTimeout(BaseConfig.OKHTTP_WRITE_TIMEOUT, TimeUnit.MILLISECONDS)
                 .build();
     }
 
