@@ -25,6 +25,7 @@ public class BaseAccountPermissionsManager {
     protected static final String FIELD_PERMISSION = "Permission";
     protected static final String FIELD_START_TIME = "StartTime";
     protected static final String FIELD_FINISH_TIME = "FinishTime";
+    protected static final String FIELD_CATEGORY = "Category";
     protected static final String FIELD_TITLE = "Title";
     protected static final String FIELD_DESCRIPTION = "Description";
 
@@ -48,7 +49,7 @@ public class BaseAccountPermissionsManager {
 
     protected static void fetchPermissions() {
 
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PERMISSIONS;
+        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PERMISSIONS + " ORDER BY " + FIELD_CATEGORY;
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -62,6 +63,7 @@ public class BaseAccountPermissionsManager {
                     BasePermissionData permission = new BasePermissionData();
                     permission.appName = resultSet.getString(FIELD_APP_NAME);
                     permission.permission = resultSet.getString(FIELD_PERMISSION);
+                    permission.category = resultSet.getString(FIELD_CATEGORY);
                     permission.title = resultSet.getString(FIELD_TITLE);
                     permission.description = resultSet.getString(FIELD_DESCRIPTION);
 
