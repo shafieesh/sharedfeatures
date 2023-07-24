@@ -14,8 +14,6 @@ public class TaskManager extends Thread {
 
     private static final String TAG = TaskManager.class.getSimpleName();
 
-    private static final int TWO_SECONDS = 1500;
-
     private static final String COLUMN_TASK_NAME = "Name";
     private static final String COLUMN_TASK_TIME = "DateTime";
     private static final List<Task> TASKS = new ArrayList<>();
@@ -29,28 +27,23 @@ public class TaskManager extends Thread {
 
     public static void addTask(Task task) {
 
-        calibrateTime(task);
+        if (!task.finalized) {
 
-        if (!task.executedBefore) {
-
-            task.executedBefore = getExecutedBefore(task);
-
-            if (task.executedBefore) addInterval(task);
+            return;
         }
 
-        long currentTime = System.currentTimeMillis();
+        calibrateTime(task);
 
-        if (task.startAndSchedule) {
+        addInterval(task);
 
-            addInterval(task);
+        if (task.runNow) {
 
-            startTask(task, currentTime);
+            startTask(task);
+        }
 
-        } else if (task.startAsyncAndSchedule || !task.executedBefore) {
+        if (task.runAsyncNow) {
 
-            addInterval(task);
-
-            startTaskAsync(task, currentTime);
+            startTaskAsync(task);
         }
 
         TASKS.add(task);
@@ -61,6 +54,7 @@ public class TaskManager extends Thread {
         long currentTime = System.currentTimeMillis();
 
         while ((currentTime - task.time) >= task.interval) {
+
             addInterval(task);
         }
     }
@@ -69,15 +63,6 @@ public class TaskManager extends Thread {
 
         task.time += task.interval;
         task.nextRun = task.time;
-
-        /*task.calendar.setTimeInMillis(task.time);
-
-        task.calendar.add(Calendar.DAY_OF_YEAR, task.dayInterval);
-        task.calendar.add(Calendar.HOUR_OF_DAY, task.hourInterval);
-        task.calendar.add(Calendar.MINUTE, task.minuteInterval);
-        task.calendar.add(Calendar.SECOND, task.secondInterval);
-
-        task.time = task.calendar.getTimeInMillis();*/
     }
 
     private static boolean getExecutedBefore(Task task) {
@@ -102,9 +87,7 @@ public class TaskManager extends Thread {
         return hasBeenDoneInCurrentInterval.get();
     }
 
-    private static void startTask(Task task, long taskInvokeTime) {
-
-        task.lastRun = taskInvokeTime;
+    private static void startTask(Task task) {
 
         if (task.saveRecord) {
 
@@ -117,9 +100,7 @@ public class TaskManager extends Thread {
         }
     }
 
-    private static void startTaskAsync(Task task, long taskInvokeTime) {
-
-        task.lastRun = taskInvokeTime;
+    private static void startTaskAsync(Task task) {
 
         if (task.saveRecord) {
 
@@ -161,7 +142,7 @@ public class TaskManager extends Thread {
 
                     addInterval(task);
 
-                    startTaskAsync(task, currentTimeMillis);
+                    startTaskAsync(task);
                 }
             }
 
@@ -185,16 +166,15 @@ public class TaskManager extends Thread {
 
         private long time;
 
-        private long lastRun;
         private long nextRun;
         private long interval;
 
         private TimingListener timingListener;
 
-        private boolean startAndSchedule;
-        private boolean executedBefore;
-        private boolean startAsyncAndSchedule;
+        private boolean runNow;
+        private boolean runAsyncNow;
         private boolean saveRecord = false;
+        private boolean finalized = false;
 
         public static Task build() {
 
@@ -244,13 +224,6 @@ public class TaskManager extends Thread {
             return this;
         }
 
-        public Task setExecutedBefore(boolean state) {
-
-            this.executedBefore = state;
-
-            return this;
-        }
-
         public Task saveRecord(boolean saveRecord) {
 
             this.saveRecord = saveRecord;
@@ -260,17 +233,40 @@ public class TaskManager extends Thread {
 
         public Task startAndSchedule() {
 
-            this.executedBefore = true;
-            this.startAndSchedule = true;
+            this.runNow = true;
+            finalized = true;
 
             return this;
         }
 
+        @Deprecated
         public Task startAsyncAndSchedule() {
 
-            this.executedBefore = true;
-            this.startAsyncAndSchedule = true;
+            this.runAsyncNow = true;
+            finalized = true;
 
+            return this;
+        }
+
+        public Task runNow() {
+
+            this.runNow = true;
+            this.runAsyncNow = false;
+
+            return this;
+        }
+
+        public Task runAsyncNow() {
+
+            this.runNow = false;
+            this.runAsyncNow = true;
+
+            return this;
+        }
+
+        public Task schedule() {
+
+            finalized = true;
             return this;
         }
 
