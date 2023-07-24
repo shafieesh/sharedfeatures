@@ -231,6 +231,7 @@ public class TaskManager extends Thread {
             return this;
         }
 
+        @Deprecated
         public Task startAndSchedule() {
 
             this.runNow = true;
