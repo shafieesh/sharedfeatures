@@ -143,7 +143,14 @@ public class DynamicConfig {
         parameters.put(2, "map");
         parameters.put(3, value);
 
-        return BaseDatabaseHelperOld.insert(TAG, statement, parameters);
+        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
+
+        if (wasSuccessful) {
+
+            fetchRecords();
+        }
+
+        return wasSuccessful;
     }
 
     public static void updateRecords() {
