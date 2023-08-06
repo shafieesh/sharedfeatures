@@ -131,7 +131,23 @@ public class DynamicConfig {
         return values;
     }
 
-    public static void updateRecords(){
+    public static boolean setMap(String section, String field, String value) {
+
+        String key = section + "-" + field;
+
+        String statement = "REPLACE INTO " + BaseConfig.TABLE_DYNAMIC_CONFIGS + " (" +
+                FIELD_KEY + ", " + FIELD_TYPE + ", " + FIELD_VALUE + ") VALUES (?, ?, ?)";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, key);
+        parameters.put(2, "map");
+        parameters.put(3, value);
+
+        return BaseDatabaseHelperOld.insert(TAG, statement, parameters);
+    }
+
+    public static void updateRecords() {
+
         fetchRecords();
     }
 }
