@@ -25,6 +25,7 @@ public class BaseAccountPermissionsManager {
     protected static final String FIELD_PERMISSION = "Permission";
     protected static final String FIELD_START_TIME = "StartTime";
     protected static final String FIELD_FINISH_TIME = "FinishTime";
+    protected static final String FIELD_POSITION = "Position";
     protected static final String FIELD_CATEGORY = "Category";
     protected static final String FIELD_TITLE = "Title";
     protected static final String FIELD_DESCRIPTION = "Description";
@@ -40,16 +41,17 @@ public class BaseAccountPermissionsManager {
                 .setName("AccountPermissionsManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .startAndSchedule()
                 .setTimingListener(task -> {
                     fetchPermissions();
                     fetchUserPermissions();
-                }));
+                })
+                .runNow()
+                .schedule());
     }
 
     protected static void fetchPermissions() {
 
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PERMISSIONS + " ORDER BY " + FIELD_CATEGORY;
+        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PERMISSIONS + " ORDER BY " + FIELD_POSITION;
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 

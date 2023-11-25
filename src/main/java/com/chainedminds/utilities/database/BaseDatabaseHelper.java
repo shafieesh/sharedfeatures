@@ -3,10 +3,7 @@ package com.chainedminds.utilities.database;
 import com.chainedminds.utilities.BaseLogs;
 import com.chainedminds.utilities.Utilities;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -124,9 +121,9 @@ public abstract class BaseDatabaseHelper {
     }
 
     public final boolean query(Connection connection,
-                                String tag, String statement,
-                                Map<Integer, Object> parameters,
-                                TwoStepQueryCallback queryCallback) {
+                               String tag, String statement,
+                               Map<Integer, Object> parameters,
+                               TwoStepQueryCallback queryCallback) {
 
         queriesCount++;
 
@@ -211,9 +208,9 @@ public abstract class BaseDatabaseHelper {
     }
 
     public final boolean query(Connection connection,
-                                String tag, String statement,
-                                Map<Integer, Object> parameters,
-                                QueryCallback queryCallback) {
+                               String tag, String statement,
+                               Map<Integer, Object> parameters,
+                               QueryCallback queryCallback) {
 
         queriesCount++;
 
@@ -249,6 +246,21 @@ public abstract class BaseDatabaseHelper {
 
             wasSuccessful = true;
 
+        /*} catch (SQLException error) {
+
+            error.getErrorCode();
+            error.getSQLState()
+            error.getMessage()
+
+            String payload = null;
+
+            if (preparedStatement != null) {
+
+                payload = preparedStatement.toString();
+            }
+
+            BaseLogs.error(tag, error, payload);
+        }*/
         } catch (Exception error) {
 
             String payload = null;
@@ -325,8 +337,8 @@ public abstract class BaseDatabaseHelper {
     }
 
     public final boolean update(Connection connection, String tag, String statement,
-                                  Map<Integer, Object> parameters,
-                                  UpdateCallback updateCallback) {
+                                Map<Integer, Object> parameters,
+                                UpdateCallback updateCallback) {
 
         updatesCount++;
 
@@ -439,8 +451,8 @@ public abstract class BaseDatabaseHelper {
     }
 
     public final boolean insert(Connection connection, String tag, String statement,
-                                 Map<Integer, Object> parameters,
-                                 InsertCallback insertCallback) {
+                                Map<Integer, Object> parameters,
+                                InsertCallback insertCallback) {
 
         insertsCount++;
 
