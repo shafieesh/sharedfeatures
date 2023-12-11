@@ -6,7 +6,9 @@ import com.chainedminds.api.accounting.BaseAccountPropertyManager;
 import com.chainedminds.api.friendship.BaseFriendshipManager;
 import com.chainedminds.models.BaseData;
 import com.chainedminds.utilities.Utilities;
+import com.chainedminds.utilities.json.JsonException;
 import com.chainedminds.utilities.json.JsonHelper;
+import com.fasterxml.jackson.core.JsonParseException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -132,14 +134,23 @@ public class BaseRequestsManager<Data> {
 
         Data request = null;
 
-        if (data instanceof byte[]) {
+        try {
 
-            request = JsonHelper.getObject((byte[]) data, mappedClass);
-        }
+            if (data instanceof byte[]) {
 
-        if (data instanceof String) {
+                request = JsonHelper.getObjectUnsafe((byte[]) data, mappedClass);
+            }
 
-            request = JsonHelper.getObject((String) data, mappedClass);
+            if (data instanceof String) {
+
+                request = JsonHelper.getObjectUnsafe((String) data, mappedClass);
+            }
+
+        } catch (JsonException ignore) {
+
+        } catch (Exception e) {
+
+            System.err.println("BaseRequestManager : " + e.getMessage());
         }
 
         if (request != null) {

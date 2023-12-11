@@ -50,9 +50,12 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
             Object responseData = BaseResources.getInstance().requestManager
                     .processRequest(context, remoteAddress, requestData);
 
-            BaseRequestsManager.optimizeReadTimeout(context, responseData);
+            if (responseData != null) {
 
-            ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
+                BaseRequestsManager.optimizeReadTimeout(context, responseData);
+
+                ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
+            }
 
             if (NettyServer.KEEP_ALIVE_CHANNELS_LIST.contains(channelID)) {
 

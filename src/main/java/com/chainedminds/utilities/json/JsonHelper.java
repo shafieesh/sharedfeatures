@@ -3,6 +3,7 @@ package com.chainedminds.utilities.json;
 import com.chainedminds.utilities.XML;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.ArrayType;
@@ -86,6 +87,18 @@ public class JsonHelper {
 
         try {
 
+            return getBytesUnsafe(data);
+
+        } catch (JsonException ignore) {
+
+            return null;
+        }
+    }
+
+    public static byte[] getBytesUnsafe(Object data) throws JsonException {
+
+        try {
+
             byte[] dataBytes = objectMapper.writeValueAsBytes(data);
 
             if (dataBytes.length == 4 &&
@@ -101,17 +114,25 @@ public class JsonHelper {
 
         } catch (Exception e) {
 
-            System.err.println("ORIGINAL DATA : \n" + XML.toXml("-", "-", data));
-
-            e.printStackTrace();
+            throw new JsonException(e);
         }
-
-        return null;
     }
 
     public static String getString(Object data) {
 
-        byte[] jsonBytes = getBytes(data);
+        try {
+
+            return getStringUnsafe(data);
+
+        } catch (JsonException ignore) {
+
+            return null;
+        }
+    }
+
+    public static String getStringUnsafe(Object data) throws JsonException {
+
+        byte[] jsonBytes = getBytesUnsafe(data);
 
         if (jsonBytes != null) {
 
@@ -122,6 +143,18 @@ public class JsonHelper {
     }
 
     public static <T> T getObject(byte[] data, Class<T> mappedClass) {
+
+        try {
+
+            return getObjectUnsafe(data, mappedClass);
+
+        } catch (JsonException ignore) {
+
+            return null;
+        }
+    }
+
+    public static <T> T getObjectUnsafe(byte[] data, Class<T> mappedClass) throws JsonException {
 
         try {
 
@@ -136,27 +169,47 @@ public class JsonHelper {
 
         } catch (Exception e) {
 
-            System.err.println("ORIGINAL DATA : \n" + new String(data));
-
-            e.printStackTrace();
+            throw new JsonException(e);
         }
-
-        return null;
     }
 
     public static <T> T getObject(String data, Class<T> mappedClass) {
+
+        try {
+
+            return getObjectUnsafe(data, mappedClass);
+
+        } catch (JsonException ignore) {
+
+            return null;
+        }
+    }
+
+    public static <T> T getObjectUnsafe(String data, Class<T> mappedClass) throws JsonException {
 
         if (data != null) {
 
             byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
 
-            return getObject(dataBytes, mappedClass);
+            return getObjectUnsafe(dataBytes, mappedClass);
         }
 
         return null;
     }
 
     public static <T> List<T> getList(byte[] data, Class<T> mappedClass) {
+
+        try {
+
+            return getListUnsafe(data, mappedClass);
+
+        } catch (JsonException ignore) {
+
+            return null;
+        }
+    }
+
+    public static <T> List<T> getListUnsafe(byte[] data, Class<T> mappedClass) throws JsonException {
 
         try {
 
@@ -167,15 +220,47 @@ public class JsonHelper {
 
         } catch (Exception e) {
 
-            System.err.println("ORIGINAL DATA : \n" + new String(data));
+            throw new JsonException(e);
+        }
+    }
 
-            e.printStackTrace();
+    public static <T> List<T> getList(String data, Class<T> mappedClass) {
+
+        try {
+
+            return getListUnsafe(data, mappedClass);
+
+        } catch (JsonException ignore) {
+
+            return null;
+        }
+    }
+
+    public static <T> List<T> getListUnsafe(String data, Class<T> mappedClass) throws JsonException {
+
+        if (data != null) {
+
+            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+
+            return getListUnsafe(dataBytes, mappedClass);
         }
 
         return null;
     }
 
     public static <T> T[] getArray(byte[] data, Class<T> mappedClass) {
+
+        try {
+
+            return getArrayUnsafe(data, mappedClass);
+
+        } catch (JsonException e) {
+
+            return null;
+        }
+    }
+
+    public static <T> T[] getArrayUnsafe(byte[] data, Class<T> mappedClass) throws JsonException {
 
         try {
 
@@ -186,33 +271,29 @@ public class JsonHelper {
 
         } catch (Exception e) {
 
-            System.err.println("ORIGINAL DATA : \n" + new String(data));
-
-            e.printStackTrace();
+            throw new JsonException(e);
         }
-
-        return null;
-    }
-
-    public static <T> List<T> getList(String data, Class<T> mappedClass) {
-
-        if (data != null) {
-
-            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-
-            return getList(dataBytes, mappedClass);
-        }
-
-        return null;
     }
 
     public static <T> T[] getArray(String data, Class<T> mappedClass) {
 
+        try {
+
+            return getArrayUnsafe(data, mappedClass);
+
+        } catch (JsonException e) {
+
+            return null;
+        }
+    }
+
+    public static <T> T[] getArrayUnsafe(String data, Class<T> mappedClass) throws JsonException {
+
         if (data != null) {
 
             byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
 
-            return getArray(dataBytes, mappedClass);
+            return getArrayUnsafe(dataBytes, mappedClass);
         }
 
         return null;
