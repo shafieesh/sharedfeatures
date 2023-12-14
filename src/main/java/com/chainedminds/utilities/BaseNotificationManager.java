@@ -619,7 +619,7 @@ public class BaseNotificationManager {
             }
 
             @Override
-            public void onResponse(Map<String, List<String>> headers, String response) {
+            public void onResponse(int code, Map<String, List<String>> headers, String response) {
 
                 System.out.println(response);
 
