@@ -51,17 +51,23 @@ public class BaseApis {
                 BaseConfig.OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION,
                 TimeUnit.SECONDS);
 
-        OK_HTTP_CLIENT = new OkHttpClient.Builder()
-                //.addNetworkInterceptor(new LoggingInterceptor())
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .proxy(proxy)
                 .cache(null)
                 .dispatcher(dispatcher)
                 .connectionPool(connectionPool)
+                .followRedirects(BaseConfig.OKHTTP_FOLLOW_REDIRECTS)
                 .callTimeout(BaseConfig.OKHTTP_CALL_TIMEOUT, TimeUnit.MILLISECONDS)
                 .connectTimeout(BaseConfig.OKHTTP_CONNECT_TIMEOUT, TimeUnit.MILLISECONDS)
                 .readTimeout(BaseConfig.OKHTTP_READ_TIMEOUT, TimeUnit.MILLISECONDS)
-                .writeTimeout(BaseConfig.OKHTTP_WRITE_TIMEOUT, TimeUnit.MILLISECONDS)
-                .build();
+                .writeTimeout(BaseConfig.OKHTTP_WRITE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+        if (BaseConfig.OKHTTP_NETWORK_INTERCEPTOR != null) {
+
+            builder.addNetworkInterceptor(BaseConfig.OKHTTP_NETWORK_INTERCEPTOR);
+        }
+
+        OK_HTTP_CLIENT = builder.build();
     }
 
     public static void call(Request.Builder builder, boolean asyncMode, ApiCallback apiCallback) {
@@ -83,6 +89,8 @@ public class BaseApis {
             Request request = builder.build();
 
             try (Response response = BaseApis.OK_HTTP_CLIENT.newCall(request).execute()) {
+
+                int code = response.code();
 
                 Headers headers = response.headers();
 
@@ -113,7 +121,7 @@ public class BaseApis {
 
                     if (apiCallback != null) {
 
-                        apiCallback.onResponse(headers.toMultimap(), responseString);
+                        apiCallback.onResponse(code, headers.toMultimap(), responseString);
                     }
                 }
             }
@@ -162,6 +170,8 @@ public class BaseApis {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
+                int code = response.code();
+
                 Headers headers = response.headers();
 
                 //System.out.println(JsonHelper.getString(headers.toMultimap()));
@@ -189,7 +199,7 @@ public class BaseApis {
 
                         if (apiCallback != null) {
 
-                            apiCallback.onResponse(headers.toMultimap(), responseString);
+                            apiCallback.onResponse(code, headers.toMultimap(), responseString);
                         }
                     }
                 }
@@ -208,7 +218,7 @@ public class BaseApis {
 
         void onError(String error);
 
-        void onResponse(Map<String, List<String>> headers, String response);
+        void onResponse(int code, Map<String, List<String>> headers, String response);
     }
 
     static class LoggingInterceptor implements Interceptor {

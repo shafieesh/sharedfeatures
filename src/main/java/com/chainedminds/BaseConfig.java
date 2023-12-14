@@ -1,6 +1,7 @@
 package com.chainedminds;
 
 import com.chainedminds.utilities.BaseConnectionManagerOld;
+import okhttp3.Interceptor;
 
 public class BaseConfig {
 
@@ -141,6 +142,7 @@ public class BaseConfig {
     public static final int MEDIA_AUDIO = 3;
     public static final int MEDIA_APK = 4;
 
+    public static boolean OKHTTP_FOLLOW_REDIRECTS = true;
     public static int OKHTTP_DISPATCHER_MAX_REQUESTS = 250;
     public static int OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST = 50;
     public static int OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS = 50;
@@ -152,6 +154,7 @@ public class BaseConfig {
     public static String OKHTTP_PROXY;
     public static String OKHTTP_PROXY_ADDRESS;
     public static int OKHTTP_PROXY_PORT;
+    public static Interceptor OKHTTP_NETWORK_INTERCEPTOR;
 
     public static int BRUTE_FORCE_ALLOWED_ATTEMPTS = 20;
     public static int BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER = FIFTEEN_MINUTES;
