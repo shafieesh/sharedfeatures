@@ -138,7 +138,7 @@ public class Utilities {
 
         List<Map.Entry<K, V>> list = new LinkedList<>(unsortMap.entrySet());
 
-        list.sort(Comparator.comparing(o -> (o.getValue())));
+        list.sort(Map.Entry.comparingByValue());
 
         Map<K, V> result = new LinkedHashMap<>();
 
@@ -432,7 +432,7 @@ public class Utilities {
 
     public static class OS {
 
-        enum OS_TYPE {
+        public enum OS_TYPE {
 
             GENERIC, WINDOWS, LINUX, MAC
         }

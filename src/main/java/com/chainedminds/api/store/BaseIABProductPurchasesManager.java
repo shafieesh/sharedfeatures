@@ -131,9 +131,9 @@ public class BaseIABProductPurchasesManager<IABTransactionData extends BaseIABTr
         return iabTransactionHolder.get();
     }
 
-    public List<IABTransactionData> getPendingTransactions() {
+    public List<BaseIABTransactionData> getPendingTransactions() {
 
-        List<IABTransactionData> transactionsList = new ArrayList<>();
+        List<BaseIABTransactionData> transactionsList = new ArrayList<>();
 
         String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_PURCHASES_IAB_PRODUCTS +
                 " WHERE " + FIELD_STATE + " = " + BaseIABPaymentManager.PURCHASE_STATE_PENDING +

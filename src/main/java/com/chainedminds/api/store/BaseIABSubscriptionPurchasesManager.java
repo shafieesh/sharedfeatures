@@ -4,14 +4,9 @@ import com.chainedminds.BaseClasses;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
-import com.chainedminds.models.market.CafeBazaarClass;
 import com.chainedminds.models.payment.BaseIABTransactionData;
-import com.chainedminds.network.DataTransportManager;
-import com.chainedminds.utilities.BaseConnectionManagerOld;
-import com.chainedminds.utilities.DynamicConfig;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
-import com.chainedminds.utilities.json.JsonHelper;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -328,66 +323,5 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
         }
 
         return iabTransaction;
-    }
-
-    public Boolean cancelIABTransaction(BaseIABTransactionData transaction) {
-
-        String sku = transaction.sku;
-        String token = transaction.token;
-        String market = transaction.market;
-        String appName = transaction.appName;
-        String packageName = DynamicConfig.getMap("PackageName", appName + "-" + market);
-
-        String apiUrl;
-
-        Boolean canceled = null;
-
-        CafeBazaarClass marketData;
-        String response;
-
-        switch (market) {
-
-            case BaseConfig.MARKET_ROYAL:
-
-                apiUrl = JHOOBIN_API_URL + packageName + "/purchases/subscriptions/" + sku +
-                        "/tokens/" + token + ":cancel?access_token=" + JHOOBIN_ACCESS_TOKEN;
-
-                response = DataTransportManager.httpGet(apiUrl);
-
-                marketData = JsonHelper.getObject(response, CafeBazaarClass.class);
-
-                if (marketData != null) {
-
-                    canceled = marketData.error == null;
-                }
-
-                break;
-        }
-
-        if (canceled == null) {
-
-            return null;
-        }
-
-        Connection connection = BaseConnectionManagerOld.getConnection();
-
-        if (connection == null) {
-
-            return null;
-        }
-
-        if (canceled) {
-
-            //transaction.verified = false;
-
-            //FIXME CHANGE FROM 0
-            updateTransactionState(connection, transaction.id, 0, transaction.purchaseDate, transaction.expirationDate);
-
-            //BaseResources.getInstance().iabPaymentManager.updateIABTransaction(connection, transaction);
-        }
-
-        BaseConnectionManagerOld.close(connection);
-
-        return canceled;
     }
 }

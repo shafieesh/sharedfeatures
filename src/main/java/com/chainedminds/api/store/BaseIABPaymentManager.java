@@ -2,21 +2,23 @@ package com.chainedminds.api.store;
 
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
+import com.chainedminds.api.BaseApis;
 import com.chainedminds.models.BaseData;
 import com.chainedminds.models.BaseProductData;
 import com.chainedminds.models.market.CafeBazaarClass;
 import com.chainedminds.models.market.JhoobinClass;
 import com.chainedminds.models.market.MarketData;
 import com.chainedminds.models.payment.BaseIABTransactionData;
-import com.chainedminds.network.DataTransportManager;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.json.JsonHelper;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BaseIABPaymentManager<DataClass extends BaseData,
+public class BaseIABPaymentManager<DataClass extends BaseData<?>,
         IABTransactionData extends BaseIABTransactionData,
         ProductData extends BaseProductData> extends BasePaymentManager<ProductData> {
 
@@ -98,19 +100,22 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
                 .setTimingListener(task -> refreshMarketsAccessTokens())
-                .startAndSchedule());
+                .runNow()
+                .schedule());
 
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("CheckPendingIabTransactions")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 2, 0)
-                .setTimingListener(task -> checkPendingTransactions()));
+                .setTimingListener(task -> checkPendingTransactions())
+                .schedule());
 
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("RefreshSubscriptions")
                 .setTime(0, 0, 0)
                 .setInterval(1, 0, 0, 0)
-                .setTimingListener(task -> BaseResources.getInstance().iabSubscriptionPurchasesManager.checkSubscriptions()));
+                .setTimingListener(task -> BaseResources.getInstance().iabSubscriptionPurchasesManager.checkSubscriptions())
+                .schedule());
     }
 
     public static void refreshMarketsAccessTokens() {
@@ -138,22 +143,37 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
         try {
 
-            String receivedData = DataTransportManager.httpPost(CAFEBAZAAR_API_URL + "auth/token/",
-                    "grant_type=refresh_token&" +
+            String url = CAFEBAZAAR_API_URL + "auth/token/";
+            String body = "grant_type=refresh_token&" +
                     "client_id=" + CAFEBAZAAR_CLIENT_ID + "&" +
                     "client_secret=" + CAFEBAZAAR_CLIENT_SECRET + "&" +
-                    "refresh_token=" + CAFEBAZAAR_REFRESH_TOKEN);
+                    "refresh_token=" + CAFEBAZAAR_REFRESH_TOKEN;
 
-            CafeBazaarClass marketData = JsonHelper.getObject(receivedData, CafeBazaarClass.class);
 
-            if (marketData != null && marketData.access_token != null) {
+            RequestBody requestBody = RequestBody.create(body, null);
 
-                ACCESS_TOKENS_MAP.put("CafeBazaar", marketData.access_token);
+            Request.Builder builder = new Request.Builder();
+            builder.url(url);
+            builder.post(requestBody);
 
-                System.out.println();
-                System.out.println("Refreshed token : " + marketData.access_token);
-                System.out.println();
-            }
+            BaseApis.callAsync(builder, new BaseApis.ApiCallback() {
+                @Override
+                public void onError(String error) {
+
+                    System.err.println(error);
+                }
+
+                @Override
+                public void onResponse(int code, Map<String, List<String>> headers, String response) {
+
+                    CafeBazaarClass marketData = JsonHelper.getObject(response, CafeBazaarClass.class);
+
+                    if (marketData != null && marketData.access_token != null) {
+
+                        ACCESS_TOKENS_MAP.put("CafeBazaar", marketData.access_token);
+                    }
+                }
+            });
 
         } catch (Exception e) {
 
@@ -162,24 +182,37 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
         try {
 
-            String receivedData = DataTransportManager.httpPost("https://accounts.google.com/o/oauth2/token",
-                    "grant_type=refresh_token&" +
-                            "client_id=" + GOOGLEPLAY_CLIENT_ID + "&" +
-                            "client_secret=" + GOOGLEPLAY_CLIENT_SECRET + "&" +
-                            "refresh_token=" + GOOGLEPLAY_REFRESH_TOKEN);
+            String url = "https://accounts.google.com/o/oauth2/token";
+            String body = "grant_type=refresh_token&" +
+                    "client_id=" + GOOGLEPLAY_CLIENT_ID + "&" +
+                    "client_secret=" + GOOGLEPLAY_CLIENT_SECRET + "&" +
+                    "refresh_token=" + GOOGLEPLAY_REFRESH_TOKEN;
 
-            System.out.println(receivedData);
 
-            CafeBazaarClass marketData = JsonHelper.getObject(receivedData, CafeBazaarClass.class);
+            RequestBody requestBody = RequestBody.create(body, null);
 
-            if (marketData != null && marketData.access_token != null) {
+            Request.Builder builder = new Request.Builder();
+            builder.url(url);
+            builder.post(requestBody);
 
-                ACCESS_TOKENS_MAP.put("GooglePlay", marketData.access_token);
+            BaseApis.callAsync(builder, new BaseApis.ApiCallback() {
+                @Override
+                public void onError(String error) {
 
-                System.out.println();
-                System.out.println("Refreshed token : " + marketData.access_token);
-                System.out.println();
-            }
+                    System.err.println(error);
+                }
+
+                @Override
+                public void onResponse(int code, Map<String, List<String>> headers, String response) {
+
+                    CafeBazaarClass marketData = JsonHelper.getObject(response, CafeBazaarClass.class);
+
+                    if (marketData != null && marketData.access_token != null) {
+
+                        ACCESS_TOKENS_MAP.put("GooglePlay", marketData.access_token);
+                    }
+                }
+            });
 
         } catch (Exception e) {
 
@@ -189,7 +222,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
     private void checkPendingTransactions() {
 
-        List<IABTransactionData> pendingTransactionsList = new ArrayList<>();
+        List<BaseIABTransactionData> pendingTransactionsList = new ArrayList<>();
 
         pendingTransactionsList.addAll(BaseResources.getInstance()
                 .iabProductPurchasesManager.getPendingTransactions());
@@ -197,7 +230,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         pendingTransactionsList.addAll(BaseResources.getInstance()
                 .iabSubscriptionPurchasesManager.getPendingTransactions());
 
-        for (IABTransactionData transaction : pendingTransactionsList) {
+        for (BaseIABTransactionData transaction : pendingTransactionsList) {
 
             if (transaction.state == PURCHASE_STATE_PENDING) {
 
@@ -364,7 +397,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         return data;
     }*/
 
-    public Boolean verifyIABTransaction(IABTransactionData transaction) {
+    public Boolean verifyIABTransaction(BaseIABTransactionData transaction) {
 
         String sku = transaction.sku;
         String purchaseToken = transaction.token;
@@ -645,22 +678,22 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
 
             //if (transaction.state == PURCHASE_STATE_VERIFIED || transaction.state == PURCHASE_STATE_REJECTED) {
 
-                if (BaseProductsManager.CATEGORY_PRODUCT.equals(productCategory)) {
+            if (BaseProductsManager.CATEGORY_PRODUCT.equals(productCategory)) {
 
-                    wasSuccessful = BaseResources.getInstance().iabProductPurchasesManager
-                            .updateTransactionState(null, transaction.id, transaction.state);
-                }
+                wasSuccessful = BaseResources.getInstance().iabProductPurchasesManager
+                        .updateTransactionState(null, transaction.id, transaction.state);
+            }
 
-                if (BaseProductsManager.CATEGORY_SUBSCRIPTION.equals(productCategory)) {
+            if (BaseProductsManager.CATEGORY_SUBSCRIPTION.equals(productCategory)) {
 
-                    wasSuccessful = BaseResources.getInstance().iabSubscriptionPurchasesManager
-                            .updateTransactionState(null, transaction.id, transaction.state,
-                                    transaction.purchaseDate, transaction.expirationDate);
-                }
+                wasSuccessful = BaseResources.getInstance().iabSubscriptionPurchasesManager
+                        .updateTransactionState(null, transaction.id, transaction.state,
+                                transaction.purchaseDate, transaction.expirationDate);
+            }
 
             //} else {
 
-                wasSuccessful = true;
+            wasSuccessful = true;
             //}
 
             return verified.get();
@@ -674,7 +707,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData,
         return null;
     }
 
-    protected void consumeIABTransaction(IABTransactionData transaction) {
+    protected void consumeIABTransaction(BaseIABTransactionData transaction) {
 
         new Thread(() -> {
 

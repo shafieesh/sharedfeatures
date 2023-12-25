@@ -55,14 +55,15 @@ public class BaseBlackListManager {
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .setTimingListener(task -> fetch())
-                .startAndSchedule());
+                .runNow()
+                .schedule());
 
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("ResetReportedPlayers")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)
                 .setTimingListener(task -> REPORTED_PLAYERS.clear())
-                .startAndSchedule());
+                .schedule());
     }
 
     private static void fetch() {

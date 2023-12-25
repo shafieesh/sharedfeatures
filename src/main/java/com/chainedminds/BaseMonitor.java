@@ -32,12 +32,12 @@ public class BaseMonitor extends Thread {
         return status;
     }
 
-    public static BaseData forceCloseServer(BaseData data) {
+    public static BaseData<?> forceCloseServer(BaseData<?> data) {
 
         String password = data.account.password;
         int userID = data.account.id;
 
-        data = new BaseData();
+        data = new BaseData<>();
         data.response = BaseConfig.RESPONSE_NOK;
 
         if ("B7R538QT387XRBO2R78XR2837".equals(password) && 1241234 == userID) {

@@ -31,7 +31,8 @@ public class GameMessages {
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
                 .setTimingListener(task -> fetch())
-                .startAndSchedule());
+                .runNow()
+                .schedule());
     }
 
     private static void fetch() {

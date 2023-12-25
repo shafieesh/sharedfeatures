@@ -14,10 +14,10 @@ import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +25,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class BaseAccountManager<Data extends BaseData> {
+public class BaseAccountManager<Data extends BaseData<?>> {
+
+    private static final String TAG = BaseAccountManager.class.getSimpleName();
 
     protected static final String FIELD_USER_ID = "UserID";
     protected static final String FIELD_USERNAME = "Username";
@@ -53,42 +55,19 @@ public class BaseAccountManager<Data extends BaseData> {
     protected static final String FIELD_MODEL = "Model";
     protected static final String FIELD_PRODUCT = "Product";
     protected static final String FIELD_UUID = "UUID";
-    protected static final String FIELD_TITLE = "Title";
-    protected static final String FIELD_DATE_TIME = "DateTime";
-    protected static final String FIELD_SCORE = "Score";
     protected static final String FIELD_LAST_COIN_CHARGE_AMOUNT = "LastCoinChargeAmount";
     protected static final String FIELD_LAST_TICKET_CHARGE_AMOUNT = "LastTicketChargeAmount";
 
     protected static final Set<Integer> PREMIUM_USERS = new HashSet<>();
     protected static final Set<Integer> CACHED_USER_INFO = new HashSet<>();
 
-    private static final String TAG = BaseAccountManager.class.getSimpleName();
-
-    private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE = new CacheManager<>(BaseConfig.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
-    private static final CacheManager<Integer, Long> CACHE_REGISTRATION_TIME = new CacheManager<>();
-
-    //protected final Set<Long> INDEX_USER_ID = new HashSet<>();
+    private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE =
+            new CacheManager<>(BaseConfig.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
 
     protected final Map<Integer, String> MAPPING_USERNAME = new HashMap<>();
     protected final Set<String> INDEX_USERNAME = new HashSet<>();
 
-    //protected final Map<Integer, String> MAPPING_PHONE_NUMBER = new HashMap<>();
-    //protected final Set<Long> INDEX_PHONE_NUMBER = new HashSet<>();
-
     protected final ReadWriteLock LOCK = new ReentrantReadWriteLock();
-
-    public void start2() {
-
-        TaskManager.addTask(TaskManager.Task.build()
-                .setName("FetchUsers")
-                .setTime(0, 0, 0)
-                .setInterval(0, 0, 30, 0)
-                .setTimingListener(task -> {
-
-                    fetch();
-                })
-                .startAndSchedule());
-    }
 
     public void start() {
 
@@ -97,7 +76,7 @@ public class BaseAccountManager<Data extends BaseData> {
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .setTimingListener(task -> CACHED_USER_INFO.clear())
-                .startAndSchedule());
+                .schedule());
 
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("FetchUsers")
@@ -106,31 +85,43 @@ public class BaseAccountManager<Data extends BaseData> {
                 .setTimingListener(task -> {
 
                     fetch();
-                    fetchPremiumUsers();
+
+                    if (BaseConfig.USING_FEATURE_SUBSCRIPTION) {
+
+                        fetchPremiumUsers();
+                    }
                 })
-                .startAndSchedule());
+                .runNow()
+                .schedule());
 
         if (!BaseConfig.DEBUG_MODE) {
 
-            TaskManager.addTask(TaskManager.Task.build()
-                    .setName("RecheckSubscriptions")
-                    .setTime(0, 0, 0)
-                    .setInterval(1, 0, 0, 0)
-                    .setTimingListener(task -> recheckSubscriptions()));
+            if (BaseConfig.USING_FEATURE_SUBSCRIPTION) {
 
-            TaskManager.addTask(TaskManager.Task.build()
-                    .setName("ChargeCoins")
-                    .setTime(0, 0, 0)
-                    .setInterval(0, 0, 10, 0)
-                    .setTimingListener(task -> chargeCoins())
-                    .startAndSchedule());
+                TaskManager.addTask(TaskManager.Task.build()
+                        .setName("RecheckSubscriptions")
+                        .setTime(0, 0, 0)
+                        .setInterval(1, 0, 0, 0)
+                        .setTimingListener(task -> recheckSubscriptions())
+                        .schedule());
+            }
 
-            TaskManager.addTask(TaskManager.Task.build()
-                    .setName("ChargePremiumCoins")
-                    .setTime(0, 0, 0)
-                    .setInterval(0, 0, 3, 0)
-                    .setTimingListener(task -> chargePremiumCoins())
-                    .startAndSchedule());
+            if (BaseConfig.USING_FEATURE_COIN) {
+
+                TaskManager.addTask(TaskManager.Task.build()
+                        .setName("ChargeCoins")
+                        .setTime(0, 0, 0)
+                        .setInterval(0, 0, 10, 0)
+                        .setTimingListener(task -> chargeCoins())
+                        .schedule());
+
+                TaskManager.addTask(TaskManager.Task.build()
+                        .setName("ChargePremiumCoins")
+                        .setTime(0, 0, 0)
+                        .setInterval(0, 0, 3, 0)
+                        .setTimingListener(task -> chargePremiumCoins())
+                        .schedule());
+            }
         }
     }
 
@@ -232,7 +223,6 @@ public class BaseAccountManager<Data extends BaseData> {
                     Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
                         PREMIUM_USERS.clear();
-
                         PREMIUM_USERS.addAll(premiumUserIDs);
                     });
                 }
@@ -523,21 +513,6 @@ public class BaseAccountManager<Data extends BaseData> {
         return storedCoins != -1 && storedCoins >= coins;
     }
 
-    public Long getRegistrationTime(int userID) {
-
-        return CACHE_REGISTRATION_TIME.get(userID, () -> {
-
-            Timestamp registrationTime = getProperty(userID, FIELD_REGISTRATION_TIME, Timestamp.class);
-
-            if (registrationTime != null) {
-
-                return registrationTime.getTime();
-            }
-
-            return null;
-        });
-    }
-
     //------------------------------------------------------------------------------------
 
     protected final <T> T getProperty(int userID, String field, Class<T> T) {
@@ -650,11 +625,6 @@ public class BaseAccountManager<Data extends BaseData> {
             return data;
         }
 
-        username = Utilities.replaceLocalizedNumbers(username);
-        password = Utilities.replaceLocalizedNumbers(password);
-
-        int userID = findUserID(username);
-
         if (isBruteForcing(address)) {
 
             //BaseNotificationManager.reportBruteForce(address, username, password);
@@ -666,6 +636,11 @@ public class BaseAccountManager<Data extends BaseData> {
 
             return data;
         }
+
+        username = Utilities.replaceLocalizedNumbers(username);
+        password = Utilities.replaceLocalizedNumbers(password);
+
+        int userID = findUserID(username);
 
         if (userID != BaseConfig.NOT_FOUND) {
 
@@ -739,18 +714,15 @@ public class BaseAccountManager<Data extends BaseData> {
 
     public boolean isBruteForcing(String address) {
 
-        int attemptsTimes = LOGIN_ATTEMPTS_CACHE.get(address, () -> 1);
+        LOGIN_ATTEMPTS_CACHE.putIfAbsent(address, new CacheManager.Record<>(0)
+                .accessLifetime(BaseConfig.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER)
+                .expirationTime(BaseConfig.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER));
 
-        if (attemptsTimes > BaseConfig.BRUTE_FORCE_ALLOWED_ATTEMPTS) {
+        int attemptsTimes = LOGIN_ATTEMPTS_CACHE.get(address);
 
-            return true;
+        LOGIN_ATTEMPTS_CACHE.setValue(address, attemptsTimes + 1);
 
-        } else {
-
-            LOGIN_ATTEMPTS_CACHE.put(address, attemptsTimes + 1);
-
-            return false;
-        }
+        return attemptsTimes > BaseConfig.BRUTE_FORCE_ALLOWED_ATTEMPTS;
     }
 
     public Data authenticateCredential(Data data) {
@@ -1289,76 +1261,75 @@ public class BaseAccountManager<Data extends BaseData> {
         return data;
     }*/
 
-    public Data searchUsers(Data data) {
+    public List<BaseAccountData> searchUsernames(@NotNull String username) {
 
-        data.response = BaseCodes.RESPONSE_NOK;
+        username = Objects.requireNonNull(username, "Username should not be null");
 
-        if (data.account == null || data.account.username == null) {
+        List<BaseAccountData> foundAccounts = new ArrayList<>();
 
-            return data;
-        }
+        String query = username.toLowerCase();
 
-        String query = data.account.username.toLowerCase();
+        getUsernameMap(TAG, usernames -> usernames.forEach((loopingUserID, loopingUsername) -> {
 
-        data.accounts = new ArrayList<>();
-
-        getUsernameMap(TAG, usernames -> usernames.forEach((userID, username) -> {
-
-            if (username.toLowerCase().contains(query)) {
+            if (loopingUsername.toLowerCase().contains(query)) {
 
                 BaseAccountData account = new BaseAccountData();
-                account.id = userID;
-                account.username = username;
+                account.id = loopingUserID;
+                account.username = loopingUsername;
 
-                data.accounts.add(account);
+                foundAccounts.add(account);
             }
         }));
 
         Comparator<BaseAccountData> comparator = Comparator.comparingInt(account -> account.username.length());
 
-        data.accounts.sort(comparator);
+        foundAccounts.sort(comparator);
 
-        if (data.accounts.size() > 100) {
+        if (foundAccounts.size() > 100) {
 
-            data.accounts = data.accounts.subList(0, 99);
+            return foundAccounts.subList(0, 99);
+
+        } else {
+
+            return foundAccounts;
         }
-
-        data.response = BaseCodes.RESPONSE_OK;
-
-        return data;
     }
 
-    public Data getUsers(Data data) {
+    public List<BaseAccountData> getAccounts(String appName) {
 
-        data.response = BaseCodes.RESPONSE_NOK;
+        List<BaseAccountData> accounts = new ArrayList<>();
 
-        if (data.account == null) {
+        if (appName != null) {
 
-            return data;
+            Set<Integer> userIDs = BaseResources.getInstance().accountPropertyManager.getUserIDs(appName);
+
+            getUsernameMap(TAG, usernames -> userIDs.forEach(userID -> {
+
+                BaseAccountData account = new BaseAccountData();
+                account.id = userID;
+                account.username = usernames.get(userID);
+
+                accounts.add(account);
+            }));
+
+        } else {
+
+            getUsernameMap(TAG, usernames -> usernames.forEach((loopingUserID, loopingUsername) -> {
+
+                BaseAccountData account = new BaseAccountData();
+                account.id = loopingUserID;
+                account.username = loopingUsername;
+
+                accounts.add(account);
+            }));
         }
 
-        String appName = data.client.appName;
-
-        Set<Integer> userIDs = BaseResources.getInstance().accountPropertyManager.getUserIDs(appName);
-
-        data.accounts = new ArrayList<>();
-
-        getUsernameMap(TAG, usernames -> userIDs.forEach(userID -> {
-
-            BaseAccountData account = new BaseAccountData();
-            account.id = userID;
-            account.username = usernames.get(userID);
-
-            data.accounts.add(account);
-        }));
 
         Comparator<BaseAccountData> comparator = Comparator.comparing(account -> account.username);
 
-        data.accounts.sort(comparator);
+        accounts.sort(comparator);
 
-        data.response = BaseCodes.RESPONSE_OK;
-
-        return data;
+        return accounts;
     }
 
     public BaseAccountData getUser(int userID, String appName, int targetUserID) {

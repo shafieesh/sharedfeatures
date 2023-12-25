@@ -5,80 +5,58 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class CacheManager<Key, Value> {
 
-    private static final String TAG = CacheManager.class.getSimpleName();
+    private static final List<CacheManager<?, ?>> CACHE_MANAGERS = new ArrayList<>();
 
-    private static final List<CacheManager> cacheManagers = new ArrayList<>();
+    private final Map<Key, Record<Value>> cache = new HashMap<>();
 
-    private final Map<Key, Data> cache = new HashMap<>();
-
-    private long RECORD_LIFETIME = 60 * 60 * 1000;
+    private long LIFETIME = 60 * 60 * 1000;
 
     public CacheManager(long recordLifetime) {
 
-        this.RECORD_LIFETIME = recordLifetime;
+        this.LIFETIME = recordLifetime;
 
-        cacheManagers.add(this);
+        CACHE_MANAGERS.add(this);
     }
 
     public CacheManager() {
 
-        cacheManagers.add(this);
+        CACHE_MANAGERS.add(this);
     }
 
-    public static void startCacheCleaner() {
+    public static void start() {
 
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("CacheManager")
                 .setTime(0, 0, 0)
-                .setInterval(0, 0, 1, 0)
-                .setTimingListener(task -> cacheManagers.forEach(CacheManager::cleanCache)));
+                .setInterval(0, 0, 0, 1)
+                .setTimingListener(task -> CACHE_MANAGERS.forEach(CacheManager::cleanCache))
+                .schedule());
     }
 
-    /*public V get(K key, NotExists<V> notExists) {
-
-        if (cache.containsKey(key)) {
-
-            return cache.get(key);
-        }
-
-        V value = notExists.add();
-
-        put(key, value);
-
-        return value;
-    }*/
-
-    /*public Value get(Key key, Value defaultValue) {
-
-        if (cache.containsKey(key)) {
-
-            return extractValue(cache.get(key));
-
-        } else {
-
-            put(key, defaultValue);
-        }
-
-        return defaultValue;
-    }*/
-
-    //ONLY USE WHEN YOU ARE SURE THERE IS DATA IN CACHE OR YOU NEED A NULL CHECK!!!
     public Value get(Key key) {
 
-        return get(key, null);
+        return getOrPut(key, null);
     }
 
-    public Value get(Key key, OnNoDataAvailableListener<Value> dataFetcher) {
+    public Value getOrDefault(Key key, Value defaultValue) {
 
-        Data storedData = cache.get(key);
+        Value value = getOrPut(key, null);
 
-        if (storedData != null && storedData.value != null) {
+        return value != null ? value : defaultValue;
+    }
 
-            storedData.lastAccessTime = System.currentTimeMillis();
+    public Value getOrPut(Key key, OnNoDataAvailableListener<Value> dataFetcher) {
 
-            return storedData.value;
+        Record<Value> storedRecord = cache.get(key);
+
+        if (storedRecord != null && storedRecord.value != null) {
+
+            storedRecord.lastAccessTime = System.currentTimeMillis();
+
+            return storedRecord.value;
 
         } else if (dataFetcher != null) {
 
@@ -93,29 +71,65 @@ public class CacheManager<Key, Value> {
 
     public void put(Key key, Value value) {
 
-        Data data = cache.getOrDefault(key, new Data());
+        Record<Value> record = new Record<>(value);
 
-        data.value = value;
-        data.lastAccessTime = System.currentTimeMillis();
-
-        cache.put(key, data);
+        put(key, record);
     }
 
-    private void cleanCache() {
+    public void put(Key key, Value value, long accessLifetime) {
 
-        long currentTime = System.currentTimeMillis();
+        Record<Value> record = new Record<>(value).accessLifetime(accessLifetime);
 
-        List<Key> keysToBeRemoved = new ArrayList<>();
+        put(key, record);
+    }
 
-        cache.forEach((key, data) -> {
+    public void put(Key key, Record<Value> record) {
 
-            if (currentTime - getLastAccessTime(data) > RECORD_LIFETIME) {
+        if (record.accessLifetime == -1) {
 
-                keysToBeRemoved.add(key);
-            }
-        });
+            record.accessLifetime = LIFETIME;
+        }
 
-        keysToBeRemoved.forEach(cache::remove);
+        cache.put(key, record);
+    }
+
+    public void putIfAbsent(Key key, Value value) {
+
+        Record<Value> record = new Record<>(value);
+
+        putIfAbsent(key, record);
+    }
+
+    public void putIfAbsent(Key key, Value value, long accessLifetime) {
+
+        Record<Value> record = new Record<>(value).accessLifetime(accessLifetime);
+
+        putIfAbsent(key, record);
+    }
+
+    public void putIfAbsent(Key key, Record<Value> record) {
+
+        if (record.accessLifetime == -1) {
+
+            record.accessLifetime = LIFETIME;
+        }
+
+        cache.putIfAbsent(key, record);
+    }
+
+    public void setValue(Key key, Value value) {
+
+        Record<Value> storedRecord = cache.get(key);
+
+        if (storedRecord != null) {
+
+            storedRecord.value(value);
+        }
+    }
+
+    public void remove(Key key) {
+
+        cache.remove(key);
     }
 
     public void invalidateCache() {
@@ -123,14 +137,22 @@ public class CacheManager<Key, Value> {
         cache.clear();
     }
 
-    private Value extractValue(Data data) {
+    private void cleanCache() {
 
-        return data != null ? data.value : null;
-    }
+        long currentTime = System.currentTimeMillis();
 
-    private long getLastAccessTime(Data data) {
+        new HashMap<>(cache).forEach((key, record) -> {
 
-        return data != null ? data.lastAccessTime : 0;
+            if (currentTime > record.expirationTime) {
+
+                cache.remove(key);
+            }
+
+            if (currentTime - record.lastAccessTime > record.accessLifetime) {
+
+                cache.remove(key);
+            }
+        });
     }
 
     public interface OnNoDataAvailableListener<V> {
@@ -138,9 +160,49 @@ public class CacheManager<Key, Value> {
         V retrieve();
     }
 
-    class Data {
+    public static class Record<Value> {
 
-        Value value;
-        long lastAccessTime;
+        private Value value;
+        private long accessLifetime = -1;
+        private long expirationTime = Long.MAX_VALUE;
+        private long lastAccessTime = System.currentTimeMillis();
+
+        public Record(Value value) {
+
+            this.value = value;
+        }
+
+        public Record<Value> value(Value value) {
+
+            this.value = value;
+
+            return this;
+        }
+
+        public Record<Value> accessLifetime(long accessLifetime) {
+
+            if (accessLifetime <= 0) {
+
+                throw new RuntimeException("Access lifetime should be a positive none zero value.");
+            }
+
+            this.accessLifetime = accessLifetime;
+
+            return this;
+        }
+
+        public Record<Value> expirationTime(long addedTime) {
+
+            long expirationTime = System.currentTimeMillis() + addedTime;
+
+            if (expirationTime <= System.currentTimeMillis()) {
+
+                throw new RuntimeException("Expiration time is passed");
+            }
+
+            this.expirationTime = expirationTime;
+
+            return this;
+        }
     }
 }

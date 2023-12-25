@@ -1,5 +1,7 @@
-package com.chainedminds;
+package com.chainedminds.test;
 
+import com.chainedminds.BaseClasses;
+import com.chainedminds.BaseResources;
 import com.chainedminds.api.accounting.BaseAccountManager;
 import com.chainedminds.api.accounting.BaseAccountPropertyManager;
 import com.chainedminds.api.accounting.BaseBlackListManager;
@@ -12,18 +14,17 @@ import com.chainedminds.models.account.BaseFriendData;
 import com.chainedminds.models.notification.BaseNotificationData;
 import com.chainedminds.models.payment.BaseIABTransactionData;
 import com.chainedminds.models.payment.BaseIPGTransactionData;
-import com.chainedminds.samples.TestRequestManager;
 import com.chainedminds.utilities.BaseFileManager;
 
-class TestResources extends BaseResources<
+public class TestResources extends BaseResources<
+        TestData,
         TestRequestManager,
         BaseProfileManager,
-        BaseAccountManager<BaseData>,
-        BaseAccountPropertyManager<BaseData>,
-        BaseFriendshipManager<BaseData, BaseFriendData>,
-        BaseFileManager,
-        BaseIABPaymentManager<BaseData, BaseIABTransactionData, BaseProductData>,
-        BaseIPGPaymentManager<BaseData, BaseIPGTransactionData, BaseProductData>,
+        BaseAccountManager<TestData>,
+        BaseAccountPropertyManager<TestData>,
+        BaseFriendshipManager<TestData, BaseFriendData>,
+        BaseFileManager, BaseIABPaymentManager<TestData, BaseIABTransactionData, BaseProductData>,
+        BaseIPGPaymentManager<TestData, BaseIPGTransactionData, BaseProductData>,
         BaseIABProductPurchasesManager<BaseIABTransactionData>,
         BaseIPGProductPurchasesManager<BaseIPGTransactionData>,
         BaseIABSubscriptionPurchasesManager<BaseIABTransactionData>,
@@ -40,7 +41,8 @@ class TestResources extends BaseResources<
 
     public void config() {
 
-        super.requestManager = new TestRequestManager(BaseData.class);
+        super.requestManager = new TestRequestManager(TestData.class);
+
         super.profileManager = new BaseProfileManager();
         super.accountManager = new BaseAccountManager<>();
         super.accountPropertyManager = new BaseAccountPropertyManager<>();
@@ -55,7 +57,16 @@ class TestResources extends BaseResources<
         super.productManager = new BaseProductsManager<>();
         super.blackListManager = new BaseBlackListManager();
 
-        BaseResources baseResources = BaseResources.getInstance();
+        BaseResources<?, TestRequestManager, BaseProfileManager, BaseAccountManager<TestData>, BaseAccountPropertyManager<TestData>,
+                BaseFriendshipManager<TestData, BaseFriendData>,
+                BaseFileManager, BaseIABPaymentManager<TestData, BaseIABTransactionData, BaseProductData>,
+                BaseIPGPaymentManager<TestData, BaseIPGTransactionData, BaseProductData>,
+                BaseIABProductPurchasesManager<BaseIABTransactionData>,
+                BaseIPGProductPurchasesManager<BaseIPGTransactionData>,
+                BaseIABSubscriptionPurchasesManager<BaseIABTransactionData>,
+                BaseIPGSubscriptionPurchasesManager<BaseIPGTransactionData>,
+                BaseProductsManager<BaseProductData>,
+                BaseBlackListManager> baseResources = BaseResources.getInstance();
 
         baseResources.requestManager = super.requestManager;
         baseResources.profileManager = super.profileManager;
@@ -74,7 +85,7 @@ class TestResources extends BaseResources<
 
         BaseClasses baseClasses = BaseClasses.getInstance();
 
-        baseClasses.dataClass = BaseData.class;
+        baseClasses.dataClass = TestData.class;
         baseClasses.accountClass = BaseAccountData.class;
         baseClasses.friendClass = BaseFriendData.class;
         baseClasses.fileClass = BaseFileData.class;

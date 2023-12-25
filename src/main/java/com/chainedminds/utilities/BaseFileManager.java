@@ -29,9 +29,7 @@ public class BaseFileManager {
     public static final int SECTION_ARTICLES = 7;
 
 
-    public final String PROJECT_DIRECTORY = BaseConfig.PROJECT_NAME;
     public final String DIRECTORY_APP = "cafegame";
-    public final String DIRECTORY_GENERAL = "general";
     public String BASE_DIRECTORY;
     public String DIRECTORY_LEAGUES = "leagues";
     public String DIRECTORY_PROFILES = "profiles";

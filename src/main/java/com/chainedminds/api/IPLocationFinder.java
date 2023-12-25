@@ -30,7 +30,8 @@ public class IPLocationFinder {
 
                         IP_ADDRESSES.clear();
                     }
-                }));
+                })
+                .schedule());
 
         TaskManager.addTask(TaskManager.Task.build()
                 .setName("IPFinderCounterReset")
@@ -39,7 +40,8 @@ public class IPLocationFinder {
                 .setTimingListener(task -> {
 
                     counter.set(0);
-                }));
+                })
+                .schedule());
     }
 
     public static String getCountry(String ipAddress) {

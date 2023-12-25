@@ -1,14 +1,14 @@
 package com.chainedminds.network;
 
-import com.chainedminds.*;
-import com.chainedminds.models.BaseData;
-import com.chainedminds.models.ClientData;
-import com.chainedminds.utilities.BaseLogs;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonHelper;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DataTransportManager extends Thread {
+public class DataTransportManager {
 
     private static final String TAG = DataTransportManager.class.getSimpleName();
 
@@ -37,18 +37,6 @@ public class DataTransportManager extends Thread {
 
     private static final ExecutorService MAIN_PIPE_EXECUTOR = Executors.newCachedThreadPool();
     private static final ExecutorService WEB_PIPE_EXECUTOR = Executors.newCachedThreadPool();
-
-    private DataTransportManager() {
-
-        System.out.println();
-        System.out.println("---------------------------");
-        System.out.println("--> Opening Transport Pipes");
-        System.out.println();
-
-        startNotWorkingTransports();
-
-        System.out.println("---------------------------");
-    }
 
     private static void saveRequest(int request) {
 
@@ -72,110 +60,6 @@ public class DataTransportManager extends Thread {
         int a = newConnections;
         newConnections = 0;
         return a;
-    }
-
-    private static String httpGetData(String urlString, Map<String, String> headers, String requestMethod, String payload) {
-
-        String receivedData = null;
-
-        try {
-
-            //Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("213.32.14.69", 65000));
-
-            URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-
-            if (headers != null) {
-
-                for (String key : headers.keySet()) {
-
-                    connection.setRequestProperty(key, headers.get(key));
-                }
-            }
-
-            if (requestMethod != null) {
-                connection.setRequestMethod(requestMethod);
-                connection.setDoOutput(true);
-            }
-
-            if (payload != null) {
-                OutputStream outputStream = connection.getOutputStream();
-                outputStream.write(payload.getBytes());
-                outputStream.close();
-            }
-
-            BufferedReader bufferedReader;
-
-            if (connection.getResponseCode() != 200) {
-                //throw new IOException(connection.getResponseMessage());
-
-                bufferedReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-
-            } else {
-
-                bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            }
-
-            StringBuilder stringBuilder = new StringBuilder();
-
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null) {
-
-                stringBuilder.append(line);
-            }
-
-            bufferedReader.close();
-            connection.disconnect();
-            receivedData = stringBuilder.toString();
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            BaseLogs.error("DataTransportManager", e, urlString + "\n" + payload);
-        }
-        return receivedData;
-    }
-
-    public static String httpGet(String urlString) {
-        return httpGetData(urlString, null, null, null);
-    }
-
-    public static String httpGet(String urlString, Map<String, String> headers) {
-        return httpGetData(urlString, headers, null, null);
-    }
-
-    public static String httpPost(String urlString, String payload) {
-        return httpGetData(urlString, null, "POST", payload);
-    }
-
-    public static String httpPost(String urlString, Map<String, String> headers, String payload) {
-        return httpGetData(urlString, headers, "POST", payload);
-    }
-
-    public static String httpDelete(String urlString) {
-        return httpGetData(urlString, null, "DELETE", null);
-    }
-
-    public static byte[] httpDownload(String urlString) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            BufferedInputStream inputStream = new BufferedInputStream(new URL(urlString).openStream());
-            final byte[] data = new byte[1024];
-            int count;
-            while ((count = inputStream.read(data, 0, 1024)) != -1) {
-                byteArrayOutputStream.write(data, 0, count);
-            }
-            inputStream.close();
-        } catch (Exception e) {
-
-            BaseLogs.error("DataTransportManager", e);
-            e.printStackTrace();
-        }
-        return byteArrayOutputStream.toByteArray();
     }
 
     public static String getData(String host, int port, Object sendingData) {
@@ -388,54 +272,7 @@ public class DataTransportManager extends Thread {
         outputStream.flush();
     }
 
-    private void startNotWorkingTransports() {
-
-        if (!mainPipeWorking && BaseMonitor.isAppRunning()) {
-
-            startInsecureTransport();
-        }
-
-        if (!webTransportWorking && BaseMonitor.isAppRunning()) {
-
-            startWebTransport();
-        }
-    }
-
-    @Override
-    public void run() {
-
-        while (BaseMonitor.isAppRunning()) {
-
-            try {
-
-                if (mainPipeThread == null || !mainPipeThread.isAlive()) {
-
-                    mainPipeWorking = false;
-
-                    System.out.println("--> Reopening Insecure Transport Pipe");
-                }
-
-                if (webTransportThread == null || !webTransportThread.isAlive()) {
-
-                    webTransportWorking = false;
-
-                    System.out.println("--> Reopening Web Transport Pipe");
-                }
-
-                startNotWorkingTransports();
-
-                Utilities.sleep(10000);
-
-            } catch (Exception e) {
-
-                BaseLogs.error("DataTransportManager", e);
-            }
-        }
-
-        closeAllSockets();
-    }
-
-    private void closeAllSockets() {
+    /*private void closeAllSockets() {
 
         try {
 
@@ -545,12 +382,7 @@ public class DataTransportManager extends Thread {
         }
     }
 
-    public static void onDisconnect() {
-
-        openConnections--;
-    }
-
-    static class WebTransportThread<Data extends BaseData> implements Runnable {
+    static class WebTransportThread<Data extends BaseData<?>> implements Runnable {
 
         Socket socket;
 
@@ -767,5 +599,5 @@ public class DataTransportManager extends Thread {
             //socket = null;
             openConnections--;
         }
-    }
+    }*/
 }

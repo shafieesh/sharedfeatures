@@ -21,10 +21,6 @@ import java.util.Map;
 
 public class BaseNotificationManager {
 
-    public static final String TAG_FRIENDSHIP_NEW_FRIEND_REQUEST = "friendship_new_friendship_request";
-    public static final String TAG_FRIENDSHIP_FRIEND_BECAME_ONLINE = "friendship_friend_became_online";
-    public static final String TAG_FRIENDSHIP_ACCEPTED_YOUR_FRIENDSHIP = "friendship_accepted_your_friendship";
-
     private static final String TAG = BaseNotificationManager.class.getSimpleName();
 
     public static boolean timeIsNotDisturbing() {
@@ -601,6 +597,11 @@ public class BaseNotificationManager {
         String url = "https://fcm.googleapis.com/fcm/send";
 
         String json = JsonHelper.getString(content);
+
+        if (json == null) {
+
+            return;
+        }
 
         RequestBody requestBody = RequestBody.create(json, null);
 

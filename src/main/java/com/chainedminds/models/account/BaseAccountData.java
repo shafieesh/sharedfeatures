@@ -7,7 +7,7 @@ import com.chainedminds.models.payment.BaseTransactionData;
 import java.util.List;
 import java.util.Set;
 
-public class BaseAccountData<FriendData extends BaseFriendData> {
+public class BaseAccountData {
 
     public int position;
     public int id;
@@ -31,13 +31,13 @@ public class BaseAccountData<FriendData extends BaseFriendData> {
     public int tickets;
 
     @Deprecated
-    public BaseAccountData<? extends BaseFriendData> account;
+    public BaseAccountData account;
 
     public BaseProfileData profile;
 
     public String language;
 
-    public FriendData friendship;
+    public BaseFriendData friendship;
 
     public Set<String> permissions;
     public Set<String> subscriptions;

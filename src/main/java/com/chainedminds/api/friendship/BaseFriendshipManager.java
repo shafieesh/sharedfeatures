@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class BaseFriendshipManager<Data extends BaseData, FriendData extends BaseFriendData> {
+public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends BaseFriendData> {
 
     private static final String TAG = BaseFriendshipManager.class.getSimpleName();
 
@@ -60,7 +60,8 @@ public class BaseFriendshipManager<Data extends BaseData, FriendData extends Bas
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .setTimingListener(task -> fetch())
-                .startAndSchedule());
+                .runNow()
+                .schedule());
     }
 
     private void fetch() {

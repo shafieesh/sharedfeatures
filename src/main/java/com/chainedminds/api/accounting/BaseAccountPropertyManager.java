@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BaseAccountPropertyManager<Data extends BaseData> {
+public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
     private static final String TAG = BaseAccountPropertyManager.class.getSimpleName();
 
@@ -37,8 +37,8 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
     private static final String FIELD_LAST_UPDATE = "LastUpdate";
     private static final String FIELD_BLOCKED = "Blocked";
 
-    private static final CacheManager<Integer, String> CREDENTIALS_CACHE = new CacheManager<>();
-    private static final CacheManager<Integer, String> LANGUAGE_CACHE = new CacheManager<>();
+    private static final CacheManager<Integer, Map<String, String>> CREDENTIALS_CACHE = new CacheManager<>();
+    private static final CacheManager<Integer, Map<String, String>> LANGUAGE_CACHE = new CacheManager<>();
 
     public static final Map<String, Map<Integer, Long>> USER_ACTIVITY = new HashMap<>();
 
@@ -73,43 +73,49 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
     public String getLanguage(int userID, String appName) {
 
-        return LANGUAGE_CACHE.get(userID, () -> {
+        Map<String, String> appNamePlatformCredential = LANGUAGE_CACHE.getOrPut(userID, HashMap::new);
+
+        if (!appNamePlatformCredential.containsKey(appName)) {
 
             String language = getPropertyOld(userID, appName, FIELD_LANGUAGE, String.class);
 
             if (language == null) {
 
-                language = BaseConfig.LANGUAGE_FA;
+                language = BaseConfig.LANGUAGE_DEFAULT;
             }
 
+            appNamePlatformCredential.put(appName, language);
+
             return language;
-        });
+
+        } else {
+
+            return appNamePlatformCredential.get(appName);
+        }
     }
 
     public boolean getCredential(int userID, String appName, String platform, AtomicReference<String> credential) {
 
-        if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName)) {
+        Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
 
-            credential.set(CREDENTIALS_CACHE.get(userID, () -> {
+        String key = appName + "-" + platform;
 
-                DBResult<String> result = getProperty(userID, appName, platform, FIELD_CREDENTIAL, String.class);
-
-                if (result.isSuccessful()) {
-
-                    return result.value;
-                }
-
-                return null;
-            }));
-
-            return true;
-
-        } else {
+        if (!appNamePlatformCredential.containsKey(key)) {
 
             DBResult<String> result = getProperty(userID, appName, platform, FIELD_CREDENTIAL, String.class);
 
-            credential.set(result.value);
+            if (result.isSuccessful()) {
+
+                appNamePlatformCredential.put(key, result.value);
+                credential.set(result.value);
+            }
+
             return result.isSuccessful();
+
+        } else {
+
+            credential.set(appNamePlatformCredential.get(key));
+            return true;
         }
     }
 
@@ -307,7 +313,7 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
             if (wasSuccessful) {
 
-                CREDENTIALS_CACHE.put(userID, null);
+                CREDENTIALS_CACHE.remove(userID);
             }
         });
     }
@@ -320,7 +326,11 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
             if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName)) {
 
-                CREDENTIALS_CACHE.put(userID, credential);
+                String key = appName + "-" + platform;
+
+                Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
+
+                appNamePlatformCredential.put(key, credential);
             }
         }
 
@@ -336,7 +346,11 @@ public class BaseAccountPropertyManager<Data extends BaseData> {
 
             if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName)) {
 
-                CREDENTIALS_CACHE.put(userID, credential);
+                String key = appName + "-" + platform;
+
+                Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
+
+                appNamePlatformCredential.put(key, credential);
             }
         }
 

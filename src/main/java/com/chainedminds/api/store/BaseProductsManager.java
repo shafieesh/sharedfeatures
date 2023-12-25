@@ -51,7 +51,8 @@ public class BaseProductsManager<ProductData extends BaseProductData> {
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .setTimingListener(task -> fetch())
-                .startAndSchedule());
+                .runNow()
+                .schedule());
     }
 
     public void fetch() {

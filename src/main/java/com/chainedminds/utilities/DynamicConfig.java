@@ -33,7 +33,8 @@ public class DynamicConfig {
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)
                 .setTimingListener(task -> fetchRecords())
-                .startAndSchedule());
+                .runNow()
+                .schedule());
     }
 
     private static void fetchRecords() {

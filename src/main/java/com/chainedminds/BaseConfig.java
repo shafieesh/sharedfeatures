@@ -5,8 +5,6 @@ import okhttp3.Interceptor;
 
 public class BaseConfig {
 
-    public static final String SCRAMBLED_PASSWORD = "3CMY@#$*U6L;OEPR/$OE4W6N7";
-
     public static final int NOT_FOUND = -1;
 
     //-------------------------------------------------------------//
@@ -17,29 +15,11 @@ public class BaseConfig {
     private static final int FEATURE_MAIN = 1;
     private static final int FEATURE_MESSAGING = 2;
 
-
-    private static int SERVER_VARIANT;
-
-    public static final String SERVER_IP_LOCALHOST = "127.0.0.1";
+    public static final boolean USING_FEATURE_SUBSCRIPTION = false;
+    public static final boolean USING_FEATURE_COIN = false;
 
     public static String FIREBASE_KEY;
     public static String FIREBASE_PROJECT_ID;
-
-
-    public static String getFeatureServerAddress(int feature) {
-
-        if (feature == FEATURE_MAIN) {
-
-            //return "ir2.tele-teb.com";
-        }
-
-        return "ir2.tele-teb.com";
-    }
-
-    public static void setVariant(int variant) {
-
-        SERVER_VARIANT = variant;
-    }
 
     //--------------------------------
 
@@ -62,30 +42,11 @@ public class BaseConfig {
     private static final int ONE_M = 1000 * ONE_K;
     public static final int ONE_B = 1000 * ONE_M;
 
-
-    public static final int LOBBY_STATE_GB_STARTING = 0;
-
     //--------------------------------------------------------------//
     //-----------------------------LOBBY----------------------------//
 
-    public static final int LOBBY_STATE_GB_MATCH_MAKING = 1;
-    public static final int LOBBY_STATE_GB_LOADING = 2;
-    public static final int LOBBY_STATE_GB_SHOW_WINNER = 4;
-    public static final int LOBBY_STATE_GB_FINISHED = 5;
-    public static final int LOBBY_STATE_GB_FOUND_WINNER = 6;
-    public static final int LOBBY_STATE_DB_PLAYING = 3;
-    public static final int LOBBY_STATE_C4_PLAYING = 103;
-    public static final int LOBBY_STATE_TF_PLAYING = 203;
-    public static final int LOBBY_STATE_MCH_PLAYING = 303;
-    public static final int LOBBY_STATE_BB_PLAYING = 403;
-    public static final int LOBBY_STATE_QW_PLAYING = 503;
-    public static final int LOBBY_STATE_FF_PLAYING = 603;
-    public static final int LOBBY_STATE_WE_PLAYING = 703;
-
     public static final int RESPONSE_OK = 100;
     public static final int RESPONSE_NOK = -100;
-
-    public static final String AD_PROVIDER_TAPSELL = "Tapsell";
 
     public static final String MARKET_CAFEBAZAAR = "CafeBazaar";
     public static final String MARKET_GOOGLE_PLAY = "GooglePlay";
@@ -101,40 +62,16 @@ public class BaseConfig {
     public static final String PAYMENT_OPTION_VAS = "VAS";
     public static final String LANGUAGE_FA = "FA";
     public static final String LANGUAGE_EN = "EN";
-    public static final String DEFAULT_LANGUAGE = LANGUAGE_FA;
-    public static final String[] ADMINS = {"CafeGameDev1", "CafeGameDev2", "CafeGameDev4"};
-    public static final int[] ADMINS_IDS = {1440, 1443};
-    public static final String[] ROLE_LOTTERY_ADMINS = {"CafeGameDev1", "CafeGameDev2"};
+    public static final String LANGUAGE_DEFAULT = LANGUAGE_EN;
+    public static final String[] ADMINS = {};
     public static final String APP_NAME_CAFE_GAME = "CafeGame";
     public static final String APP_NAME_CAFE_CHAT = "CafeChat";
 
     public static String PROJECT_NAME;
 
-    public static String[] PACKAGE_NAMES = null;
-
-    public static final String GAME_NAME_QUIZWARS = "QuizWars";
-
-    public static boolean hasFeature(int feature) {
-
-        if (SERVER_VARIANT == VARIANT_MAIN_SERVER) {
-
-            if (feature != FEATURE_MESSAGING) {
-
-                return true;
-            }
-        }
-
-        if (SERVER_VARIANT == VARIANT_MESSAGING_SERVER) {
-
-            return feature == FEATURE_MESSAGING;
-        }
-
-        return false;
-    }
-    private static final String LOCALHOST = "127.0.0.1";
     public static String DATABASE_NAME;
-    public static String DATABASE_USERNAME = "game_server";
-    public static String DATABASE_PASSWORD = "74T3NOQ&EAH13#EAGPRONU";
+    public static String DATABASE_USERNAME;
+    public static String DATABASE_PASSWORD;
     public static int SOCKET_TIME_OUT_API_PIPE = 15 * 1000;
     public static int SOCKET_TIME_OUT_MAIN_PIPE = 60 * 1000;
     public static final int MEDIA_STRING = 1;
@@ -156,7 +93,7 @@ public class BaseConfig {
     public static int OKHTTP_PROXY_PORT;
     public static Interceptor OKHTTP_NETWORK_INTERCEPTOR;
 
-    public static int BRUTE_FORCE_ALLOWED_ATTEMPTS = 20;
+    public static int BRUTE_FORCE_ALLOWED_ATTEMPTS = 7;
     public static int BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER = FIFTEEN_MINUTES;
 
     protected static void config() {
@@ -223,10 +160,8 @@ public class BaseConfig {
     }
 
     //-------------------------------------------------------------//
-    
-    public static final String PLATFORM_ANDROID = "Android";
 
-    //-------------------------------------------------------------//
+    public static final String PLATFORM_ANDROID = "Android";
     public static final String PLATFORM_IOS = "iOS";
     public static final String PLATFORM_WINDOWS_PHONE = "WindowsPhone";
     public static final String PLATFORM_WEB = "Web";
@@ -403,14 +338,8 @@ public class BaseConfig {
     public static String TABLE_NAME_LOGS = "logs";
     public static String TABLE_LOGS;
     //----------------------------------------------------------------------------------------------------------------//
-    public static String TABLE_RUBIKA_ACCOUNTS_PERMISSIONS;
-    //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_LEADERBOARD_DAILY = "leaderboard_daily";
     public static String TABLE_LEADERBOARD_DAILY;
-
-
-
-
 
     //-------------------------------------------------------------//
 
@@ -423,8 +352,6 @@ public class BaseConfig {
 
     public static boolean DEBUG_MODE = true;
     public static String DATABASE_URL;
-
-    public static boolean FEATURE_PURCHASING = false;
 
     //-------------------------------------------------------------//
 

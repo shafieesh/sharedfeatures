@@ -8,9 +8,8 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TaskManager extends Thread {
+public class TaskManager {
 
     private static final String TAG = TaskManager.class.getSimpleName();
 
@@ -19,6 +18,11 @@ public class TaskManager extends Thread {
     private static final List<Task> TASKS = new ArrayList<>();
 
     private static final ExecutorService TASK_EXECUTOR = Executors.newCachedThreadPool();
+
+    public static void start() {
+
+        new Thread(TaskManager::run).start();
+    }
 
     public static int randomSecond() {
 
@@ -65,33 +69,11 @@ public class TaskManager extends Thread {
         task.nextRun = task.time;
     }
 
-    private static boolean getExecutedBefore(Task task) {
-
-        AtomicBoolean hasBeenDoneInCurrentInterval = new AtomicBoolean(false);
-
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_TASKS_HISTORY + " WHERE "
-                + COLUMN_TASK_NAME + " = ? AND " + COLUMN_TASK_TIME + " >= ?";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, task.name);
-        parameters.put(2, new Timestamp(task.time));
-
-        BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
-
-            if (resultSet.next()) {
-
-                hasBeenDoneInCurrentInterval.set(true);
-            }
-        });
-
-        return hasBeenDoneInCurrentInterval.get();
-    }
-
     private static void startTask(Task task) {
 
         if (task.saveRecord) {
 
-            saveTaskInvokeTime(task);
+            TASK_EXECUTOR.execute(() -> saveTaskInvokeTime(task));
         }
 
         if (task.timingListener != null) {
@@ -125,8 +107,7 @@ public class TaskManager extends Thread {
         BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters);
     }
 
-    @Override
-    public void run() {
+    private static void run() {
 
         long currentTimeMillis;
 
@@ -153,11 +134,6 @@ public class TaskManager extends Thread {
     public interface TimingListener {
 
         void onStartedTask(Task task);
-    }
-
-    public interface SearchListener {
-
-        void onFoundTask(Task task);
     }
 
     public static class Task {
@@ -209,8 +185,8 @@ public class TaskManager extends Thread {
             calendar.add(Calendar.MINUTE, -minute);
             calendar.add(Calendar.SECOND, -second);
 
-            this.interval = (day * 24 * 60 * 60 * 1000) + (hour * 60 * 60 * 1000) +
-                    (minute * 60 * 1000) + (second * 1000);
+            this.interval = (day * 24 * 60 * 60 * 1000L) + (hour * 60 * 60 * 1000L) +
+                    (minute * 60 * 1000L) + (second * 1000L);
 
             this.time = calendar.getTimeInMillis();
 

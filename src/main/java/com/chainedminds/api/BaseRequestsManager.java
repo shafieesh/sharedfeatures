@@ -5,10 +5,10 @@ import com.chainedminds.BaseConfig;
 import com.chainedminds.api.accounting.BaseAccountPropertyManager;
 import com.chainedminds.api.friendship.BaseFriendshipManager;
 import com.chainedminds.models.BaseData;
+import com.chainedminds.models.account.BaseAccountData;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonException;
 import com.chainedminds.utilities.json.JsonHelper;
-import com.fasterxml.jackson.core.JsonParseException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -82,7 +82,7 @@ public class BaseRequestsManager<Data> {
 
     public Object handleRequest(Data data, Socket socket) {
 
-        BaseData responseData = new BaseData();
+        BaseData<BaseAccountData> responseData = new BaseData<>();
         responseData.response = BaseCodes.RESPONSE_NOK;
         responseData.message = "Default response from BaseRequestManager";
 

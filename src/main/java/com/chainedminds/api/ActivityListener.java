@@ -31,7 +31,8 @@ public class ActivityListener {
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .setTimingListener(task -> fetch())
-                .startAndSchedule());
+                .runAsyncNow()
+                .schedule());
     }
 
     private static void fetch() {

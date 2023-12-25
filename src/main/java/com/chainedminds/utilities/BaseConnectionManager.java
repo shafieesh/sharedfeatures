@@ -52,7 +52,7 @@ public abstract class BaseConnectionManager {
         manualConnections.setConnectionChecker(connectionChecker);
 
         TaskManager.addTask(TaskManager.Task.build()
-                .setName("FetchCategories")
+                .setName("Ping Connections")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 0, 10)
                 .setTimingListener(task -> {
@@ -60,7 +60,7 @@ public abstract class BaseConnectionManager {
                     automaticConnections.pingConnections();
                     manualConnections.pingConnections();
                 })
-                .startAndSchedule());
+                .schedule());
     }
 
     public final Connection getConnection() {
