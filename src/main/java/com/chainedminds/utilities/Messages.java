@@ -1,7 +1,7 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.BaseConfig;
-import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
+import com.chainedminds._Config;
+import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -40,9 +40,9 @@ public class Messages {
 
     private static void fetch() {
 
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_MESSAGES;
+        String selectStatement = "SELECT * FROM " + _Config.TABLE_MESSAGES;
 
-        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final List<Message> messages = new ArrayList<>();
 

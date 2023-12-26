@@ -1,7 +1,7 @@
 package com.chainedminds.network.netty.mainPipe;
 
-import com.chainedminds.BaseResources;
-import com.chainedminds.api.BaseRequestsManager;
+import com.chainedminds._Resources;
+import com.chainedminds.api._RequestHandler;
 import com.chainedminds.network.netty.ChannelListeners;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
@@ -55,10 +55,10 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
             Runnable task = () -> {
 
-                Object responseData = BaseResources.getInstance().requestManager
+                Object responseData = _Resources.getInstance().requestManager
                         .processRequest(context, remoteAddress, requestData);
 
-                BaseRequestsManager.optimizeReadTimeout(context, responseData);
+                _RequestHandler.optimizeReadTimeout(context, responseData);
 
                 ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
 
@@ -74,10 +74,10 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
             if (!NettyServer.execute(task)) {
 
-                Object responseData = BaseResources.getInstance().requestManager
+                Object responseData = _Resources.getInstance().requestManager
                         .sendServerBusyResponse(requestData);
 
-                BaseRequestsManager.optimizeReadTimeout(context, responseData);
+                _RequestHandler.optimizeReadTimeout(context, responseData);
 
                 context.channel().writeAndFlush(responseData);//.addListener(ChannelFutureListener.CLOSE);
             }

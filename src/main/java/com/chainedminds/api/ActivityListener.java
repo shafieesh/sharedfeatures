@@ -1,10 +1,10 @@
 package com.chainedminds.api;
 
-import com.chainedminds.BaseConfig;
-import com.chainedminds.BaseResources;
-import com.chainedminds.utilities.BaseNotificationManager;
+import com.chainedminds._Config;
+import com.chainedminds._Resources;
+import com.chainedminds.utilities._NotificationManager;
 import com.chainedminds.utilities.TaskManager;
-import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
+import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +37,9 @@ public class ActivityListener {
 
     private static void fetch() {
 
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_ACTIVITY_FINDER;
+        String selectStatement = "SELECT * FROM " + _Config.TABLE_ACTIVITY_FINDER;
 
-        BaseDatabaseHelperOld.query(TAG, selectStatement, resultSet -> {
+        _DatabaseOld.query(TAG, selectStatement, resultSet -> {
 
             Map<Integer, Integer> relations = new HashMap<>();
 
@@ -52,7 +52,7 @@ public class ActivityListener {
 
             for (int targetID : relations.keySet()) {
 
-                targetNames.put(targetID, BaseResources.getInstance().accountManager.getUsername(targetID));
+                targetNames.put(targetID, _Resources.getInstance().accountManager.getUsername(targetID));
             }
 
             for (int targetID : RELATIONS.keySet()) {
@@ -82,7 +82,7 @@ public class ActivityListener {
 
             String targetName = TARGETS_NAMES.get(targetID);
 
-            BaseNotificationManager.sendNotification(RELATIONS.get(targetID), BaseConfig.APP_NAME_CAFE_GAME,
+            _NotificationManager.sendNotification(RELATIONS.get(targetID), _Config.APP_NAME_CAFE_GAME,
                     "Activity Reporter", targetName + " has became online.");
         }
     }
@@ -95,7 +95,7 @@ public class ActivityListener {
 
             String targetName = TARGETS_NAMES.get(targetID);
 
-            BaseNotificationManager.sendNotification(RELATIONS.get(targetID), BaseConfig.APP_NAME_CAFE_GAME,
+            _NotificationManager.sendNotification(RELATIONS.get(targetID), _Config.APP_NAME_CAFE_GAME,
                     "Activity Reporter", targetName + " entered the chat room.");
         }
     }
@@ -108,7 +108,7 @@ public class ActivityListener {
 
             String targetName = TARGETS_NAMES.get(targetID);
 
-            BaseNotificationManager.sendNotification(RELATIONS.get(targetID), BaseConfig.APP_NAME_CAFE_GAME,
+            _NotificationManager.sendNotification(RELATIONS.get(targetID), _Config.APP_NAME_CAFE_GAME,
                     "Activity Reporter", targetName + " left the chat room.");
         }
     }

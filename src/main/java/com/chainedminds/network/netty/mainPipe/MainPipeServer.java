@@ -1,6 +1,6 @@
 package com.chainedminds.network.netty.mainPipe;
 
-import com.chainedminds.BaseConfig;
+import com.chainedminds._Config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -29,7 +29,7 @@ public class MainPipeServer {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
 
-                            socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(BaseConfig.DEFAULT_TIMEOUT));
+                            socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT));
                             socketChannel.pipeline().addLast("DECODER", new MainChannelDecoder());
                             socketChannel.pipeline().addLast("PROCESSOR", CHANNEL_DATA_PROCESSOR);
                             socketChannel.pipeline().addLast("ENCODER", CHANNEL_ENCODER);
@@ -40,7 +40,7 @@ public class MainPipeServer {
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             //serverBootstrap.childOption(ChannelOption.SO_LINGER, 20);
 
-            ChannelFuture channelFuture = serverBootstrap.bind(BaseConfig.SERVER_PORT_MAIN).syncUninterruptibly();
+            ChannelFuture channelFuture = serverBootstrap.bind(_Config.SERVER_PORT_MAIN).syncUninterruptibly();
 
             System.out.println("Starting main pipe server...");
 

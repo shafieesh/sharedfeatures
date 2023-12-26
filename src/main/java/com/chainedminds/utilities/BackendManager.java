@@ -1,6 +1,6 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.models.BaseData;
+import com.chainedminds.models._Data;
 
 public class BackendManager {
 
@@ -14,7 +14,7 @@ public class BackendManager {
             BACKEND_LEADERBOARD_MANAGER
     };
 
-    public static BaseData register(BaseData data) {
+    public static _Data register(_Data data) {
 
         //String channelID = data.client.channelID;
 

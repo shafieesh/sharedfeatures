@@ -1,7 +1,7 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.BaseConfig;
-import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
+import com.chainedminds._Config;
+import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
@@ -39,9 +39,9 @@ public class DynamicConfig {
 
     private static void fetchRecords() {
 
-        String selectStatement = "SELECT * FROM " + BaseConfig.TABLE_DYNAMIC_CONFIGS;
+        String selectStatement = "SELECT * FROM " + _Config.TABLE_DYNAMIC_CONFIGS;
 
-        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Map<String, String> maps = new HashMap<>();
             private final Map<String, ArrayList<String>> lists = new HashMap<>();
@@ -136,7 +136,7 @@ public class DynamicConfig {
 
         String key = section + "-" + field;
 
-        String statement = "REPLACE INTO " + BaseConfig.TABLE_DYNAMIC_CONFIGS + " (" +
+        String statement = "REPLACE INTO " + _Config.TABLE_DYNAMIC_CONFIGS + " (" +
                 FIELD_KEY + ", " + FIELD_TYPE + ", " + FIELD_VALUE + ") VALUES (?, ?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -144,7 +144,7 @@ public class DynamicConfig {
         parameters.put(2, "map");
         parameters.put(3, value);
 
-        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
+        boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 

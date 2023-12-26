@@ -15,7 +15,7 @@
  */
 package com.chainedminds.network.netty.telnetPipe;
 
-import com.chainedminds.BaseConfig;
+import com.chainedminds._Config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -46,7 +46,7 @@ public class TelnetPipeServer {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
 
-                            socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(BaseConfig.DEFAULT_TIMEOUT));
+                            socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT));
                             socketChannel.pipeline().addLast("DELIMITER", new DelimiterBasedFrameDecoder(
                                     8192, Delimiters.lineDelimiter()));
                             socketChannel.pipeline().addLast("DECODER", CHANNEL_DECODER);
@@ -59,7 +59,7 @@ public class TelnetPipeServer {
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             //serverBootstrap.childOption(ChannelOption.SO_LINGER, 20);
 
-            ChannelFuture channelFuture = serverBootstrap.bind(BaseConfig.SERVER_PORT_TELNET).syncUninterruptibly();
+            ChannelFuture channelFuture = serverBootstrap.bind(_Config.SERVER_PORT_TELNET).syncUninterruptibly();
 
             System.out.println("Starting telnet pipe server...");
 

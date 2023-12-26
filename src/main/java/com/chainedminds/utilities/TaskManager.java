@@ -1,8 +1,8 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.BaseConfig;
-import com.chainedminds.BaseMonitor;
-import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
+import com.chainedminds._Config;
+import com.chainedminds._Monitor;
+import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -97,21 +97,21 @@ public class TaskManager {
 
     private static void saveTaskInvokeTime(Task task) {
 
-        String insertStatement = "INSERT " + BaseConfig.TABLE_TASKS_HISTORY + " (" +
+        String insertStatement = "INSERT " + _Config.TABLE_TASKS_HISTORY + " (" +
                 COLUMN_TASK_NAME + ", " + COLUMN_TASK_TIME + ") " + "VALUES (?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, task.name);
         parameters.put(2, new Timestamp(System.currentTimeMillis()));
 
-        BaseDatabaseHelperOld.insert(TAG, insertStatement, parameters);
+        _DatabaseOld.insert(TAG, insertStatement, parameters);
     }
 
     private static void run() {
 
         long currentTimeMillis;
 
-        while (BaseMonitor.isAppRunning()) {
+        while (_Monitor.isAppRunning()) {
 
             currentTimeMillis = System.currentTimeMillis();
 

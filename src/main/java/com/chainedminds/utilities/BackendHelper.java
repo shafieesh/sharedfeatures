@@ -1,6 +1,6 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.BaseConfig;
+import com.chainedminds._Config;
 
 import java.awt.*;
 import java.util.Calendar;
@@ -158,32 +158,32 @@ public class BackendHelper {
 
     public static String getLanguageWithMarket(String market) {
 
-        if (BaseConfig.MARKET_GOOGLE_PLAY.equals(market)) {
+        if (_Config.MARKET_GOOGLE_PLAY.equals(market)) {
 
-            return BaseConfig.LANGUAGE_EN;
+            return _Config.LANGUAGE_EN;
         }
 
-        return BaseConfig.LANGUAGE_FA;
+        return _Config.LANGUAGE_FA;
     }
 
     public static String getPaymentType(String market) {
 
-        if (market.equals(BaseConfig.MARKET_CAFEBAZAAR)) {
+        if (market.equals(_Config.MARKET_CAFEBAZAAR)) {
 
-            return BaseConfig.PAYMENT_OPTION_IAB;
+            return _Config.PAYMENT_OPTION_IAB;
         }
 
-        if (market.equals(BaseConfig.MARKET_TOOSKA)) {
+        if (market.equals(_Config.MARKET_TOOSKA)) {
 
-            return BaseConfig.PAYMENT_OPTION_IPG;
+            return _Config.PAYMENT_OPTION_IPG;
         }
 
-        if (market.equals(BaseConfig.MARKET_VADA) || market.equals(BaseConfig.MARKET_ROYAL)) {
+        if (market.equals(_Config.MARKET_VADA) || market.equals(_Config.MARKET_ROYAL)) {
 
-            return BaseConfig.PAYMENT_OPTION_VAS;
+            return _Config.PAYMENT_OPTION_VAS;
         }
 
-        return BaseConfig.PAYMENT_OPTION_IAB;
+        return _Config.PAYMENT_OPTION_IAB;
     }
 
     public static int parseColor(String colorString) {

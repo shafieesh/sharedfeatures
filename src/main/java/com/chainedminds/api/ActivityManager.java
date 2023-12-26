@@ -1,7 +1,7 @@
 package com.chainedminds.api;
 
-import com.chainedminds.BaseConfig;
-import com.chainedminds.api.accounting.BaseAccountPropertyManager;
+import com.chainedminds._Config;
+import com.chainedminds.api.accounting._AccountSession;
 import com.chainedminds.utilities.Messages;
 import com.chainedminds.utilities.Utilities;
 
@@ -71,36 +71,36 @@ public class ActivityManager {
 
             default:
 
-                long lastActivity = BaseAccountPropertyManager.USER_ACTIVITY
+                long lastActivity = _AccountSession.USER_ACTIVITY
                         .getOrDefault(appName, new HashMap<>())
                         .getOrDefault(userID, 0L);
 
                 long diff = System.currentTimeMillis() - lastActivity;
 
-                if (diff > BaseConfig.ONE_YEAR) {
+                if (diff > _Config.ONE_YEAR) {
 
                     return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_YEARS_AGO,
-                            language, "" + Math.round(diff / BaseConfig.ONE_YEAR));
+                            language, "" + Math.round(diff / _Config.ONE_YEAR));
                 }
-                if (diff > BaseConfig.ONE_MONTH) {
+                if (diff > _Config.ONE_MONTH) {
 
                     return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_MONTHS_AGO,
-                            language, "" + Math.round(diff / BaseConfig.ONE_MONTH));
+                            language, "" + Math.round(diff / _Config.ONE_MONTH));
                 }
-                if (diff > BaseConfig.ONE_DAY) {
+                if (diff > _Config.ONE_DAY) {
 
                     return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_DAYS_AGO,
-                            language, "" + Math.round(diff / BaseConfig.ONE_DAY));
+                            language, "" + Math.round(diff / _Config.ONE_DAY));
                 }
-                if (diff > BaseConfig.ONE_HOUR) {
+                if (diff > _Config.ONE_HOUR) {
 
                     return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_HOURS_AGO,
-                            language, "" + Math.round(diff / BaseConfig.ONE_HOUR));
+                            language, "" + Math.round(diff / _Config.ONE_HOUR));
                 }
-                if (diff > BaseConfig.ONE_MINUTE) {
+                if (diff > _Config.ONE_MINUTE) {
 
                     return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_MINUTES_AGO,
-                            language, "" + Math.round(diff / BaseConfig.ONE_MINUTE));
+                            language, "" + Math.round(diff / _Config.ONE_MINUTE));
                 }
 
                 return "";
@@ -122,7 +122,7 @@ public class ActivityManager {
 
             LAST_MODIFICATION.keySet().removeIf(key -> {
 
-                if (System.currentTimeMillis() - LAST_MODIFICATION.getOrDefault(key, 0L) > BaseConfig.TEN_MINUTES) {
+                if (System.currentTimeMillis() - LAST_MODIFICATION.getOrDefault(key, 0L) > _Config.TEN_MINUTES) {
 
                     LAST_ACTIVITY_CACHE.remove(key);
 

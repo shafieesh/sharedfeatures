@@ -1,6 +1,6 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds.BaseConfig;
+import com.chainedminds._Config;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -45,35 +45,35 @@ public class Utilities {
 
         if (diff < 0) return result;
 
-        if (diff > BaseConfig.ONE_DAY) {
+        if (diff > _Config.ONE_DAY) {
 
             if ("FA".equals(language)) {
 
-                result = Math.round(diff / BaseConfig.ONE_DAY) + " روز";
+                result = Math.round(diff / _Config.ONE_DAY) + " روز";
 
             } else {
 
-                result = Math.round(diff / BaseConfig.ONE_DAY) + " days";
+                result = Math.round(diff / _Config.ONE_DAY) + " days";
             }
-        } else if (diff > BaseConfig.ONE_HOUR) {
+        } else if (diff > _Config.ONE_HOUR) {
 
             if ("FA".equals(language)) {
 
-                result = Math.round(diff / BaseConfig.ONE_HOUR) + " ساعت";
+                result = Math.round(diff / _Config.ONE_HOUR) + " ساعت";
 
             } else {
 
-                result = Math.round(diff / BaseConfig.ONE_HOUR) + " hours";
+                result = Math.round(diff / _Config.ONE_HOUR) + " hours";
             }
-        } else if (diff > BaseConfig.ONE_MINUTE) {
+        } else if (diff > _Config.ONE_MINUTE) {
 
             if ("FA".equals(language)) {
 
-                result = Math.round(diff / BaseConfig.ONE_MINUTE) + " دقیقه";
+                result = Math.round(diff / _Config.ONE_MINUTE) + " دقیقه";
 
             } else {
 
-                result = Math.round(diff / BaseConfig.ONE_MINUTE) + " minutes";
+                result = Math.round(diff / _Config.ONE_MINUTE) + " minutes";
             }
         }
 
@@ -220,7 +220,7 @@ public class Utilities {
 
             e.printStackTrace();
 
-            BaseLogs.error("HttpConnection", e);
+            _Logs.error("HttpConnection", e);
         }
 
         return wasSuccessful;
@@ -288,7 +288,7 @@ public class Utilities {
 
             e.printStackTrace();
 
-            BaseLogs.error("HttpConnection", e);
+            _Logs.error("HttpConnection", e);
         }
 
         return wasSuccessful;
@@ -296,7 +296,7 @@ public class Utilities {
 
     /**
      * Helper method for doing a full try catch in a nested method.<br>
-     * This will also catches any uncaught exceptions and saves the exception with {@link BaseLogs} utility.
+     * This will also catches any uncaught exceptions and saves the exception with {@link _Logs} utility.
      *
      * @param Tag The class name which is requesting this try-catch. This will be used when logging the exceptions.
      * @param job The nested job that needs to be completed inside a try-catch.
@@ -309,7 +309,7 @@ public class Utilities {
 
         } catch (Exception e) {
 
-            BaseLogs.error(Tag, e);
+            _Logs.error(Tag, e);
         }
     }
 
@@ -335,7 +335,7 @@ public class Utilities {
 
         } catch (Exception e) {
 
-            BaseLogs.error(Tag, e);
+            _Logs.error(Tag, e);
 
         } finally {
 

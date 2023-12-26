@@ -1,7 +1,7 @@
 package com.chainedminds.network.netty.telnetPipe;
 
-import com.chainedminds.BaseResources;
-import com.chainedminds.api.BaseRequestsManager;
+import com.chainedminds._Resources;
+import com.chainedminds.api._RequestHandler;
 import com.chainedminds.network.netty.ChannelListeners;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
@@ -47,12 +47,12 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
         Runnable task = () -> {
 
-            Object responseData = BaseResources.getInstance().requestManager
+            Object responseData = _Resources.getInstance().requestManager
                     .processRequest(context, remoteAddress, requestData);
 
             if (responseData != null) {
 
-                BaseRequestsManager.optimizeReadTimeout(context, responseData);
+                _RequestHandler.optimizeReadTimeout(context, responseData);
 
                 ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
             }
@@ -69,10 +69,10 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
         if (!NettyServer.execute(task)) {
 
-            Object responseData = BaseResources.getInstance().requestManager
+            Object responseData = _Resources.getInstance().requestManager
                     .sendServerBusyResponse(requestData);
 
-            BaseRequestsManager.optimizeReadTimeout(context, responseData);
+            _RequestHandler.optimizeReadTimeout(context, responseData);
 
             context.channel().writeAndFlush(responseData);//.addListener(ChannelFutureListener.CLOSE);
         }

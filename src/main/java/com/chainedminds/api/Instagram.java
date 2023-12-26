@@ -1,9 +1,9 @@
 package com.chainedminds.api;
 
-import com.chainedminds.BaseCodes;
-import com.chainedminds.models.BaseData;
+import com.chainedminds._Codes;
+import com.chainedminds.models._Data;
 import com.chainedminds.models.InstagramData;
-import com.chainedminds.models.account.BaseAccountData;
+import com.chainedminds.models.account._AccountData;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonHelper;
 
@@ -15,11 +15,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Instagram {
 
-    public static Map<String, Object> getInstagramData(BaseData data) {
+    public static Map<String, Object> getInstagramData(_Data data) {
 
         Map<String, Object> response = new HashMap<>();
 
-        response.put("response", BaseCodes.RESPONSE_NOK);
+        response.put("response", _Codes.RESPONSE_NOK);
 
         Utilities.tryAndIgnore(() -> {
 
@@ -27,7 +27,7 @@ public class Instagram {
 
             for (Object account : data.accounts) {
 
-                String profileID = ((BaseAccountData) account).username;
+                String profileID = ((_AccountData) account).username;
 
                 Map<String, Map<String, Integer>> accountData = new HashMap<>();
                 accountData.put(profileID, getInstagramData(profileID));
@@ -37,7 +37,7 @@ public class Instagram {
 
             response.put("accounts", accounts);
 
-            response.put("response", BaseCodes.RESPONSE_OK);
+            response.put("response", _Codes.RESPONSE_OK);
         });
 
         return response;
