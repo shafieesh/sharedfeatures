@@ -175,11 +175,16 @@ public class Messages {
         public static String SERVERS_ARE_NOT_AVAILABLE = "SERVERS_ARE_NOT_AVAILABLE";
         public static String MISSING_DATA = "MISSING_DATA";
         public static String MISSING_PERMISSION = "MISSING_PERMISSION";
+        public static String USERNAME_IS_TOO_SHORT = "USERNAME_IS_TOO_SHORT";
+        public static String PASSWORD_IS_TOO_SHORT = "PASSWORD_IS_TOO_SHORT";
         public static String INVALID_USERNAME_OR_PASSWORD = "INVALID_USERNAME_OR_PASSWORD";
+        public static String SOMETHING_WENT_WRONG = "SOMETHING_WENT_WRONG";
+        public static String SOMETHING_WENT_WRONG_TRY_AGAIN = "SOMETHING_WENT_WRONG_TRY_AGAIN";
         public static String TOO_MANY_ATTEMPTS = "TOO_MANY_ATTEMPTS";
+        public static String ACCOUNT_DEACTIVATED = "ACCOUNT_DEACTIVATED";
 
         public static String USERNAME_HAS_REGISTERED_BEFORE = "USERNAME_HAS_REGISTERED_BEFORE";
-        public static String PASSWORD_IS_TOO_SHORT = "PASSWORD_IS_TOO_SHORT";
+
     }
 
     public static class Notification {

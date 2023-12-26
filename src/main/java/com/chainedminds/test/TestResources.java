@@ -17,14 +17,14 @@ import com.chainedminds.models.payment.BaseIPGTransactionData;
 import com.chainedminds.utilities.BaseFileManager;
 
 public class TestResources extends BaseResources<
-        TestData,
         TestRequestManager,
         BaseProfileManager,
         BaseAccountManager<TestData>,
-        BaseAccountPropertyManager<TestData>,
+        BaseAccountPropertyManager,
         BaseFriendshipManager<TestData, BaseFriendData>,
-        BaseFileManager, BaseIABPaymentManager<TestData, BaseIABTransactionData, BaseProductData>,
-        BaseIPGPaymentManager<TestData, BaseIPGTransactionData, BaseProductData>,
+        BaseFileManager,
+        BaseIABPaymentManager<BaseIABTransactionData, BaseProductData>,
+        BaseIPGPaymentManager<BaseIPGTransactionData, BaseProductData>,
         BaseIABProductPurchasesManager<BaseIABTransactionData>,
         BaseIPGProductPurchasesManager<BaseIPGTransactionData>,
         BaseIABSubscriptionPurchasesManager<BaseIABTransactionData>,
@@ -42,10 +42,9 @@ public class TestResources extends BaseResources<
     public void config() {
 
         super.requestManager = new TestRequestManager(TestData.class);
-
         super.profileManager = new BaseProfileManager();
         super.accountManager = new BaseAccountManager<>();
-        super.accountPropertyManager = new BaseAccountPropertyManager<>();
+        super.accountPropertyManager = new BaseAccountPropertyManager();
         super.friendshipManager = new BaseFriendshipManager<>();
         super.fileManager = new BaseFileManager();
         super.iabPaymentManager = new BaseIABPaymentManager<>();
@@ -57,10 +56,10 @@ public class TestResources extends BaseResources<
         super.productManager = new BaseProductsManager<>();
         super.blackListManager = new BaseBlackListManager();
 
-        BaseResources<?, TestRequestManager, BaseProfileManager, BaseAccountManager<TestData>, BaseAccountPropertyManager<TestData>,
+        BaseResources<TestRequestManager, BaseProfileManager, BaseAccountManager<TestData>, BaseAccountPropertyManager,
                 BaseFriendshipManager<TestData, BaseFriendData>,
-                BaseFileManager, BaseIABPaymentManager<TestData, BaseIABTransactionData, BaseProductData>,
-                BaseIPGPaymentManager<TestData, BaseIPGTransactionData, BaseProductData>,
+                BaseFileManager, BaseIABPaymentManager<BaseIABTransactionData, BaseProductData>,
+                BaseIPGPaymentManager<BaseIPGTransactionData, BaseProductData>,
                 BaseIABProductPurchasesManager<BaseIABTransactionData>,
                 BaseIPGProductPurchasesManager<BaseIPGTransactionData>,
                 BaseIABSubscriptionPurchasesManager<BaseIABTransactionData>,

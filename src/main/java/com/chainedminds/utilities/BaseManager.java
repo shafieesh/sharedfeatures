@@ -27,7 +27,7 @@ public class BaseManager<Data extends BaseData> {
     protected Data handleMissingData(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
-        data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+        data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
         return data;
     }

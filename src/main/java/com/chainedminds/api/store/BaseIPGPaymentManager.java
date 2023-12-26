@@ -3,12 +3,13 @@ package com.chainedminds.api.store;
 import com.chainedminds.BaseClasses;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
-import com.chainedminds.models.BaseData;
 import com.chainedminds.models.BaseProductData;
 import com.chainedminds.models.payment.BaseIPGTransactionData;
 import com.chainedminds.models.payment.PasargadData;
 import com.chainedminds.models.payment.ZarinPalData;
-import com.chainedminds.utilities.*;
+import com.chainedminds.utilities.DynamicConfig;
+import com.chainedminds.utilities.HttpResponseCallback;
+import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
 import com.chainedminds.utilities.json.JsonHelper;
 
@@ -21,8 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BaseIPGPaymentManager<Data extends BaseData,
-        IPGTransactionData extends BaseIPGTransactionData,
+public class BaseIPGPaymentManager<IPGTransactionData extends BaseIPGTransactionData,
         ProductData extends BaseProductData> extends BasePaymentManager<ProductData> {
 
     private static final String TAG = BaseIPGPaymentManager.class.getSimpleName();
@@ -63,7 +63,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         if (data.ipgTransaction == null || data.ipgTransaction.sku == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -181,7 +181,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         if (data.ipgTransaction == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -283,7 +283,7 @@ public class BaseIPGPaymentManager<Data extends BaseData,
 
         if (data.ipgTransaction == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }

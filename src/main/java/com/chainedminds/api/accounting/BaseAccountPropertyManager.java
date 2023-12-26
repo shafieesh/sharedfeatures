@@ -1,14 +1,14 @@
 package com.chainedminds.api.accounting;
 
-import com.chainedminds.BaseClasses;
 import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
-import com.chainedminds.BaseResources;
+import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.models.BaseData;
-import com.chainedminds.models.account.BaseAccountData;
-import com.chainedminds.utilities.*;
-import com.chainedminds.utilities.database.DBResult;
+import com.chainedminds.utilities.CacheManager;
+import com.chainedminds.utilities.Hash;
+import com.chainedminds.utilities.TaskManager;
 import com.chainedminds.utilities.database.BaseDatabaseHelperOld;
+import com.chainedminds.utilities.database.DBResult;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.Connection;
@@ -16,31 +16,39 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BaseAccountPropertyManager<Data extends BaseData<?>> {
+public class BaseAccountPropertyManager {
 
     private static final String TAG = BaseAccountPropertyManager.class.getSimpleName();
 
-    private static final String FIELD_USER_ID = "UserID";
-    private static final String FIELD_APP_NAME = "AppName";
-    private static final String FIELD_PLATFORM = "Platform";
-    private static final String FIELD_CREDENTIAL = "Credential";
-    private static final String FIELD_PLAY_TIME = "PlayTime";
-    private static final String FIELD_RESULT = "Result";
-    private static final String FIELD_DATE_TIME = "DateTime";
-    private static final String FIELD_GAME_NAME = "GameName";
-    private static final String FIELD_SCORE = "Score";
-    private static final String FIELD_LEAGUE_ID = "LeagueID";
-    private static final String FIELD_FIREBASE_ID = "FirebaseID";
-    private static final String FIELD_IP_ADDRESS = "IPAddress";
-    private static final String FIELD_LANGUAGE = "Language";
-    private static final String FIELD_UUID = "UUID";
-    private static final String FIELD_LAST_UPDATE = "LastUpdate";
-    private static final String FIELD_BLOCKED = "Blocked";
+    protected static final String FIELD_USER_ID = "UserID";
+    protected static final String FIELD_APP_NAME = "AppName";
+    protected static final String FIELD_PLATFORM = "Platform";
+    protected static final String FIELD_IS_ACTIVE = "IsActive";
+    protected static final String FIELD_CREDENTIAL = "Credential";
+    protected static final String FIELD_APP_VERSION = "AppVersion";
+    protected static final String FIELD_MARKET = "Market";
+    protected static final String FIELD_LANGUAGE = "Language";
+    protected static final String FIELD_UUID = "UUID";
+    protected static final String FIELD_FIREBASE_ID = "FirebaseID";
+    protected static final String FIELD_IP_ADDRESS = "IPAddress";
+    protected static final String FIELD_COUNTRY = "Country";
+    protected static final String FIELD_LAST_UPDATE = "LastUpdate";
 
-    private static final CacheManager<Integer, Map<String, String>> CREDENTIALS_CACHE = new CacheManager<>();
-    private static final CacheManager<Integer, Map<String, String>> LANGUAGE_CACHE = new CacheManager<>();
+    protected static final CacheManager<Integer, Map<String, String>> CREDENTIALS_CACHE = new CacheManager<>();
+    protected static final CacheManager<Integer, Map<String, String>> LANGUAGE_CACHE = new CacheManager<>();
 
+    protected final Set<Integer> CACHED_USERS_INFO = new HashSet<>();
     public static final Map<String, Map<Integer, Long>> USER_ACTIVITY = new HashMap<>();
+
+    public void start() {
+
+        TaskManager.addTask(TaskManager.Task.build()
+                .setName("Clear Cached Users Info")
+                .setTime(0, 0, 0)
+                .setInterval(0, 0, 15, 0)
+                .setTimingListener(task -> CACHED_USERS_INFO.clear())
+                .schedule());
+    }
 
     public void fetch() {
 
@@ -56,11 +64,10 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
                     String appName = resultSet.getString(FIELD_APP_NAME);
-                    long epoch = resultSet.getTimestamp(FIELD_LAST_UPDATE).getTime();
+                    long lastUpdate = resultSet.getTimestamp(FIELD_LAST_UPDATE).getTime();
 
                     USER_ACTIVITY.putIfAbsent(appName, new HashMap<>());
-
-                    USER_ACTIVITY.get(appName).put(userID, epoch);
+                    USER_ACTIVITY.get(appName).put(userID, lastUpdate);
                 }
             }
 
@@ -119,9 +126,9 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
         }
     }
 
-    public Boolean getBlocked(int userID, String appName) {
+    public Boolean getIsActive(int userID, String appName) {
 
-        return getPropertyOld(userID, appName, FIELD_BLOCKED, Boolean.class);
+        return getPropertyOld(userID, appName, FIELD_IS_ACTIVE, Boolean.class);
     }
 
     public String getFirebaseID(int userID, String appName) {
@@ -166,7 +173,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         userIDs.add(userID);
 
-        if (uuids != null && uuids.size() > 0) {
+        if (uuids != null && !uuids.isEmpty()) {
 
             Map<Integer, Object> parameters = new HashMap<>();
 
@@ -187,7 +194,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
             String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
                     BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
-                    FIELD_BLOCKED + " = FALSE AND " + FIELD_UUID +
+                    FIELD_IS_ACTIVE + " = FALSE AND " + FIELD_UUID +
                     " IN (" + questionMarksArray + ")";
 
             BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
@@ -208,7 +215,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         userIDs.add(userID);
 
-        if (firebaseIDs != null && firebaseIDs.size() > 0) {
+        if (firebaseIDs != null && !firebaseIDs.isEmpty()) {
 
             Map<Integer, Object> parameters = new HashMap<>();
 
@@ -229,7 +236,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
             String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
                     BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
-                    FIELD_BLOCKED + " = FALSE AND " + FIELD_FIREBASE_ID +
+                    FIELD_IS_ACTIVE + " = FALSE AND " + FIELD_FIREBASE_ID +
                     " IN (" + questionMarksArray + ")";
 
             BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
@@ -250,7 +257,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         userIDs.add(userID);
 
-        if (ipAddresses != null && ipAddresses.size() > 0) {
+        if (ipAddresses != null && !ipAddresses.isEmpty()) {
 
             Map<Integer, Object> parameters = new HashMap<>();
 
@@ -271,7 +278,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
             String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
                     BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
-                    FIELD_BLOCKED + " = FALSE AND " + FIELD_IP_ADDRESS +
+                    FIELD_IS_ACTIVE + " = FALSE AND " + FIELD_IP_ADDRESS +
                     " IN (" + questionMarksArray + ")";
 
             BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
@@ -299,39 +306,17 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
         return BaseDatabaseHelperOld.update(TAG, updateStatement, parameters);
     }
 
-    public boolean setCredential(int userID, String credential) {
-
-        String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
-                " SET " + FIELD_CREDENTIAL + " = ? WHERE " + FIELD_USER_ID + " = ?";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, credential);
-        parameters.put(2, userID);
-
-        return BaseDatabaseHelperOld.update(TAG, statement, parameters, (wasSuccessful, error) -> {
-
-            if (wasSuccessful) {
-
-                CREDENTIALS_CACHE.remove(userID);
-            }
-        });
-    }
-
     public boolean setCredential(int userID, String appName, String platform, String credential) {
 
         boolean wasSuccessful = setProperty(userID, appName, platform, FIELD_CREDENTIAL, credential);
 
         if (wasSuccessful) {
 
-            if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName)) {
+            String key = appName + "-" + platform;
 
-                String key = appName + "-" + platform;
+            Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
 
-                Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
-
-                appNamePlatformCredential.put(key, credential);
-            }
+            appNamePlatformCredential.put(key, credential);
         }
 
         return wasSuccessful;
@@ -344,27 +329,24 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         if (wasSuccessful) {
 
-            if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName)) {
+            String key = appName + "-" + platform;
 
-                String key = appName + "-" + platform;
+            Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
 
-                Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
-
-                appNamePlatformCredential.put(key, credential);
-            }
+            appNamePlatformCredential.put(key, credential);
         }
 
         return wasSuccessful;
     }
 
-    public boolean setBlocked(int userID, boolean block) {
+    public boolean setIsActive(int userID, boolean isActive) {
 
         String statement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
-                " SET " + FIELD_BLOCKED + " = ? WHERE " + FIELD_USER_ID + " = ?";
+                " SET " + FIELD_IS_ACTIVE + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
-        parameters.put(1, block);
+        parameters.put(1, isActive);
         parameters.put(2, userID);
 
         return BaseDatabaseHelperOld.update(TAG, statement, parameters);
@@ -554,7 +536,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
-                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
+                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")" + ", " + FIELD_LAST_UPDATE + " = NOW()";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
@@ -570,7 +552,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
-                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
+                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")" + ", " + FIELD_LAST_UPDATE + " = NOW()";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
@@ -586,7 +568,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
         String updateStatement = "INSERT INTO " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
-                ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")";
+                ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")" + ", " + FIELD_LAST_UPDATE + " = NOW()";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
@@ -599,248 +581,86 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
 
     //------------------------------------------------------------------------------------
 
-    /*public Data getPublicProfile0(Data data) {
-
-        data.response = BaseCodes.RESPONSE_NOK;
-
-        int profileID = data.account.id;
-
-        boolean upToDateClient = data.player != null;
-
-        if (upToDateClient) {
-
-            profileID = data.player.id;
-
-            if (profileID == 0) {
-
-                String gamerTag = data.player.gamerTag;
-
-                profileID = BaseResources.getInstance().accountManager.findUserID(gamerTag);
-            }
-        }
-
-        int subRequest = data.subRequest;
-
-        BaseFileManager fileManager = BaseResources.getInstance().fileManager;
-
-        if (subRequest == BaseCodes.REQUEST_BASIC_DATA) {
-
-            data = getPublicProfile(profileID, data);
-        }
-
-        if (subRequest == BaseCodes.REQUEST_FILE_INFO) {
-
-            *//*FileClass file = FileManager.getFileInfo();
-
-            if (file != null) {
-
-                data.file = file;
-
-                data.response = BaseCodes.RESPONSE_OK;
-            }*//*
-        }
-
-        if (subRequest == BaseCodes.REQUEST_FILE_BYTES) {
-
-            String fileName = profileID + ".jpg";
-            int filePath = BaseFileManager.SECTION_PROFILES;
-
-            if (!fileManager.exists(filePath, fileName)) {
-
-                fileName = "1.jpg";
-            }
-
-            byte[] fileBytes = fileManager.loadFile(filePath, fileName);
-
-            String encodedString = Base64Helper.encode(fileBytes);
-
-            if (encodedString != null) {
-
-                data.file = BaseClasses.construct(BaseClasses.getInstance().fileClass);
-                data.file.base64 = encodedString;
-
-                data.response = BaseCodes.RESPONSE_OK;
-            }
-        }
-
-        if (subRequest == BaseCodes.REQUEST_FILE_HASH) {
-
-            String fileName = profileID + ".jpg";
-            int filePath = BaseFileManager.SECTION_PROFILES;
-
-            if (!fileManager.exists(filePath, fileName)) {
-
-                fileName = "1.jpg";
-            }
-
-            BaseFileData file = fileManager.getHash(filePath, fileName);
-
-            if (file != null) {
-
-                data.file = file;
-
-                data.response = BaseCodes.RESPONSE_OK;
-            }
-        }
-
-        return data;
-    }*/
-
-    /*public Data getFullProfile0(Data data) {
+    protected <Data extends BaseData<?>> void updateAccount(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
         int userID = data.account.id;
-        int profileID = data.player.id;
+        int appVersion = data.client.appVersion;
+        String appName = data.client.appName;
+        String platform = data.client.platform;
+        String market = data.client.market;
+        String language = data.client.language;
+        String firebaseID = data.client.firebaseID;
+        String ipAddress = data.client.address;
+        String uuid = data.client.uuid;
+        String country = IPLocationFinder.getCountry(ipAddress);
 
-        int lowerSubRequest = data.lowerSubRequest;
+        if (uuid == null) {
 
-        if (lowerSubRequest == BaseCodes.REQUEST_BASIC_DATA) {
-
-            data = getFullProfile(profileID, data);
+            uuid = Hash.md5(System.currentTimeMillis());
         }
 
-        if (lowerSubRequest == BaseCodes.REQUEST_FILE_INFO) {
+        String statement = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
 
-            *//*FileClass file = FileManager.getFileInfo();
+                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_APP_VERSION +
+                ", " + FIELD_PLATFORM + ", " + FIELD_MARKET + ", " + FIELD_LANGUAGE +
+                ", " + FIELD_FIREBASE_ID + ", " + FIELD_IP_ADDRESS + ", " + FIELD_UUID +
+                ", " + FIELD_COUNTRY + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
 
-            if (file != null) {
+                "ON DUPLICATE KEY UPDATE " +
 
-                data.file = file;
-
-                data.response = BaseCodes.RESPONSE_OK;
-            }*//*
-        }
-
-        BaseFileManager fileManager = BaseResources.getInstance().fileManager;
-
-        if (lowerSubRequest == BaseCodes.REQUEST_FILE_BYTES) {
-
-            String fileName = profileID + ".jpg";
-            int filePath = BaseFileManager.SECTION_PROFILES;
-
-            if (!fileManager.exists(filePath, fileName)) {
-
-                fileName = "1.jpg";
-            }
-
-            byte[] fileBytes = fileManager.loadFile(filePath, fileName);
-
-            String encodedString = Base64Helper.encode(fileBytes);
-
-            if (encodedString != null) {
-
-                data.file = BaseClasses.construct(BaseClasses.getInstance().fileClass);
-                data.file.base64 = encodedString;
-            }
-        }
-
-        if (lowerSubRequest == BaseCodes.REQUEST_FILE_HASH) {
-
-            String fileName = profileID + ".jpg";
-            int filePath = BaseFileManager.SECTION_PROFILES;
-
-            if (!fileManager.exists(filePath, fileName)) {
-
-                fileName = "1.jpg";
-            }
-
-            BaseFileData file = fileManager.getHash(filePath, fileName);
-
-            if (file != null) {
-
-                data.file = file;
-
-                data.response = BaseCodes.RESPONSE_OK;
-            }
-        }
-
-        return data;
-    }*/
-
-    public Data getFullProfile(int profileID, Data data) {
-
-        return data;
-    }
-
-    public Data getPublicProfile(int profileID, Data data) {
-
-        return data;
-    }
-
-    public Data updateProfile(Data data) {
-
-        data.response = BaseCodes.RESPONSE_NOK;
-
-        int userID = data.account.id;
-        int lowerSubRequest = data.lowerSubRequest;
-
-        if (lowerSubRequest == BaseCodes.REQUEST_BASIC_DATA) {
-
-            //data.profile = getPublicProfile(userID);
-        }
-
-        if (lowerSubRequest == BaseCodes.REQUEST_FILE_BYTES) {
-
-            if (data.file != null) {
-
-                byte[] fileBytes = Base64Helper.decode(data.file.base64);
-
-                boolean wasSuccessful = BaseResources.getInstance().fileManager
-                        .saveFile(BaseFileManager.SECTION_PROFILES, userID + ".jpg", fileBytes);
-
-                if (wasSuccessful) {
-
-                    data.response = BaseCodes.RESPONSE_OK;
-                }
-
-                data.file = null;
-            }
-        }
-
-        return data;
-    }
-
-    protected <Account extends BaseAccountData> Account getAccountProperties(int userID, String appName) {
-
-        return getAccountProperties(userID, appName, null);
-    }
-
-    protected <AccountData extends BaseAccountData> AccountData getAccountProperties(
-            int userID, String appName, AccountData basicAccount) {
-
-        AtomicReference<AccountData> account = new AtomicReference<>(basicAccount);
-
-        String statement = "SELECT * FROM " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
-                " WHERE " + FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ?";
+                FIELD_APP_VERSION + " = VALUES (" + FIELD_APP_VERSION + "), " +
+                FIELD_PLATFORM + " = VALUES (" + FIELD_PLATFORM + "), " +
+                FIELD_MARKET + " = VALUES (" + FIELD_MARKET + "), " +
+                FIELD_LANGUAGE + " = VALUES (" + FIELD_LANGUAGE + "), " +
+                FIELD_FIREBASE_ID + " = VALUES (" + FIELD_FIREBASE_ID + "), " +
+                FIELD_IP_ADDRESS + " = VALUES (" + FIELD_IP_ADDRESS + "), " +
+                FIELD_UUID + " = VALUES (" + FIELD_UUID + "), " +
+                FIELD_COUNTRY + " = VALUES (" + FIELD_COUNTRY + "), " +
+                FIELD_LAST_UPDATE + " = NOW()";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
         parameters.put(1, userID);
         parameters.put(2, appName);
+        parameters.put(3, appVersion);
+        parameters.put(4, platform);
+        parameters.put(5, market);
+        parameters.put(6, language);
+        parameters.put(7, firebaseID);
+        parameters.put(8, ipAddress);
+        parameters.put(9, uuid);
+        parameters.put(10, country);
 
-        BaseDatabaseHelperOld.query(TAG, statement, parameters, resultSet -> {
+        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
 
-            if (resultSet.next()) {
+        if (wasSuccessful) {
 
-                AccountData accountData = basicAccount;
+            CACHED_USERS_INFO.add(userID);
 
-                if (accountData == null) {
+            data.response = BaseCodes.RESPONSE_OK;
 
-                    accountData = (AccountData) BaseClasses.construct(BaseClasses.getInstance().accountClass);
-                }
+            if (data.client.uuid == null) {
 
-                accountData.id = resultSet.getInt(FIELD_USER_ID);
-                accountData.score = resultSet.getInt(FIELD_SCORE);
+                data.client.uuid = uuid;
 
-                account.set(accountData);
+                data.response = BaseCodes.RESPONSE_OK_CHANGE_UUID;
             }
-        });
-
-        return account.get();
+        }
     }
 
-    public int getScore(int userID, String appName, String platform) {
+    public <Data extends BaseData<?>> Data getFullProfile(int profileID, Data data) {
+
+        return data;
+    }
+
+    public <Data extends BaseData<?>> Data getPublicProfile(int profileID, Data data) {
+
+        return data;
+    }
+
+    /*public int getScore(int userID, String appName, String platform) {
 
         DBResult<Integer> result = getProperty(userID, appName, platform, FIELD_SCORE, Integer.class);
 
@@ -853,26 +673,6 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
     }
 
     public void addScore(Integer userID, String appName, String platform, String gameName, int score, int playTime, boolean wonGame) {
-
-        /*String statement = "INSERT " + BaseConfig.TABLE_GAME_SESSIONS + " (" + FIELD_USER_ID +
-                ", " + FIELD_APP_NAME + ", " + FIELD_GAME_NAME + ", " + FIELD_PLAY_TIME +
-                ", " + FIELD_SCORE + ", " + FIELD_RESULT + ")" + " VALUES (?, ?, ?, ?, ?, ?)";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, gameName);
-        parameters.put(4, playTime);
-        parameters.put(5, score);
-        parameters.put(6, wonGame);
-
-        if (userID == 1) {
-
-            parameters.put(5, 0);
-        }*/
-
-        //boolean wasSuccessful = DatabaseHelper.insert(connection, TAG, statement, parameters);
 
         synchronized (userID) {
 
@@ -900,7 +700,7 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
                 BaseConnectionManagerOld.rollback(connection);
 
                 Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
-                        addScore(userID, appName, platform,  gameName, score, playTime, wonGame));
+                        addScore(userID, appName, platform, gameName, score, playTime, wonGame));
             }
 
             BaseConnectionManagerOld.close(connection);
@@ -1018,10 +818,5 @@ public class BaseAccountPropertyManager<Data extends BaseData<?>> {
     protected boolean setScore(Connection connection, int userID, String appName, String platform, int score) {
 
         return setProperty(connection, userID, appName, platform, FIELD_SCORE, score);
-    }
-
-    public boolean isCafeChatDataTransferred(int userID, String appName) {
-
-        return getPropertyOld(userID, appName, FIELD_USER_ID, Integer.class) == userID;
-    }
+    }*/
 }

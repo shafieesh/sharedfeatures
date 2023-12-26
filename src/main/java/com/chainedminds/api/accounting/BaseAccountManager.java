@@ -5,9 +5,7 @@ import com.chainedminds.BaseCodes;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
 import com.chainedminds.api.ActivityListener;
-import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.models.BaseData;
-import com.chainedminds.models.CoinChargeSettings;
 import com.chainedminds.models.account.BaseAccountData;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.*;
@@ -31,35 +29,14 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
     protected static final String FIELD_USER_ID = "UserID";
     protected static final String FIELD_USERNAME = "Username";
+    protected static final String FIELD_PASSWORD = "Password";
+    protected static final String FIELD_IS_ACTIVE = "IsActive";
     protected static final String FIELD_NAME = "Name";
-    protected static final String FIELD_IP_ADDRESS = "IPAddress";
     protected static final String FIELD_PHONE_NUMBER = "PhoneNumber";
     protected static final String FIELD_EMAIL = "Email";
-    protected static final String FIELD_COINS = "Coins";
-    protected static final String FIELD_TICKETS = "Tickets";
-    protected static final String FIELD_PASSWORD = "Password";
     protected static final String FIELD_REGISTRATION_TIME = "RegistrationTime";
-    protected static final String FIELD_BIO = "Bio";
-    protected static final String FIELD_PREMIUM_PASS = "PremiumPass";
-    protected static final String FIELD_APP_NAME = "AppName";
-    protected static final String FIELD_APP_VERSION = "AppVersion";
-    protected static final String FIELD_PLATFORM = "Platform";
-    protected static final String FIELD_MARKET = "Market";
-    protected static final String FIELD_LANGUAGE = "Language";
-    protected static final String FIELD_COUNTRY = "Country";
     protected static final String FIELD_LAST_UPDATE = "LastUpdate";
-    protected static final String FIELD_FIREBASE_ID = "FirebaseID";
-    protected static final String FIELD_SDK = "SDK";
-    protected static final String FIELD_BRAND = "Brand";
-    protected static final String FIELD_MANUFACTURER = "Manufacturer";
-    protected static final String FIELD_MODEL = "Model";
-    protected static final String FIELD_PRODUCT = "Product";
-    protected static final String FIELD_UUID = "UUID";
-    protected static final String FIELD_LAST_COIN_CHARGE_AMOUNT = "LastCoinChargeAmount";
-    protected static final String FIELD_LAST_TICKET_CHARGE_AMOUNT = "LastTicketChargeAmount";
 
-    protected static final Set<Integer> PREMIUM_USERS = new HashSet<>();
-    protected static final Set<Integer> CACHED_USER_INFO = new HashSet<>();
 
     private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE =
             new CacheManager<>(BaseConfig.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
@@ -72,57 +49,14 @@ public class BaseAccountManager<Data extends BaseData<?>> {
     public void start() {
 
         TaskManager.addTask(TaskManager.Task.build()
-                .setName("HourlyCache")
-                .setTime(0, 0, 0)
-                .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> CACHED_USER_INFO.clear())
-                .schedule());
-
-        TaskManager.addTask(TaskManager.Task.build()
                 .setName("FetchUsers")
                 .setTime(0, 0, 0)
-                .setInterval(0, 0, 30, 0)
-                .setTimingListener(task -> {
-
-                    fetch();
-
-                    if (BaseConfig.USING_FEATURE_SUBSCRIPTION) {
-
-                        fetchPremiumUsers();
-                    }
-                })
+                .setInterval(0, 0, 5, 0)
+                .setTimingListener(task -> fetch())
                 .runNow()
                 .schedule());
 
-        if (!BaseConfig.DEBUG_MODE) {
-
-            if (BaseConfig.USING_FEATURE_SUBSCRIPTION) {
-
-                TaskManager.addTask(TaskManager.Task.build()
-                        .setName("RecheckSubscriptions")
-                        .setTime(0, 0, 0)
-                        .setInterval(1, 0, 0, 0)
-                        .setTimingListener(task -> recheckSubscriptions())
-                        .schedule());
-            }
-
-            if (BaseConfig.USING_FEATURE_COIN) {
-
-                TaskManager.addTask(TaskManager.Task.build()
-                        .setName("ChargeCoins")
-                        .setTime(0, 0, 0)
-                        .setInterval(0, 0, 10, 0)
-                        .setTimingListener(task -> chargeCoins())
-                        .schedule());
-
-                TaskManager.addTask(TaskManager.Task.build()
-                        .setName("ChargePremiumCoins")
-                        .setTime(0, 0, 0)
-                        .setInterval(0, 0, 3, 0)
-                        .setTimingListener(task -> chargePremiumCoins())
-                        .schedule());
-            }
-        }
+        addTasks();
     }
 
     protected void addTasks() {
@@ -186,91 +120,6 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(INDEX_USERNAME));
     }
 
-    protected void recheckSubscriptions() {
-
-        Set<Integer> premiumUsers = new HashSet<>();
-
-        Utilities.lock(TAG, LOCK.readLock(), () -> premiumUsers.addAll(PREMIUM_USERS));
-
-        BaseResources.getInstance().iabPaymentManager.checkSubscriptionsFor(premiumUsers);
-    }
-
-    protected void fetchPremiumUsers() {
-
-        String selectStatement = "SELECT " + FIELD_USER_ID + " FROM " +
-                BaseConfig.TABLE_ACCOUNTS + " WHERE " + FIELD_PREMIUM_PASS + " = TRUE";
-
-        BaseDatabaseHelperOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
-
-            private final List<Integer> premiumUserIDs = new ArrayList<>();
-
-            @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
-
-                while (resultSet.next()) {
-
-                    int userID = resultSet.getInt(FIELD_USER_ID);
-
-                    premiumUserIDs.add(userID);
-                }
-            }
-
-            @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
-
-                if (wasSuccessful) {
-
-                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
-
-                        PREMIUM_USERS.clear();
-                        PREMIUM_USERS.addAll(premiumUserIDs);
-                    });
-                }
-            }
-        });
-    }
-
-    protected void chargeCoins() {
-
-        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
-                FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
-                " + 20 WHERE " + FIELD_PREMIUM_PASS + " = FALSE AND " + FIELD_COINS + " < 100";
-
-        BaseDatabaseHelperOld.update(TAG, updateStatement);
-    }
-
-    protected void chargePremiumCoins() {
-
-        String updateStatement = "UPDATE " + BaseConfig.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
-                FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
-                " + 20 WHERE " + FIELD_PREMIUM_PASS + " = TRUE AND " + FIELD_COINS + " < 100";
-
-        BaseDatabaseHelperOld.update(TAG, updateStatement);
-    }
-
-    protected CoinChargeSettings getCoinChargeSettings() {
-
-        CoinChargeSettings coinChargeSettings = new CoinChargeSettings();
-
-        coinChargeSettings.normalInterval = 600000;
-        coinChargeSettings.normalSpeed = 1;
-        coinChargeSettings.premiumInterval = 200000;
-        coinChargeSettings.premiumSpeed = 3;
-        coinChargeSettings.coinChargeCap = 100;
-        coinChargeSettings.ticketChargeTime = 10;
-
-        return coinChargeSettings;
-    }
-
-    public boolean isPremium(int userID) {
-
-        AtomicBoolean isPremium = new AtomicBoolean(false);
-
-        Utilities.lock(TAG, LOCK.readLock(), () -> isPremium.set(PREMIUM_USERS.contains(userID)));
-
-        return isPremium.get();
-    }
-
     public int findUserID(String username) {
 
         AtomicInteger userID = new AtomicInteger(BaseConfig.NOT_FOUND);
@@ -307,7 +156,6 @@ public class BaseAccountManager<Data extends BaseData<?>> {
                 " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, userID);
 
         BaseDatabaseHelperOld.query(TAG, selectStatement, parameters, resultSet -> {
@@ -318,17 +166,14 @@ public class BaseAccountManager<Data extends BaseData<?>> {
                         .construct(BaseClasses.getInstance().accountClass);
 
                 foundAccount.id = userID;
-                foundAccount.gamerTag = resultSet.getString(FIELD_USERNAME);
                 foundAccount.username = resultSet.getString(FIELD_USERNAME);
-                foundAccount.name = resultSet.getString(FIELD_NAME);
                 foundAccount.password = resultSet.getString(FIELD_PASSWORD);
+                foundAccount.isActive = resultSet.getBoolean(FIELD_IS_ACTIVE);
+                foundAccount.name = resultSet.getString(FIELD_NAME);
                 foundAccount.phoneNumber = resultSet.getLong(FIELD_PHONE_NUMBER);
                 foundAccount.email = resultSet.getString(FIELD_EMAIL);
-                foundAccount.coins = resultSet.getInt(FIELD_COINS);
-                foundAccount.tickets = resultSet.getInt(FIELD_TICKETS);
-                foundAccount.bio = resultSet.getString(FIELD_BIO);
-                foundAccount.lastCoinChargeAmount = resultSet.getInt(FIELD_LAST_COIN_CHARGE_AMOUNT);
-                foundAccount.lastTicketChargeAmount = resultSet.getInt(FIELD_LAST_TICKET_CHARGE_AMOUNT);
+                foundAccount.registrationTime = resultSet.getTimestamp(FIELD_REGISTRATION_TIME).getTime();
+                foundAccount.lastUpdate = resultSet.getTimestamp(FIELD_LAST_UPDATE).getTime();
 
                 account.set(foundAccount);
             }
@@ -344,16 +189,6 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         Utilities.lock(TAG, LOCK.readLock(), () -> username.set(MAPPING_USERNAME.get(userID)));
 
         return username.get();
-    }
-
-    public boolean setPremiumPass(Connection connection, int userID, boolean isActive) {
-
-        return setProperty(connection, userID, FIELD_PREMIUM_PASS, isActive);
-    }
-
-    public boolean setPremiumPass(int userID, boolean isActive) {
-
-        return setProperty(userID, FIELD_PREMIUM_PASS, isActive);
     }
 
     protected boolean validateUserID(int userID) {
@@ -461,58 +296,6 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         return wasSuccessful;
     }
 
-    public int getCoins(int userID) {
-
-        return getProperty(userID, FIELD_COINS, Integer.class);
-    }
-
-    public int getCoins(Connection connection, int userID) {
-
-        return getProperty(connection, userID, FIELD_COINS, Integer.class);
-    }
-
-    protected boolean setCoins(Connection connection, int userID, int coins) {
-
-        return setProperty(connection, userID, FIELD_COINS, coins);
-    }
-
-    public boolean changeCoins(Connection connection, int userID, int amount) {
-
-        synchronized (userID + "") {
-
-            int storedCoins = getCoins(connection, userID);
-
-            if (storedCoins != -1) {
-
-                int newCoins = storedCoins + amount;
-
-                boolean wasSuccessful;
-
-                if (newCoins >= 0) {
-
-                    wasSuccessful = setCoins(connection, userID, newCoins);
-
-                } else {
-
-                    wasSuccessful = setCoins(connection, userID, 0);
-                }
-
-                return wasSuccessful;
-
-            } else {
-
-                return false;
-            }
-        }
-    }
-
-    public boolean hasEnoughCoins(int userID, int coins) {
-
-        int storedCoins = getCoins(userID);
-
-        return storedCoins != -1 && storedCoins >= coins;
-    }
-
     //------------------------------------------------------------------------------------
 
     protected final <T> T getProperty(int userID, String field, Class<T> T) {
@@ -595,22 +378,19 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 //        if (BaseBlackListManager.isBlocked(uuid, BaseBlackListManager.TYPE_UUID,
 //                BaseBlackListManager.REASON_ADMIN_KICK) == BaseBlackListManager.STATE_KICKED) {
 //
-//            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.YOU_ARE_BLOCKED_FOR_SOME_TIMES, data.client.language);
+//            data.message = Messages.get("GENERAL", Messages.General.YOU_ARE_BLOCKED_FOR_SOME_TIMES, data.client.language);
 //
 //            return data;
 //        }
 
-        if (data.account == null ||
-                (data.account.username == null && data.account.gamerTag == null) ||
-                data.account.password == null) {
+        if (data.account == null || data.account.username == null || data.account.password == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }
 
-
-        String username = data.account.username != null ? data.account.username : data.account.gamerTag;
+        String username = data.account.username;
         String password = data.account.password;
         String appName = data.client.appName;
         String platform = data.client.platform;
@@ -618,20 +398,13 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         String address = data.client.address;
         int appVersion = data.client.appVersion;
 
-        if (BaseConfig.APP_NAME_CAFE_CHAT.equals(appName)) {
-
-            data.message = "Please install CafeGame to continue";
-
-            return data;
-        }
-
         if (isBruteForcing(address)) {
 
             //BaseNotificationManager.reportBruteForce(address, username, password);
 
             data.response = BaseCodes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.TOO_MANY_ATTEMPTS, language);
 
             return data;
@@ -644,11 +417,12 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         if (userID != BaseConfig.NOT_FOUND) {
 
-            Boolean isBlocked = BaseResources.getInstance().accountPropertyManager.getBlocked(userID, appName);
+            Boolean isActive = BaseResources.getInstance().accountPropertyManager.getIsActive(userID, appName);
 
-            if (isBlocked != null && isBlocked) {
+            if (isActive != null && !isActive) {
 
-                data.message = "این حساب مسدود شده است";
+                data.message = Messages.get("GENERAL",
+                        Messages.General.ACCOUNT_DEACTIVATED, language);
 
                 return data;
             }
@@ -666,8 +440,6 @@ public class BaseAccountManager<Data extends BaseData<?>> {
                     boolean wasSuccessful = BaseResources.getInstance().accountPropertyManager.setCredential(connection, userID, appName, platform, credential);
 
                     if (wasSuccessful) {
-
-                        resetChargedItems(connection, userID);
 
                         data.account.id = userID;
                         data.account.credential = credential;
@@ -690,7 +462,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
                     data.response = BaseCodes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
 
-                    data.message = Messages.get("SYSTEM_GENERAL",
+                    data.message = Messages.get("GENERAL",
                             Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
                 }
             }
@@ -699,17 +471,11 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
             data.response = BaseCodes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
         }
 
         return data;
-    }
-
-    private void resetChargedItems(Connection connection, int userID) {
-
-        setProperty(connection, userID, FIELD_LAST_COIN_CHARGE_AMOUNT, 0);
-        setProperty(connection, userID, FIELD_LAST_TICKET_CHARGE_AMOUNT, 0);
     }
 
     public boolean isBruteForcing(String address) {
@@ -731,7 +497,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         if (data.account == null || data.account.credential == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -775,21 +541,16 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         //------------------------------------------------
         //------------UPDATE USER'S ACCOUNT---------------
 
-        if (BaseConfig.APP_NAME_CAFE_GAME.equals(appName) && appVersion < 37 &&
-                !CACHED_USER_INFO.contains(userID)) {
+        if (!BaseResources.getInstance().accountPropertyManager.CACHED_USERS_INFO.contains(userID)) {
 
-            NettyServer.execute(() -> updateAccount(data));
+            NettyServer.execute(() -> BaseResources.getInstance().accountPropertyManager.updateAccount(data));
         }
 
         ActivityListener.setBecameOnline(userID);
 
         //------------REQUESTS------------------------
 
-        onSubRequestReceived(data);
-
-        //--------------------------------------------
-
-        return data;
+        return onSubRequestReceived(data);
     }
 
     public Data onSubRequestReceived(Data data) {
@@ -810,36 +571,33 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
-        if (data.account == null ||
-                data.account.username == null ||
-                data.account.username.length() < 3) {
+        if (data.account == null || data.account.username == null || data.account.password == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }
-
-        String language = data.client.language;
-        String lowerCasedUsername = data.account.username.toLowerCase();
-
-        /*if (lowerCasedUsername.contains("dev") ||
-                lowerCasedUsername.contains("developer") ||
-                lowerCasedUsername.contains("admin") ||
-                lowerCasedUsername.contains("cafegame") ||
-                lowerCasedUsername.contains("fandogh")) {
-
-            data.message = Messages.get("SYSTEM_GENERAL",
-                    Messages.General.ILLEGAL_GAMER_TAG, language);
-
-            return data;
-        }*/
 
         String username = data.account.username;
         String password = data.account.password;
         String name = data.account.name;
         String appName = data.client.appName;
         String platform = data.client.platform;
+        String language = data.client.language;
+
+        if (username.length() < 4) {
+
+            data.message = Messages.get("GENERAL",
+                    Messages.General.USERNAME_IS_TOO_SHORT, data.client.language);
+            return data;
+        }
+
+        if (password.length() < 6) {
+
+            data.message = Messages.get("GENERAL",
+                    Messages.General.PASSWORD_IS_TOO_SHORT, data.client.language);
+            return data;
+        }
 
         username = Utilities.replaceLocalizedNumbers(username);
 
@@ -857,13 +615,13 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
                 data.response = BaseCodes.RESPONSE_NOK;
 
-                data.message = Messages.get("SYSTEM_GENERAL",
+                data.message = Messages.get("GENERAL",
                         Messages.General.YOU_ARE_BLOCKED_FOR_SOME_TIMES, language);
 
                 return data;
             }*/
 
-            int userID = registerAccount(username, password, name, appName, platform);
+            int userID = registerAccount(username, password, name);
 
             if (userID != -1) {
 
@@ -882,14 +640,14 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
             data.response = BaseCodes.RESPONSE_IS_REGISTERED_BEFORE;
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.USERNAME_HAS_REGISTERED_BEFORE, language);
         }
 
         return data;
     }
 
-    protected int registerAccount(String username, String password, String name, String appName, String platform) {
+    protected int registerAccount(String username, String password, String name) {
 
         AtomicInteger userID = new AtomicInteger(BaseConfig.NOT_FOUND);
 
@@ -908,155 +666,15 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
                 userID.set(generatedID);
 
-                if (appName != null && platform != null) {
+                Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                    String insertStatement2 = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
-                            " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM +
-                            ") VALUES (?, ?, ?)";
-
-                    parameters.put(1, generatedID);
-                    parameters.put(2, appName);
-                    parameters.put(3, platform);
-
-                    wasSuccessful = BaseDatabaseHelperOld.insert(TAG, insertStatement2, parameters);
-                }
-
-                if (wasSuccessful) {
-
-                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
-
-                        MAPPING_USERNAME.put(userID.get(), username);
-                        INDEX_USERNAME.add(username.toLowerCase());
-                    });
-                }
+                    MAPPING_USERNAME.put(userID.get(), username);
+                    INDEX_USERNAME.add(username.toLowerCase());
+                });
             }
         });
 
         return userID.get();
-    }
-
-    protected Data updateAccount(Data data) {
-
-        data.response = BaseCodes.RESPONSE_NOK;
-
-        int userID = data.account.id;
-        int appVersion = data.client.appVersion;
-        String appName = data.client.appName;
-        String platform = data.client.platform;
-        String market = data.client.market;
-        String language = data.client.language;
-        String firebaseID = data.client.firebaseID;
-        String ipAddress = data.client.address;
-        int sdk = data.client.sdk;
-        String brand = data.client.brand;
-        String manufacturer = data.client.manufacturer;
-        String model = data.client.model;
-        String product = data.client.product;
-        String uuid = data.client.uuid;
-        String country = IPLocationFinder.getCountry(ipAddress);
-
-        if (appVersion == 0) {
-
-            appVersion = data.client.appVersion;
-            appName = data.client.appName;
-            platform = data.client.platform;
-            market = data.client.market;
-            language = data.client.language;
-            firebaseID = data.client.firebaseID;
-        }
-
-        if (uuid == null) {
-
-            uuid = Hash.md5(System.currentTimeMillis());
-        }
-
-        String statement = "INSERT " + BaseConfig.TABLE_ACCOUNTS_PROPERTIES +
-
-                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_APP_VERSION +
-                ", " + FIELD_PLATFORM + ", " + FIELD_MARKET + ", " + FIELD_LANGUAGE +
-                ", " + FIELD_FIREBASE_ID + ", " + FIELD_IP_ADDRESS + ", " + FIELD_UUID +
-                ", " + FIELD_COUNTRY + ", " + FIELD_LAST_UPDATE + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()) " +
-
-                "ON DUPLICATE KEY UPDATE " +
-
-                FIELD_APP_VERSION + " = VALUES (" + FIELD_APP_VERSION + "), " +
-                FIELD_PLATFORM + " = VALUES (" + FIELD_PLATFORM + "), " +
-                FIELD_MARKET + " = VALUES (" + FIELD_MARKET + "), " +
-                FIELD_LANGUAGE + " = VALUES (" + FIELD_LANGUAGE + "), " +
-                FIELD_FIREBASE_ID + " = VALUES (" + FIELD_FIREBASE_ID + "), " +
-                FIELD_IP_ADDRESS + " = VALUES (" + FIELD_IP_ADDRESS + "), " +
-                FIELD_UUID + " = VALUES (" + FIELD_UUID + "), " +
-                FIELD_COUNTRY + " = VALUES (" + FIELD_COUNTRY + "), " +
-                FIELD_LAST_UPDATE + " = VALUES (" + FIELD_LAST_UPDATE + ")";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, appVersion);
-        parameters.put(4, platform);
-        parameters.put(5, market);
-        parameters.put(6, language);
-        parameters.put(7, firebaseID);
-        parameters.put(8, ipAddress);
-        parameters.put(9, uuid);
-        parameters.put(10, country);
-
-        boolean wasSuccessful = BaseDatabaseHelperOld.insert(TAG, statement, parameters);
-
-        statement = "INSERT INTO " + BaseConfig.TABLE_DEVICES_PROPERTIES +
-
-                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM +
-                ", " + FIELD_MARKET + ", " + FIELD_LANGUAGE + ", " + FIELD_APP_VERSION +
-                ", " + FIELD_SDK + ", " + FIELD_BRAND + ", " + FIELD_MANUFACTURER +
-                ", " + FIELD_MODEL + ", " + FIELD_PRODUCT + ", " + FIELD_UUID +
-                ", " + FIELD_LAST_UPDATE + ") " +
-
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE " +
-
-                FIELD_MARKET + " = VALUES (" + FIELD_MARKET + "), " +
-                FIELD_LANGUAGE + " = VALUES (" + FIELD_LANGUAGE + "), " +
-                FIELD_APP_VERSION + " = VALUES (" + FIELD_APP_VERSION + "), " +
-                FIELD_SDK + " = VALUES (" + FIELD_SDK + "), " +
-                FIELD_BRAND + " = VALUES (" + FIELD_BRAND + "), " +
-                FIELD_MANUFACTURER + " = VALUES (" + FIELD_MANUFACTURER + "), " +
-                FIELD_MODEL + " = VALUES (" + FIELD_MODEL + "), " +
-                FIELD_PRODUCT + " = VALUES (" + FIELD_PRODUCT + "), " +
-                FIELD_UUID + " = VALUES (" + FIELD_UUID + "), " +
-                FIELD_LAST_UPDATE + " = VALUES (" + FIELD_LAST_UPDATE + ")";
-
-        parameters.clear();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, platform);
-        parameters.put(4, market);
-        parameters.put(5, language);
-        parameters.put(6, appVersion);
-        parameters.put(7, sdk);
-        parameters.put(8, brand);
-        parameters.put(9, manufacturer);
-        parameters.put(10, model);
-        parameters.put(11, product);
-        parameters.put(12, uuid);
-
-        wasSuccessful &= BaseDatabaseHelperOld.insert(TAG, statement, parameters);
-
-        if (wasSuccessful) {
-
-            CACHED_USER_INFO.add(userID);
-
-            data.response = BaseCodes.RESPONSE_OK;
-
-            if (data.client.uuid == null) {
-
-                data.client.uuid = uuid;
-
-                data.response = BaseCodes.RESPONSE_OK_CHANGE_UUID;
-            }
-        }
-
-        return data;
     }
 
     //------------------------------------------------------------------------------------
@@ -1067,7 +685,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         if (data.account == null || (data.account.phoneNumber + "").length() == 0) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -1090,9 +708,9 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
-        if (data.account == null || (data.account.email + "").length() == 0) {
+        if (data.account == null || data.account.email == null || data.account.email.isEmpty()) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -1117,7 +735,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         if (data.account == null || data.account.name == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -1136,38 +754,13 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         return data;
     }
 
-    protected Data setBio(Data data) {
-
-        data.response = BaseCodes.RESPONSE_NOK;
-
-        if (data.account == null || data.account.bio == null) {
-
-            data.message = Messages.get("SYSTEM_GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
-
-            return data;
-        }
-
-        int userID = data.account.id;
-        String bio = data.account.bio;
-
-        boolean wasSuccessful = setProperty(userID, FIELD_BIO, bio);
-
-        if (wasSuccessful) {
-
-            data.response = BaseCodes.RESPONSE_OK;
-        }
-
-        return data;
-    }
-
     protected Data setPassword(Data data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
 
-        if (data.account == null || (data.account.password + "").length() == 0) {
+        if (data.account == null || data.account.password == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -1175,7 +768,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         if (data.account.password.length() < 6) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.PASSWORD_IS_TOO_SHORT, data.client.language);
 
             return data;
@@ -1202,7 +795,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
         if (data.account == null || data.client == null || data.client.packageName == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -1254,7 +847,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
             data.response = BaseCodes.RESPONSE_NOK_INVALID_APPLICATION_ID;
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages
+            data.message = Messages.get("GENERAL", Messages
                     .General.INVALID_APPLICATION_ID, data.client.language);
         }
 
@@ -1295,7 +888,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         }
     }
 
-    public List<BaseAccountData> getAccounts(String appName) {
+    public List<BaseAccountData> getAccountsCompact(String appName) {
 
         List<BaseAccountData> accounts = new ArrayList<>();
 
@@ -1311,19 +904,7 @@ public class BaseAccountManager<Data extends BaseData<?>> {
 
                 accounts.add(account);
             }));
-
-        } else {
-
-            getUsernameMap(TAG, usernames -> usernames.forEach((loopingUserID, loopingUsername) -> {
-
-                BaseAccountData account = new BaseAccountData();
-                account.id = loopingUserID;
-                account.username = loopingUsername;
-
-                accounts.add(account);
-            }));
         }
-
 
         Comparator<BaseAccountData> comparator = Comparator.comparing(account -> account.username);
 
@@ -1332,7 +913,27 @@ public class BaseAccountManager<Data extends BaseData<?>> {
         return accounts;
     }
 
-    public BaseAccountData getUser(int userID, String appName, int targetUserID) {
+    public List<BaseAccountData> getAccountsCompact() {
+
+        List<BaseAccountData> accounts = new ArrayList<>();
+
+        getUsernameMap(TAG, usernames -> usernames.forEach((loopingUserID, loopingUsername) -> {
+
+            BaseAccountData account = new BaseAccountData();
+            account.id = loopingUserID;
+            account.username = loopingUsername;
+
+            accounts.add(account);
+        }));
+
+        Comparator<BaseAccountData> comparator = Comparator.comparing(account -> account.username);
+
+        accounts.sort(comparator);
+
+        return accounts;
+    }
+
+    public BaseAccountData getAccount(int userID, String appName, int targetUserID) {
 
         AtomicReference<BaseAccountData> accountHolder = new AtomicReference<>();
 

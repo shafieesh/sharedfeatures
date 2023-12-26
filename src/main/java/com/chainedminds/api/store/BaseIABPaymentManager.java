@@ -3,7 +3,6 @@ package com.chainedminds.api.store;
 import com.chainedminds.BaseConfig;
 import com.chainedminds.BaseResources;
 import com.chainedminds.api.BaseApis;
-import com.chainedminds.models.BaseData;
 import com.chainedminds.models.BaseProductData;
 import com.chainedminds.models.market.CafeBazaarClass;
 import com.chainedminds.models.market.JhoobinClass;
@@ -15,10 +14,13 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 import java.sql.Connection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BaseIABPaymentManager<DataClass extends BaseData<?>,
+public class BaseIABPaymentManager<
         IABTransactionData extends BaseIABTransactionData,
         ProductData extends BaseProductData> extends BasePaymentManager<ProductData> {
 
@@ -244,28 +246,6 @@ public class BaseIABPaymentManager<DataClass extends BaseData<?>,
         }
     }
 
-    public void checkSubscriptionsFor(Set<Integer> checkingUserIDs) {
-
-        Set<Integer> activeSubscribers = BaseResources.getInstance()
-                .iabSubscriptionPurchasesManager.getActiveSubscribers();
-
-        if (activeSubscribers != null) {
-
-            for (int userID : checkingUserIDs) {
-
-                if (!activeSubscribers.remove(userID)) {
-
-                    BaseResources.getInstance().accountManager.setPremiumPass(userID, false);
-                }
-            }
-
-            for (int userID : activeSubscribers) {
-
-                BaseResources.getInstance().accountManager.setPremiumPass(userID, true);
-            }
-        }
-    }
-
     /*public DataClass processIABTransaction(DataClass data) {
 
         data.response = BaseCodes.RESPONSE_NOK;
@@ -275,7 +255,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData<?>,
                 data.iabTransaction.sku == null ||
                 data.iabTransaction.token == null) {
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -358,7 +338,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData<?>,
 
             if (verified == null) {
 
-                data.message = Messages.get("SYSTEM_GENERAL", Messages.General.SERVERS_ARE_NOT_AVAILABLE, language);
+                data.message = Messages.get("GENERAL", Messages.General.SERVERS_ARE_NOT_AVAILABLE, language);
 
                 return data;
             }
@@ -386,7 +366,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData<?>,
 
             data.response = BaseCodes.RESPONSE_NOK;
 
-            data.message = Messages.get("SYSTEM_GENERAL", Messages.General.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
         }
 
         if (iabTransaction.state == PURCHASE_STATE_APPLIED) {
@@ -821,7 +801,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData<?>,
 
                     String notificationLanguage = "FA";
 
-                    String notificationMessage = Messages.get("SYSTEM_GENERAL",
+                    String notificationMessage = Messages.get("GENERAL",
                             Messages.General.SUBSCRIPTION_CANCELED, notificationLanguage);
 
                     BaseNotificationManager.sendNotification(userID, appName, BaseConfig.APP_NAME_CAFE_GAME, notificationMessage);
@@ -835,7 +815,7 @@ public class BaseIABPaymentManager<DataClass extends BaseData<?>,
                 } else {
 
                     data.response = BaseCodes.RESPONSE_NOK;
-                    data.message = Messages.get("SYSTEM_GENERAL", Messages.General.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
+                    data.message = Messages.get("GENERAL", Messages.General.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
                 }
             }
         }

@@ -1,6 +1,5 @@
 package com.chainedminds;
 
-import com.chainedminds.utilities.BaseConnectionManagerOld;
 import okhttp3.Interceptor;
 
 public class BaseConfig {
@@ -8,12 +7,6 @@ public class BaseConfig {
     public static final int NOT_FOUND = -1;
 
     //-------------------------------------------------------------//
-
-    private static final int VARIANT_MAIN_SERVER = 1;
-    private static final int VARIANT_MESSAGING_SERVER = 1;
-
-    private static final int FEATURE_MAIN = 1;
-    private static final int FEATURE_MESSAGING = 2;
 
     public static final boolean USING_FEATURE_SUBSCRIPTION = false;
     public static final boolean USING_FEATURE_COIN = false;
@@ -65,9 +58,6 @@ public class BaseConfig {
     public static final String LANGUAGE_DEFAULT = LANGUAGE_EN;
     public static final String[] ADMINS = {};
     public static final String APP_NAME_CAFE_GAME = "CafeGame";
-    public static final String APP_NAME_CAFE_CHAT = "CafeChat";
-
-    public static String PROJECT_NAME;
 
     public static String DATABASE_NAME;
     public static String DATABASE_USERNAME;
@@ -352,24 +342,6 @@ public class BaseConfig {
 
     public static boolean DEBUG_MODE = true;
     public static String DATABASE_URL;
-
-    //-------------------------------------------------------------//
-
-    public static void setDebugMode(boolean debugMode) {
-
-        DEBUG_MODE = debugMode;
-
-        if (DEBUG_MODE) {
-
-            DATABASE_URL = "jdbc:mysql://" + "db.fandoghapps.com" + "/" + DATABASE_NAME + "?useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true";
-
-        } else {
-
-            DATABASE_URL = "jdbc:mysql://" + "db.fandoghapps.com" + "/" + DATABASE_NAME + "?useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true";
-        }
-
-        BaseConnectionManagerOld.config();
-    }
 
     //-------------------------------------------------------------//
 }

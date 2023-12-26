@@ -113,7 +113,7 @@ public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -142,13 +142,13 @@ public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends 
 
             case YOU_HAVE_TOO_MANY_FRIENDS:
 
-                data.message = Messages.get("SYSTEM_GENERAL", Messages.General.
+                data.message = Messages.get("GENERAL", Messages.General.
                         YOU_HAVE_TOO_MANY_FRIENDS, language);
                 return data;
 
             case TARGET_HAS_TOO_MANY_FRIENDS:
 
-                data.message = Messages.get("SYSTEM_GENERAL", Messages.General.
+                data.message = Messages.get("GENERAL", Messages.General.
                         TARGET_HAS_TOO_MANY_FRIENDS, language);
                 return data;
         }
@@ -236,7 +236,7 @@ public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -316,7 +316,7 @@ public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -372,7 +372,7 @@ public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("SYSTEM_GENERAL",
+            data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
 
             return data;
@@ -538,31 +538,31 @@ public class BaseFriendshipManager<Data extends BaseData<?>, FriendData extends 
 
             for (FriendData friend : pendingRelations) {
 
-                friend.gamerTag = usernames.get(friend.id);
+                friend.username = usernames.get(friend.id);
             }
             for (FriendData friend : waitingRelations) {
 
-                friend.gamerTag = usernames.get(friend.id);
+                friend.username = usernames.get(friend.id);
             }
             for (FriendData friend : onlineFriends) {
 
-                friend.gamerTag = usernames.get(friend.id);
+                friend.username = usernames.get(friend.id);
             }
             for (FriendData friend : awayFriends) {
 
-                friend.gamerTag = usernames.get(friend.id);
+                friend.username = usernames.get(friend.id);
             }
             for (FriendData friend : offlineFriends) {
 
-                friend.gamerTag = usernames.get(friend.id);
+                friend.username = usernames.get(friend.id);
             }
         });
 
         Comparator<FriendData> comparator = (friend1, friend2) -> {
 
-            if (friend1 != null && friend1.gamerTag != null && friend2 != null && friend2.gamerTag != null) {
+            if (friend1 != null && friend1.username != null && friend2 != null && friend2.username != null) {
 
-                return friend1.gamerTag.compareToIgnoreCase(friend2.gamerTag);
+                return friend1.username.compareToIgnoreCase(friend2.username);
             }
 
             return 0;

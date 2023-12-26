@@ -81,7 +81,8 @@ public class BaseIABSubscriptionPurchasesManager<IABTransactionData extends Base
 
                 if (iabTransaction.expirationDate > System.currentTimeMillis()) {
 
-                    BaseResources.getInstance().accountManager.setPremiumPass(iabTransaction.userID, true);
+                    //TODO
+                    //BaseResources.getInstance().accountManager.setPremiumPass(iabTransaction.userID, true);
                 }
             }
         }
