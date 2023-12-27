@@ -620,7 +620,7 @@ public class _AccountSession {
         String uuid = data.client.uuid;
         String firebaseID = data.client.firebaseID;
         String ipAddress = data.client.address;
-        String country = data.client.uuid;
+        String country = data.client.country;
 
         if (country == null) {
 
