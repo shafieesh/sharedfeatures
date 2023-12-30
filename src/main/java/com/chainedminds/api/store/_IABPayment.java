@@ -9,7 +9,7 @@ import com.chainedminds.models.market.JhoobinClass;
 import com.chainedminds.models.market.MarketData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.utilities.*;
-import com.chainedminds.utilities.json.JsonHelper;
+import com.chainedminds.utilities.json.Json;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -97,7 +97,7 @@ public class _IABPayment<
 
     public void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("RefreshMarketsAccessTokens")
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
@@ -105,18 +105,18 @@ public class _IABPayment<
                 .runNow()
                 .schedule());
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("CheckPendingIabTransactions")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 2, 0)
                 .setTimingListener(task -> checkPendingTransactions())
                 .schedule());
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("RefreshSubscriptions")
                 .setTime(0, 0, 0)
                 .setInterval(1, 0, 0, 0)
-                .setTimingListener(task -> _Resources.getInstance().iabSubscriptionPurchasesManager.checkSubscriptions())
+                .setTimingListener(task -> _Resources.getInstance().iabSubscriptionPurchase.checkSubscriptions())
                 .schedule());
     }
 
@@ -168,7 +168,7 @@ public class _IABPayment<
                 @Override
                 public void onResponse(int code, Map<String, List<String>> headers, String response) {
 
-                    CafeBazaarClass marketData = JsonHelper.getObject(response, CafeBazaarClass.class);
+                    CafeBazaarClass marketData = Json.getObject(response, CafeBazaarClass.class);
 
                     if (marketData != null && marketData.access_token != null) {
 
@@ -207,7 +207,7 @@ public class _IABPayment<
                 @Override
                 public void onResponse(int code, Map<String, List<String>> headers, String response) {
 
-                    CafeBazaarClass marketData = JsonHelper.getObject(response, CafeBazaarClass.class);
+                    CafeBazaarClass marketData = Json.getObject(response, CafeBazaarClass.class);
 
                     if (marketData != null && marketData.access_token != null) {
 
@@ -230,7 +230,7 @@ public class _IABPayment<
                 .iabProductPurchasesManager.getPendingTransactions());
 
         pendingTransactionsList.addAll(_Resources.getInstance()
-                .iabSubscriptionPurchasesManager.getPendingTransactions());
+                .iabSubscriptionPurchase.getPendingTransactions());
 
         for (_IABTransactionData transaction : pendingTransactionsList) {
 
@@ -385,7 +385,7 @@ public class _IABPayment<
         String appName = transaction.appName;
         String packageName = DynamicConfig.getMap("PackageName", appName + "-" + market);
 
-        ProductData originalProduct = (ProductData) _Resources.getInstance().productManager.getProduct(market, sku);
+        ProductData originalProduct = (ProductData) _Resources.getInstance().product.getProduct(market, sku);
 
         if (originalProduct == null) {
 
@@ -437,7 +437,7 @@ public class _IABPayment<
 
                 if (responseCode == 200) {
 
-                    CafeBazaarClass marketData = JsonHelper.getObject(responseMessage, CafeBazaarClass.class);
+                    CafeBazaarClass marketData = Json.getObject(responseMessage, CafeBazaarClass.class);
 
                     if (marketData == null) {
 
@@ -495,7 +495,7 @@ public class _IABPayment<
 
                 if (responseCode == 200) {
 
-                    MarketData marketData = JsonHelper.getObject(responseMessage, MarketData.class);
+                    MarketData marketData = Json.getObject(responseMessage, MarketData.class);
 
                     if (marketData != null) {
 
@@ -550,7 +550,7 @@ public class _IABPayment<
 
                 if (responseCode == 200) {
 
-                    MarketData marketData = JsonHelper.getObject(responseMessage, MarketData.class);
+                    MarketData marketData = Json.getObject(responseMessage, MarketData.class);
 
                     if (marketData != null) {
 
@@ -609,7 +609,7 @@ public class _IABPayment<
 
                 if (responseCode == 200) {
 
-                    JhoobinClass marketData = JsonHelper.getObject(responseMessage, JhoobinClass.class);
+                    JhoobinClass marketData = Json.getObject(responseMessage, JhoobinClass.class);
 
                     if (marketData == null) {
 
@@ -666,7 +666,7 @@ public class _IABPayment<
 
             if (_Product.CATEGORY_SUBSCRIPTION.equals(productCategory)) {
 
-                wasSuccessful = _Resources.getInstance().iabSubscriptionPurchasesManager
+                wasSuccessful = _Resources.getInstance().iabSubscriptionPurchase
                         .updateTransactionState(null, transaction.id, transaction.state,
                                 transaction.purchaseDate, transaction.expirationDate);
             }
@@ -709,14 +709,14 @@ public class _IABPayment<
                     String sku = transaction.sku;
 
                     ProductData originalProduct = (ProductData) _Resources.getInstance()
-                            .productManager.getProduct(market, sku);
+                            .product.getProduct(market, sku);
 
                     if (originalProduct == null) {
 
                         return;
                     }
 
-                    Connection connection = _ConnectionManagerOld.getConnection(_ConnectionManagerOld.MANUAL_COMMIT);
+                    Connection connection = _ConnectionOld.get(_ConnectionOld.MANUAL_COMMIT);
 
                     boolean wasSuccessful = onConsuming(connection, transaction, originalProduct);
 
@@ -728,23 +728,23 @@ public class _IABPayment<
 
                     if (_Product.CATEGORY_SUBSCRIPTION.equals(originalProduct.category)) {
 
-                        wasSuccessful &= _Resources.getInstance().iabSubscriptionPurchasesManager
+                        wasSuccessful &= _Resources.getInstance().iabSubscriptionPurchase
                                 .updateTransactionState(connection, transaction.id, PURCHASE_STATE_APPLIED,
                                         transaction.purchaseDate, transaction.expirationDate);
                     }
 
                     if (wasSuccessful) {
 
-                        _ConnectionManagerOld.commit(connection);
+                        _ConnectionOld.commit(connection);
 
                         transaction.state = PURCHASE_STATE_APPLIED;
 
                     } else {
 
-                        _ConnectionManagerOld.rollback(connection);
+                        _ConnectionOld.rollback(connection);
                     }
 
-                    _ConnectionManagerOld.close(connection);
+                    _ConnectionOld.close(connection);
 
                     if (wasSuccessful) {
 

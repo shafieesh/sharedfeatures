@@ -11,7 +11,7 @@ import com.chainedminds.utilities.DynamicConfig;
 import com.chainedminds.utilities.HttpResponseCallback;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.json.JsonHelper;
+import com.chainedminds.utilities.json.Json;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -373,7 +373,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         zarinPal.Authority = transaction.arbitraryData.get("Authority");
         zarinPal.Amount = transaction.amount;
 
-        String jsonRequest = JsonHelper.getString(zarinPal);
+        String jsonRequest = Json.getString(zarinPal);
 
         System.out.println("Request : " + jsonRequest);
 
@@ -390,7 +390,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
                 if (responseCode == 200) {
 
-                    ZarinPalData response = JsonHelper.getObject(receivedMessage, ZarinPalData.class);
+                    ZarinPalData response = Json.getObject(receivedMessage, ZarinPalData.class);
 
                     if (response != null) {
 
@@ -414,7 +414,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         PasargadData paymentData = new PasargadData();
         paymentData.TransactionReferenceID = transaction.arbitraryData.get("tref");
 
-        String jsonPaymentData = JsonHelper.getString(paymentData);
+        String jsonPaymentData = Json.getString(paymentData);
 
         Utilities.openConnection(getTransactionResultUrl, null, "POST", jsonPaymentData, new HttpResponseCallback() {
             @Override
@@ -424,7 +424,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
                 if (responseCode == 200) {
 
-                    PasargadData checkTransactionResponse = JsonHelper.getObject(receivedMessage, PasargadData.class);
+                    PasargadData checkTransactionResponse = Json.getObject(receivedMessage, PasargadData.class);
 
                     if (checkTransactionResponse != null) {
 
@@ -454,7 +454,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         paymentData.InvoiceDate = transaction.arbitraryData.get(FIELD_PASARGAD_INVOICE_DATE);
         paymentData.Amount = transaction.amount;
 
-        jsonPaymentData = JsonHelper.getString(paymentData);
+        jsonPaymentData = Json.getString(paymentData);
 
         System.out.println(jsonPaymentData);
 
@@ -465,7 +465,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
             if (responseCode == 200) {
 
-                PasargadData signResponse = JsonHelper.getObject(receivedMessage, PasargadData.class);
+                PasargadData signResponse = Json.getObject(receivedMessage, PasargadData.class);
 
                 if (signResponse != null && signResponse.IsSuccess) {
 
@@ -494,7 +494,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
                 if (responseCode == 200) {
 
-                    PasargadData verificationResponse = JsonHelper.getObject(receivedMessage, PasargadData.class);
+                    PasargadData verificationResponse = Json.getObject(receivedMessage, PasargadData.class);
 
                     if (verificationResponse != null) {
 
@@ -550,7 +550,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         paymentData.Amount = transaction.amount * 10;
         paymentData.RedirectAddress = transaction.redirectAddress;
 
-        String jsonPaymentData = JsonHelper.getString(paymentData);
+        String jsonPaymentData = Json.getString(paymentData);
 
         //System.out.println(jsonPaymentData);
 
@@ -561,7 +561,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
                     if (responseCode == 200) {
 
-                        PasargadData signResponse = JsonHelper.getObject(receivedMessage, PasargadData.class);
+                        PasargadData signResponse = Json.getObject(receivedMessage, PasargadData.class);
 
                         if (signResponse != null && signResponse.IsSuccess) {
 
@@ -589,7 +589,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
                     if (responseCode == 200) {
 
-                        PasargadData tokenResponse = JsonHelper.getObject(receivedMessage, PasargadData.class);
+                        PasargadData tokenResponse = Json.getObject(receivedMessage, PasargadData.class);
 
                         if (tokenResponse != null && tokenResponse.IsSuccess) {
 
@@ -615,7 +615,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         zarinPal.Description = "خرید درون برنامه\u200Cای";
         zarinPal.CallbackURL = transaction.redirectAddress;
 
-        String jsonRequest = JsonHelper.getString(zarinPal);
+        String jsonRequest = Json.getString(zarinPal);
 
         System.out.println("Request : " + jsonRequest);
 
@@ -630,7 +630,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
                 if (responseCode == 200) {
 
-                    ZarinPalData response = JsonHelper.getObject(receivedMessage, ZarinPalData.class);
+                    ZarinPalData response = Json.getObject(receivedMessage, ZarinPalData.class);
 
                     if (response != null) {
 

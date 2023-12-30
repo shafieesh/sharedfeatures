@@ -4,12 +4,12 @@ import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.models._Data;
-import com.chainedminds.utilities.CacheManager;
-import com.chainedminds.utilities.Hash;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Cache;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.database.DBResult;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 import com.chainedminds.utilities.database._DatabaseOld;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -21,39 +21,44 @@ public class _AccountSession {
     private static final String TAG = _AccountSession.class.getSimpleName();
 
     protected static final String FIELD_USER_ID = "UserID";
+    protected static final String FIELD_CREDENTIAL = "Credential";
     protected static final String FIELD_APP_NAME = "AppName";
     protected static final String FIELD_PLATFORM = "Platform";
-    protected static final String FIELD_IS_ACTIVE = "IsActive";
-    protected static final String FIELD_CREDENTIAL = "Credential";
     protected static final String FIELD_APP_VERSION = "AppVersion";
-    protected static final String FIELD_MARKET = "Market";
     protected static final String FIELD_LANGUAGE = "Language";
-    protected static final String FIELD_UUID = "UUID";
     protected static final String FIELD_FIREBASE_ID = "FirebaseID";
     protected static final String FIELD_IP_ADDRESS = "IPAddress";
     protected static final String FIELD_COUNTRY = "Country";
     protected static final String FIELD_LAST_UPDATE = "LastUpdate";
 
-    protected static final CacheManager<Integer, Map<String, String>> CREDENTIALS_CACHE = new CacheManager<>();
-    protected static final CacheManager<Integer, Map<String, String>> LANGUAGE_CACHE = new CacheManager<>();
+    protected static final Cache<String, Integer> CREDENTIALS_CACHE = new Cache<>();
+    protected static final Cache<Integer, Map<String, String>> LANGUAGE_CACHE = new Cache<>();
 
-    protected final Set<Integer> CACHED_USERS_INFO = new HashSet<>();
+    protected final Set<String> CACHED_USERS_INFO = new HashSet<>();
     public static final Map<String, Map<Integer, Long>> USER_ACTIVITY = new HashMap<>();
 
     public void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("Clear Cached Users Info")
                 .setTime(0, 0, 0)
-                .setInterval(0, 0, 15, 0)
+                .setInterval(0, 0, 5, 0)
                 .setTimingListener(task -> CACHED_USERS_INFO.clear())
+                .schedule());
+
+
+        Task.add(Task.Data.build()
+                .setName("Remove Stale Sessions")
+                .setTime(0, 0, 0)
+                .setInterval(0, 1, 0, 0)
+                .setTimingListener(task -> removeStaleSessions())
                 .schedule());
     }
 
     public void fetch() {
 
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " + FIELD_APP_NAME +
-                ", " + FIELD_LAST_UPDATE + " FROM " + _Config.TABLE_ACCOUNTS_PROPERTIES;
+                ", " + FIELD_LAST_UPDATE + " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS;
 
         _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
@@ -89,98 +94,71 @@ public class _AccountSession {
 
     //------------------------
 
-    public Boolean getIsActive(int userID, String appName) {
+    public boolean getUserIdByCredential(String credential, AtomicReference<Integer> userID) {
 
-        return getPropertyOld(userID, appName, FIELD_IS_ACTIVE, Boolean.class);
-    }
+        Integer cachedUserID = CREDENTIALS_CACHE.get(credential);
 
-    public boolean setIsActive(int userID, boolean isActive) {
+        if (cachedUserID == null) {
 
-        String statement = "UPDATE " + _Config.TABLE_ACCOUNTS_PROPERTIES +
-                " SET " + FIELD_IS_ACTIVE + " = ? WHERE " + FIELD_USER_ID + " = ?";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, isActive);
-        parameters.put(2, userID);
-
-        return _DatabaseOld.update(TAG, statement, parameters);
-    }
-
-    //------------------------
-
-    public boolean getCredential(int userID, String appName, String platform, AtomicReference<String> credential) {
-
-        Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
-
-        String key = appName + "-" + platform;
-
-        if (!appNamePlatformCredential.containsKey(key)) {
-
-            DBResult<String> result = getProperty(userID, appName, platform, FIELD_CREDENTIAL, String.class);
+            DBResult<Integer> result = getProperty(credential, FIELD_USER_ID, Integer.class);
 
             if (result.isSuccessful()) {
 
-                appNamePlatformCredential.put(key, result.value);
-                credential.set(result.value);
+                CREDENTIALS_CACHE.put(credential, result.value);
+                userID.set(result.value);
             }
 
             return result.isSuccessful();
 
         } else {
 
-            credential.set(appNamePlatformCredential.get(key));
+            userID.set(cachedUserID);
             return true;
         }
     }
 
-    public boolean setCredential(int userID, String appName, String platform, String credential) {
+    public boolean addCredential(int userID, String credential, String appName,
+                                 String platform, int appVersion, String language) {
 
-        boolean wasSuccessful = setProperty(userID, appName, platform, FIELD_CREDENTIAL, credential);
+        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_SESSIONS + " (" +
+                FIELD_USER_ID + ", " + FIELD_CREDENTIAL + ", " + FIELD_APP_NAME + ", " +
+                FIELD_PLATFORM + ", " + FIELD_APP_VERSION + ", " + FIELD_LANGUAGE +
+                ") VALUES (?, ?, ?, ?, ?, ?)";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, userID);
+        parameters.put(2, credential);
+        parameters.put(3, appName);
+        parameters.put(4, platform);
+        parameters.put(5, appVersion);
+        parameters.put(6, language);
+
+        boolean wasSuccessful = _DatabaseOld.insert(TAG, updateStatement, parameters);
 
         if (wasSuccessful) {
 
-            String key = appName + "-" + platform;
-
-            Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
-
-            appNamePlatformCredential.put(key, credential);
+            CREDENTIALS_CACHE.put(credential, userID);
         }
 
         return wasSuccessful;
     }
 
-    public boolean setCredential(Connection connection, int userID,
-                                 String appName, String platform, String credential) {
+    protected Boolean validateCredential(int userID, @NotNull String credential) {
 
-        boolean wasSuccessful = setProperty(connection, userID, appName, platform, FIELD_CREDENTIAL, credential);
+        AtomicReference<Integer> storedUserID = new AtomicReference<>();
 
-        if (wasSuccessful) {
-
-            String key = appName + "-" + platform;
-
-            Map<String, String> appNamePlatformCredential = CREDENTIALS_CACHE.getOrPut(userID, HashMap::new);
-
-            appNamePlatformCredential.put(key, credential);
-        }
-
-        return wasSuccessful;
-    }
-
-    protected Boolean validateCredential(int userID, String appName, String platform, String credential) {
-
-        if (credential == null) {
-
-            return false;
-        }
-
-        AtomicReference<String> storedCredential = new AtomicReference<>();
-
-        boolean wasSuccessful = getCredential(userID, appName, platform, storedCredential);
+        boolean wasSuccessful = getUserIdByCredential(credential, storedUserID);
 
         if (wasSuccessful) {
 
-            return credential.equals(storedCredential.get());
+            if (storedUserID.get() != null) {
+
+                return userID == storedUserID.get();
+
+            } else {
+
+                return false;
+            }
         }
 
         return null;
@@ -209,62 +187,6 @@ public class _AccountSession {
 
             return appNamePlatformCredential.get(appName);
         }
-    }
-
-    //------------------------
-
-    public String getUUID(int userID, String appName) {
-
-        return getPropertyOld(userID, appName, FIELD_UUID, String.class);
-    }
-
-    public Set<String> getUUIDs(int userID) {
-
-        DBResult<Set<String>> result = getProperties(userID, FIELD_UUID, new HashSet<>(), String.class);
-
-        return result.value;
-    }
-
-    public Set<Integer> getSimilarAccountsByUUID(int userID, Collection<String> uuids) {
-
-        Set<Integer> userIDs = new HashSet<>();
-
-        userIDs.add(userID);
-
-        if (uuids != null && !uuids.isEmpty()) {
-
-            Map<Integer, Object> parameters = new HashMap<>();
-
-            List<String> questionMarks = new ArrayList<>();
-
-            int counter = 1;
-
-            for (String uuid : uuids) {
-
-                parameters.put(counter, uuid);
-
-                questionMarks.add("?");
-
-                counter++;
-            }
-
-            String questionMarksArray = String.join(", ", questionMarks);
-
-            String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
-                    _Config.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
-                    FIELD_IS_ACTIVE + " = FALSE AND " + FIELD_UUID +
-                    " IN (" + questionMarksArray + ")";
-
-            _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
-
-                while (resultSet.next()) {
-
-                    userIDs.add(resultSet.getInt(FIELD_USER_ID));
-                }
-            });
-        }
-
-        return userIDs;
     }
 
     //------------------------
@@ -306,10 +228,9 @@ public class _AccountSession {
 
             String questionMarksArray = String.join(", ", questionMarks);
 
-            String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
-                    _Config.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
-                    FIELD_IS_ACTIVE + " = FALSE AND " + FIELD_FIREBASE_ID +
-                    " IN (" + questionMarksArray + ")";
+            String statement = "SELECT DISTINCT " + FIELD_USER_ID +
+                    " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
+                    " WHERE " + FIELD_FIREBASE_ID + " IN (" + questionMarksArray + ")";
 
             _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
 
@@ -325,7 +246,7 @@ public class _AccountSession {
 
     public boolean removeFirebaseID(int userID, String firebaseID) {
 
-        String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS_PROPERTIES + " SET " +
+        String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
                 FIELD_FIREBASE_ID + " = NULL WHERE " + FIELD_USER_ID + " = ? AND " + FIELD_FIREBASE_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -375,10 +296,9 @@ public class _AccountSession {
 
             String questionMarksArray = String.join(", ", questionMarks);
 
-            String statement = "SELECT DISTINCT " + FIELD_USER_ID + " FROM " +
-                    _Config.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
-                    FIELD_IS_ACTIVE + " = FALSE AND " + FIELD_IP_ADDRESS +
-                    " IN (" + questionMarksArray + ")";
+            String statement = "SELECT DISTINCT " + FIELD_USER_ID +
+                    " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
+                    " WHERE " + FIELD_IP_ADDRESS + " IN (" + questionMarksArray + ")";
 
             _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
 
@@ -394,13 +314,139 @@ public class _AccountSession {
 
     //------------------------------------------------------------------------------------
 
+    protected List<SessionData> getActiveSessions(int userID) {
+
+        List<SessionData> activeSessions = new ArrayList<>();
+
+        String statement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
+                " WHERE " + FIELD_USER_ID + " = ?";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, userID);
+
+        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+
+            final List<SessionData> sessions = new ArrayList<>();
+
+            @Override
+            public void onFetchingData(ResultSet resultSet) throws Exception {
+
+                if (resultSet.next()) {
+
+                    SessionData session = new SessionData();
+                    session.userID = resultSet.getInt(FIELD_USER_ID);
+                    session.credential = resultSet.getString(FIELD_CREDENTIAL);
+                    session.appName = resultSet.getString(FIELD_APP_NAME);
+                    session.platform = resultSet.getString(FIELD_PLATFORM);
+                    session.appVersion = resultSet.getInt(FIELD_APP_VERSION);
+                    session.language = resultSet.getString(FIELD_LANGUAGE);
+                    session.firebaseID = resultSet.getString(FIELD_FIREBASE_ID);
+                    session.ipAddress = resultSet.getString(FIELD_IP_ADDRESS);
+                    session.country = resultSet.getString(FIELD_COUNTRY);
+                    session.lastUpdate = resultSet.getTimestamp(FIELD_LAST_UPDATE).getTime();
+
+                    sessions.add(session);
+                }
+            }
+
+            @Override
+            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+
+                if (wasSuccessful) {
+
+                    activeSessions.addAll(sessions);
+                }
+            }
+        });
+
+        return activeSessions;
+    }
+
+    protected boolean terminateSession(int userID, String credential) {
+
+        Boolean credentialIsValid = validateCredential(userID, credential);
+
+        if (credentialIsValid == null) {
+
+            return false;
+        }
+
+        if (credentialIsValid) {
+
+            String statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS + " WHERE " +
+                    FIELD_USER_ID + " = ? AND " + FIELD_CREDENTIAL + " = ?";
+
+            Map<Integer, Object> parameters = new HashMap<>();
+            parameters.put(1, userID);
+
+            boolean wasSuccessful = _DatabaseOld.update(TAG, statement, parameters);
+
+            if (wasSuccessful) {
+
+                CREDENTIALS_CACHE.remove(credential);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected void removeStaleSessions() {
+
+        List<String> staleCredentials = new ArrayList<>();
+
+        String statement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
+                " WHERE " + FIELD_LAST_UPDATE + " < DATE_SUB(NOW(), INTERVAL 7 DAY)";
+
+        _DatabaseOld.query(TAG, statement, new TwoStepQueryCallback() {
+
+            final List<String> credentials = new ArrayList<>();
+
+            @Override
+            public void onFetchingData(ResultSet resultSet) throws Exception {
+
+                if (resultSet.next()) {
+
+                    credentials.add(resultSet.getString(FIELD_CREDENTIAL));
+                }
+            }
+
+            @Override
+            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+
+                if (wasSuccessful) {
+
+                    staleCredentials.addAll(credentials);
+                }
+            }
+        });
+
+        if (!staleCredentials.isEmpty()) {
+
+            String credentialsArray = String.join(", ", staleCredentials);
+
+            statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS + " WHERE " +
+                    FIELD_CREDENTIAL + " IN (" + credentialsArray + ")";
+
+            boolean wasSuccessful = _DatabaseOld.update(TAG, statement);
+
+            if (wasSuccessful) {
+
+                CREDENTIALS_CACHE.remove(staleCredentials);
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------
+
     @Deprecated
     private <T> T getPropertyOld(int userID, String appName, String field, Class<T> T) {
 
         AtomicReference<T> value = new AtomicReference<>();
 
         String statement = "SELECT " + field + " FROM " +
-                _Config.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
+                _Config.TABLE_ACCOUNTS_SESSIONS + " WHERE " +
                 FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -427,12 +473,53 @@ public class _AccountSession {
         return value.get();
     }
 
+
+    public <T> DBResult<T> getProperty(String credential, String field, Class<T> T) {
+
+        DBResult<T> result = new DBResult<>();
+
+        String statement = "SELECT " + field + " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
+                " WHERE " + FIELD_CREDENTIAL + " = ?";
+
+        Map<Integer, Object> parameters = new HashMap<>();
+        parameters.put(1, credential);
+
+        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+
+            private T value = null;
+
+            @Override
+            public void onFetchingData(ResultSet resultSet) throws Exception {
+
+                if (resultSet.next()) {
+
+                    value = resultSet.getObject(field, T);
+                }
+            }
+
+            @Override
+            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+
+                if (wasSuccessful) {
+
+                    result.value = value;
+
+                } else {
+
+                    result.error = error;
+                }
+            }
+        });
+
+        return result;
+    }
+
     public <T> DBResult<T> getProperty(int userID, String appName, String platform, String field, Class<T> T) {
 
         DBResult<T> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
-                _Config.TABLE_ACCOUNTS_PROPERTIES + " WHERE " +
+                _Config.TABLE_ACCOUNTS_SESSIONS + " WHERE " +
                 FIELD_USER_ID + " = ? AND " + FIELD_APP_NAME + " = ? AND " + FIELD_PLATFORM + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -484,7 +571,7 @@ public class _AccountSession {
         DBResult<Series> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
-                _Config.TABLE_ACCOUNTS_PROPERTIES +
+                _Config.TABLE_ACCOUNTS_SESSIONS +
                 " WHERE " + FIELD_APP_NAME + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -526,7 +613,7 @@ public class _AccountSession {
         DBResult<Series> result = new DBResult<>();
 
         String statement = "SELECT " + field + " FROM " +
-                _Config.TABLE_ACCOUNTS_PROPERTIES +
+                _Config.TABLE_ACCOUNTS_SESSIONS +
                 " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -569,7 +656,7 @@ public class _AccountSession {
 
     public boolean setProperty(Connection connection, int userID, String appName, String platform, String field, Object value) {
 
-        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_PROPERTIES + " (" +
+        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_SESSIONS + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
                 ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")" +
                 ", " + FIELD_LAST_UPDATE + " = NOW()";
@@ -592,7 +679,7 @@ public class _AccountSession {
 
     public boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
 
-        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_PROPERTIES + " (" +
+        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_SESSIONS + " (" +
                 FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
                 ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field +
                 " = VALUES (" + field + ")" + ", " + FIELD_LAST_UPDATE + " = NOW()";
@@ -611,13 +698,9 @@ public class _AccountSession {
 
         data.response = _Codes.RESPONSE_NOK;
 
-        int userID = data.account.id;
-        String appName = data.client.appName;
-        String platform = data.client.platform;
+        String credential = data.account.credential;
         int appVersion = data.client.appVersion;
-        String market = data.client.market;
         String language = data.client.language;
-        String uuid = data.client.uuid;
         String firebaseID = data.client.firebaseID;
         String ipAddress = data.client.address;
         String country = data.client.country;
@@ -627,57 +710,27 @@ public class _AccountSession {
             country = IPLocationFinder.getCountry(ipAddress);
         }
 
-        if (uuid == null) {
-
-            uuid = Hash.md5(System.currentTimeMillis());
-        }
-
-        String statement = "INSERT " + _Config.TABLE_ACCOUNTS_PROPERTIES +
-
-                " (" + FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_APP_VERSION +
-                ", " + FIELD_PLATFORM + ", " + FIELD_MARKET + ", " + FIELD_LANGUAGE +
-                ", " + FIELD_FIREBASE_ID + ", " + FIELD_IP_ADDRESS + ", " + FIELD_UUID +
-                ", " + FIELD_COUNTRY + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
-
-                "ON DUPLICATE KEY UPDATE " +
-
-                FIELD_APP_VERSION + " = VALUES (" + FIELD_APP_VERSION + "), " +
-                FIELD_PLATFORM + " = VALUES (" + FIELD_PLATFORM + "), " +
-                FIELD_MARKET + " = VALUES (" + FIELD_MARKET + "), " +
-                FIELD_LANGUAGE + " = VALUES (" + FIELD_LANGUAGE + "), " +
-                FIELD_FIREBASE_ID + " = VALUES (" + FIELD_FIREBASE_ID + "), " +
-                FIELD_IP_ADDRESS + " = VALUES (" + FIELD_IP_ADDRESS + "), " +
-                FIELD_UUID + " = VALUES (" + FIELD_UUID + "), " +
-                FIELD_COUNTRY + " = VALUES (" + FIELD_COUNTRY + "), " +
-                FIELD_LAST_UPDATE + " = NOW()";
+        String statement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
+                FIELD_APP_VERSION + " = ?, " + FIELD_LANGUAGE + " = ?, " +
+                FIELD_FIREBASE_ID + " = ?, " + FIELD_IP_ADDRESS + " = ?, " +
+                FIELD_COUNTRY + " = ?, " + FIELD_LAST_UPDATE +
+                " = NOW() WHERE " + FIELD_CREDENTIAL + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, appVersion);
-        parameters.put(4, platform);
-        parameters.put(5, market);
-        parameters.put(6, language);
-        parameters.put(7, firebaseID);
-        parameters.put(8, ipAddress);
-        parameters.put(9, uuid);
-        parameters.put(10, country);
+        parameters.put(1, appVersion);
+        parameters.put(2, language);
+        parameters.put(3, firebaseID);
+        parameters.put(4, ipAddress);
+        parameters.put(5, country);
+        parameters.put(6, credential);
 
         boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
-            CACHED_USERS_INFO.add(userID);
+            CACHED_USERS_INFO.add(credential);
 
             data.response = _Codes.RESPONSE_OK;
-
-            if (data.client.uuid == null) {
-
-                data.client.uuid = uuid;
-
-                data.response = _Codes.RESPONSE_OK_CHANGE_UUID;
-            }
         }
     }
 
@@ -850,4 +903,20 @@ public class _AccountSession {
 
         return setProperty(connection, userID, appName, platform, FIELD_SCORE, score);
     }*/
+
+    //------------------------------------------------------------------------------------
+
+    public static class SessionData {
+
+        public int userID;
+        public String credential;
+        public String appName;
+        public String platform;
+        public int appVersion;
+        public String language;
+        public String firebaseID;
+        public String ipAddress;
+        public String country;
+        public long lastUpdate;
+    }
 }

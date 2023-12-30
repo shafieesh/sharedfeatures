@@ -73,7 +73,7 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
 
         for (_IABTransactionData iabTransaction : subscriptionsList) {
 
-            Boolean verified = _Resources.getInstance().iabPaymentManager.verifyIABTransaction(iabTransaction);
+            Boolean verified = _Resources.getInstance().iabPayment.verifyIABTransaction(iabTransaction);
 
             if (verified != null && verified) {
 

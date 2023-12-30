@@ -8,9 +8,9 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 @Deprecated
-public class _ConnectionManagerOld {
+public class _ConnectionOld {
 
-    private static final String TAG = _ConnectionManagerOld.class.getSimpleName();
+    private static final String TAG = _ConnectionOld.class.getSimpleName();
 
     public static final int DEFAULT_OPTIONS = 0;
     public static final int MANUAL_COMMIT = 1;
@@ -39,7 +39,7 @@ public class _ConnectionManagerOld {
         automaticConnections.setConnectionChecker(connectionChecker);
         manualConnections.setConnectionChecker(connectionChecker);
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("Ping Connections")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 0, 10)
@@ -51,12 +51,12 @@ public class _ConnectionManagerOld {
                 .schedule());
     }
 
-    public static Connection getConnection() {
+    public static Connection get() {
 
-        return getConnection(DEFAULT_OPTIONS);
+        return get(DEFAULT_OPTIONS);
     }
 
-    public static Connection getConnection(int options) {
+    public static Connection get(int options) {
 
         Connection connection = null;
 

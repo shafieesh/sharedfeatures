@@ -1,9 +1,7 @@
 package com.chainedminds.utilities.json;
 
-import com.chainedminds.utilities.XML;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.ArrayType;
@@ -16,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class JsonHelper {
+public class Json {
 
     private static final ObjectMapper objectMapper = new ObjectMapper()
             //.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT)

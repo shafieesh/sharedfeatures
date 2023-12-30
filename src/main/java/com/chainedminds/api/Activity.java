@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ActivityManager {
+public class Activity {
 
-    private static final String TAG = ActivityManager.class.getSimpleName();
+    private static final String TAG = Activity.class.getSimpleName();
 
-    private static final Map<Integer, Activity> LAST_ACTIVITY_CACHE = new HashMap<>();
+    private static final Map<Integer, Type> LAST_ACTIVITY_CACHE = new HashMap<>();
     private static final Map<Integer, Long> LAST_MODIFICATION = new HashMap<>();
 
     private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
@@ -24,11 +24,11 @@ public class ActivityManager {
 
         cleanUpLastAccessTimes();
 
-        AtomicReference<Activity> activity = new AtomicReference<>(Activity.NOTHING);
+        AtomicReference<Type> activity = new AtomicReference<>(Type.NOTHING);
 
         Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-            activity.set(LAST_ACTIVITY_CACHE.getOrDefault(userID, Activity.NOTHING));
+            activity.set(LAST_ACTIVITY_CACHE.getOrDefault(userID, Type.NOTHING));
         });
 
         switch (activity.get()) {
@@ -107,11 +107,11 @@ public class ActivityManager {
         }
     }
 
-    public static void setLastActivity(int userID, Activity activity) {
+    public static void setLastActivity(int userID, Type type) {
 
         Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-            LAST_ACTIVITY_CACHE.put(userID, activity);
+            LAST_ACTIVITY_CACHE.put(userID, type);
             LAST_MODIFICATION.put(userID, System.currentTimeMillis());
         });
     }
@@ -134,7 +134,7 @@ public class ActivityManager {
         });
     }
 
-    public enum Activity {
+    public enum Type {
 
         NOTHING,
         PLAYING_DB,

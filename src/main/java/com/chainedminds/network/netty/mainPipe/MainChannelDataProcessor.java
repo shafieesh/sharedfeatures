@@ -55,7 +55,7 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
             Runnable task = () -> {
 
-                Object responseData = _Resources.getInstance().requestManager
+                Object responseData = _Resources.getInstance().requestHandler
                         .processRequest(context, remoteAddress, requestData);
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);
@@ -74,7 +74,7 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
             if (!NettyServer.execute(task)) {
 
-                Object responseData = _Resources.getInstance().requestManager
+                Object responseData = _Resources.getInstance().requestHandler
                         .sendServerBusyResponse(requestData);
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);

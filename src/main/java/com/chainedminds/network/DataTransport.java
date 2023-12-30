@@ -1,7 +1,7 @@
 package com.chainedminds.network;
 
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.json.JsonHelper;
+import com.chainedminds.utilities.json.Json;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +16,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DataTransportManager {
+public class DataTransport {
 
-    private static final String TAG = DataTransportManager.class.getSimpleName();
+    private static final String TAG = DataTransport.class.getSimpleName();
 
     private static final int INSECURE_PREFIX_DATA_LENGTH = 10;
     private static ServerSocket webTransportPipe;
@@ -81,7 +81,7 @@ public class DataTransportManager {
 
             } else {
 
-                sendingMessage = JsonHelper.getString(sendingData);
+                sendingMessage = Json.getString(sendingData);
             }
 
             socketWriteInsecure(socket, sendingMessage);
@@ -121,7 +121,7 @@ public class DataTransportManager {
 
             } else {
 
-                sendingMessage = JsonHelper.getString(sendingData);
+                sendingMessage = Json.getString(sendingData);
             }
 
             socketWriteInsecure(socket, sendingMessage);

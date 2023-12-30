@@ -9,11 +9,9 @@ import java.util.Set;
 
 public class BackendHelper {
 
-    private static final String[] CHARS = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-            "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-            "Y", "Z", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
+    private static final String[] CHARS = new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l",
             "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+            "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     public static int getDigitsCount(int n) {
 
@@ -146,14 +144,14 @@ public class BackendHelper {
 
         Random random = new Random();
 
-        String token = "";
+        StringBuilder token = new StringBuilder();
 
         for (int i = 0; i < 45; i++) {
 
-            token += CHARS[random.nextInt(CHARS.length)];
+            token.append(CHARS[random.nextInt(CHARS.length)]);
         }
 
-        return token;
+        return token.toString();
     }
 
     public static String getLanguageWithMarket(String market) {

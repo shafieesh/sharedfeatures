@@ -29,7 +29,7 @@ public class Messages {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName(TAG)
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)

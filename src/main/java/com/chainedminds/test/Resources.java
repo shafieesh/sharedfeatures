@@ -2,7 +2,7 @@ package com.chainedminds.test;
 
 import com.chainedminds._Classes;
 import com.chainedminds._Resources;
-import com.chainedminds.api.accounting._AccountManager;
+import com.chainedminds.api.accounting._Account;
 import com.chainedminds.api.accounting._AccountSession;
 import com.chainedminds.api.accounting._BlackList;
 import com.chainedminds.api.accounting._Profile;
@@ -20,7 +20,7 @@ import com.chainedminds.utilities._File;
 public class Resources extends _Resources<
         RequestHandler,
         _Profile,
-        _AccountManager<Data>,
+        _Account<Data>,
         _AccountSession,
         _Friendship<Data, _FriendData>,
         _File,
@@ -42,22 +42,22 @@ public class Resources extends _Resources<
 
     public void config() {
 
-        super.requestManager = new RequestHandler(Data.class);
-        super.profileManager = new _Profile();
-        super.accountManager = new _AccountManager<>();
-        super.accountPropertyManager = new _AccountSession();
-        super.friendshipManager = new _Friendship<>();
-        super.fileManager = new _File();
-        super.iabPaymentManager = new _IABPayment<>();
-        super.ipgPaymentManager = new _IPGPayment<>();
+        super.requestHandler = new RequestHandler(Data.class);
+        super.profile = new _Profile();
+        super.account = new _Account<>();
+        super.accountSession = new _AccountSession();
+        super.friendship = new _Friendship<>();
+        super.file = new _File();
+        super.iabPayment = new _IABPayment<>();
+        super.ipgPayment = new _IPGPayment<>();
         super.iabProductPurchasesManager = new _IABProductPurchase<>();
         super.ipgProductPurchasesManager = new _IPGProductPurchase<>();
-        super.iabSubscriptionPurchasesManager = new _IABSubscriptionPurchase<>();
-        super.ipgSubscriptionPurchasesManager = new _IPGSubscriptionPurchase<>();
-        super.productManager = new _Product<>();
-        super.blackListManager = new _BlackList();
+        super.iabSubscriptionPurchase = new _IABSubscriptionPurchase<>();
+        super.ipgSubscriptionPurchase = new _IPGSubscriptionPurchase<>();
+        super.product = new _Product<>();
+        super.blackList = new _BlackList();
 
-        _Resources<RequestHandler, _Profile, _AccountManager<Data>, _AccountSession,
+        _Resources<RequestHandler, _Profile, _Account<Data>, _AccountSession,
                         _Friendship<Data, _FriendData>,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                         _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -68,20 +68,20 @@ public class Resources extends _Resources<
                         _Product<_ProductData>,
                         _BlackList> resources = _Resources.getInstance();
 
-        resources.requestManager = super.requestManager;
-        resources.profileManager = super.profileManager;
-        resources.accountManager = super.accountManager;
-        resources.accountPropertyManager = super.accountPropertyManager;
-        resources.friendshipManager = super.friendshipManager;
-        resources.fileManager = super.fileManager;
-        resources.iabPaymentManager = super.iabPaymentManager;
-        resources.ipgPaymentManager = super.ipgPaymentManager;
+        resources.requestHandler = super.requestHandler;
+        resources.profile = super.profile;
+        resources.account = super.account;
+        resources.accountSession = super.accountSession;
+        resources.friendship = super.friendship;
+        resources.file = super.file;
+        resources.iabPayment = super.iabPayment;
+        resources.ipgPayment = super.ipgPayment;
         resources.iabProductPurchasesManager = super.iabProductPurchasesManager;
         resources.ipgProductPurchasesManager = super.ipgProductPurchasesManager;
-        resources.iabSubscriptionPurchasesManager = super.iabSubscriptionPurchasesManager;
-        resources.ipgSubscriptionPurchasesManager = super.ipgSubscriptionPurchasesManager;
-        resources.productManager = super.productManager;
-        resources.blackListManager = super.blackListManager;
+        resources.iabSubscriptionPurchase = super.iabSubscriptionPurchase;
+        resources.ipgSubscriptionPurchase = super.ipgSubscriptionPurchase;
+        resources.product = super.product;
+        resources.blackList = super.blackList;
 
         _Classes classes = _Classes.getInstance();
 

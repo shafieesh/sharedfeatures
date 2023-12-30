@@ -1,7 +1,7 @@
 package com.chainedminds.api.accounting;
 
 import com.chainedminds._Config;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
@@ -29,7 +29,7 @@ public class _Level {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("LevelManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)

@@ -5,7 +5,7 @@ import com.chainedminds.models._Data;
 import com.chainedminds.models.InstagramData;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.json.JsonHelper;
+import com.chainedminds.utilities.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,7 +72,7 @@ public class Instagram {
 
         String json = loadedHtml.get().split("window._sharedData = ")[1].split(";</scrip")[0];
 
-        InstagramData instagramData = JsonHelper.getObject(json, InstagramData.class);
+        InstagramData instagramData = Json.getObject(json, InstagramData.class);
 
         if (instagramData.entry_data.ProfilePage == null) {
 

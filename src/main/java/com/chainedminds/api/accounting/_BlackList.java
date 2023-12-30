@@ -2,7 +2,7 @@ package com.chainedminds.api.accounting;
 
 import com.chainedminds._Config;
 import com.chainedminds.models.BlockData;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
@@ -50,7 +50,7 @@ public class _BlackList {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("BlackListManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
@@ -58,7 +58,7 @@ public class _BlackList {
                 .runNow()
                 .schedule());
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("ResetReportedPlayers")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)

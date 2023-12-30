@@ -1,6 +1,6 @@
 package com.chainedminds.api;
 
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class IPLocationFinder {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("CleanUpIPCache")
                 .setTime(0, 0, 0)
                 .setInterval(1, 0, 0, 0)
@@ -33,7 +33,7 @@ public class IPLocationFinder {
                 })
                 .schedule());
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("IPFinderCounterReset")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 1, 0)

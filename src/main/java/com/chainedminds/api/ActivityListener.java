@@ -3,7 +3,7 @@ package com.chainedminds.api;
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
 import com.chainedminds.utilities._NotificationManager;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class ActivityListener {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("RefreshActivityFinderList")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
@@ -52,7 +52,7 @@ public class ActivityListener {
 
             for (int targetID : relations.keySet()) {
 
-                targetNames.put(targetID, _Resources.getInstance().accountManager.getUsername(targetID));
+                targetNames.put(targetID, _Resources.getInstance().account.getUsername(targetID));
             }
 
             for (int targetID : RELATIONS.keySet()) {

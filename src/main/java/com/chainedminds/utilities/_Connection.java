@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-public abstract class _ConnectionManager {
+public abstract class _Connection {
 
-    private static final String TAG = _ConnectionManager.class.getSimpleName();
+    private static final String TAG = _Connection.class.getSimpleName();
 
     public static final int DEFAULT_OPTIONS = 0;
     public static final int MANUAL_COMMIT = 1;
@@ -51,7 +51,7 @@ public abstract class _ConnectionManager {
         automaticConnections.setConnectionChecker(connectionChecker);
         manualConnections.setConnectionChecker(connectionChecker);
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("Ping Connections")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 0, 10)
@@ -63,12 +63,12 @@ public abstract class _ConnectionManager {
                 .schedule());
     }
 
-    public final Connection getConnection() {
+    public final Connection get() {
 
-        return getConnection(DEFAULT_OPTIONS);
+        return get(DEFAULT_OPTIONS);
     }
 
-    public final Connection getConnection(int options) {
+    public final Connection get(int options) {
 
         Connection connection = null;
 

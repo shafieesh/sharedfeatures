@@ -10,7 +10,7 @@ import com.chainedminds.models.notification.Action;
 import com.chainedminds.models.notification._NotificationData;
 import com.chainedminds.models.notification.FirebaseResponseData;
 import com.chainedminds.network.netty.NettyServer;
-import com.chainedminds.utilities.json.JsonHelper;
+import com.chainedminds.utilities.json.Json;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -322,7 +322,7 @@ public class _NotificationManager {
 
     public static void notifyUser(int userID, String appName, String title, String content) {
 
-        String firebaseID = _Resources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
+        String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
 
         if (firebaseID != null) {
 
@@ -341,7 +341,7 @@ public class _NotificationManager {
 
             notificationContent.data = new HashMap<>();
             notificationContent.data.put("type", "NOTIFICATION");
-            notificationContent.data.put("notification", JsonHelper.getString(notification));
+            notificationContent.data.put("notification", Json.getString(notification));
 
             sendToFirebase(userID, notificationContent);
         }
@@ -351,7 +351,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -374,7 +374,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -414,9 +414,9 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            int userID = _Resources.getInstance().accountManager.findUserID(username);
+            int userID = _Resources.getInstance().account.findUserID(username);
 
-            String firebaseID = _Resources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -438,9 +438,9 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            int userID = _Resources.getInstance().accountManager.findUserID(username);
+            int userID = _Resources.getInstance().account.findUserID(username);
 
-            String firebaseID = _Resources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -455,7 +455,7 @@ public class _NotificationManager {
 
                 content.data = new HashMap<>();
                 content.data.put("type", "ACTION");
-                content.data.put("action", JsonHelper.getString(action));
+                content.data.put("action", Json.getString(action));
 
                 sendToFirebase(userID, content);
             }
@@ -466,7 +466,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.getInstance().accountPropertyManager.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -481,7 +481,7 @@ public class _NotificationManager {
 
                 content.data = new HashMap<>();
                 content.data.put("type", "ACTION");
-                content.data.put("action", JsonHelper.getString(action));
+                content.data.put("action", Json.getString(action));
 
                 sendToFirebase(userID, content);
             }
@@ -596,7 +596,7 @@ public class _NotificationManager {
 
         String url = "https://fcm.googleapis.com/fcm/send";
 
-        String json = JsonHelper.getString(content);
+        String json = Json.getString(content);
 
         if (json == null) {
 
@@ -624,7 +624,7 @@ public class _NotificationManager {
 
                 System.out.println(response);
 
-                FirebaseResponseData responseData = JsonHelper.getObject(response, FirebaseResponseData.class);
+                FirebaseResponseData responseData = Json.getObject(response, FirebaseResponseData.class);
 
                 if (responseData != null) {
 
@@ -634,7 +634,7 @@ public class _NotificationManager {
 
                         if ("NotRegistered".equals(error) || "InvalidRegistration".equals(error)) {
 
-                            _Resources.getInstance().accountPropertyManager.removeFirebaseID(userID, content.to);
+                            _Resources.getInstance().accountSession.removeFirebaseID(userID, content.to);
                         }
                     }
                 }
@@ -710,7 +710,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
         //content.data.put("action", JsonHelper.getString(action));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
@@ -760,7 +760,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
         //content.data.put("action", JsonHelper.getString(action));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
@@ -810,7 +810,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
         //content.data.put("action", JsonHelper.getString(action));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
@@ -860,7 +860,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
         //content.data.put("action", JsonHelper.getString(action));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
@@ -908,7 +908,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
         //content.data.put("action", JsonHelper.getString(action));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
@@ -956,7 +956,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
         //content.data.put("action", JsonHelper.getString(action));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
@@ -980,7 +980,7 @@ public class _NotificationManager {
 
         content.data = new HashMap<>();
         content.data.put("type", "NOTIFICATION");
-        content.data.put("notification", JsonHelper.getString(notification));
+        content.data.put("notification", Json.getString(notification));
 
         sendToFirebase(_Codes.NOT_FOUND, content);
     }

@@ -4,12 +4,12 @@ import com.chainedminds._Classes;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
-import com.chainedminds.api.ActivityManager;
+import com.chainedminds.api.Activity;
 import com.chainedminds.models._Data;
 import com.chainedminds.models.account._FriendData;
 import com.chainedminds.utilities._NotificationManager;
 import com.chainedminds.utilities.Messages;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
@@ -55,7 +55,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
     public void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("FriendsListManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
@@ -206,9 +206,9 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 int receiverID = friendID;
                 int senderID = userID;
 
-                String requestingUserName = _Resources.getInstance().accountManager.getUsername(senderID);
+                String requestingUserName = _Resources.getInstance().account.getUsername(senderID);
                 String receiverLanguage = _Resources.getInstance()
-                        .accountPropertyManager.getLanguage(receiverID, appName);
+                        .accountSession.getLanguage(receiverID, appName);
 
                 String tag = Messages.Notification.Friendship.TAG_NEW_FRIEND_REQUEST;
 
@@ -291,9 +291,9 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 int receiverID = friendID;
                 int acceptingUserID = userID;
 
-                String requestingUserName = _Resources.getInstance().accountManager.getUsername(acceptingUserID);
+                String requestingUserName = _Resources.getInstance().account.getUsername(acceptingUserID);
                 String receiverLanguage = _Resources.getInstance()
-                        .accountPropertyManager.getLanguage(receiverID, appName);
+                        .accountSession.getLanguage(receiverID, appName);
 
                 String tag = Messages.Notification.Friendship.TAG_ACCEPTED_YOUR_FRIENDSHIP;
 
@@ -490,7 +490,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                         friend.status = STATE_PENDING;
                         friend.id = friendId;
                         friend.onlineStatus = getOnlineStatus(friendId);
-                        friend.activity = ActivityManager.getLastActivity(friendId, appName, language);
+                        friend.activity = Activity.getLastActivity(friendId, appName, language);
 
                         pendingRelations.add(friend);
                     }
@@ -501,7 +501,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                         friend.status = STATE_WAITING;
                         friend.id = friendId;
                         friend.onlineStatus = getOnlineStatus(friendId);
-                        friend.activity = ActivityManager.getLastActivity(friendId, appName, language);
+                        friend.activity = Activity.getLastActivity(friendId, appName, language);
 
                         waitingRelations.add(friend);
                     }
@@ -513,7 +513,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                         friend.status = STATE_FRIENDSHIP;
                         friend.id = friendId;
                         friend.onlineStatus = getOnlineStatus(friendId);
-                        friend.activity = ActivityManager.getLastActivity(friendId, appName, language);
+                        friend.activity = Activity.getLastActivity(friendId, appName, language);
 
                         if (friend.onlineStatus == ONLINE_STATUS_ONLINE) {
 
@@ -534,7 +534,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             }
         });
 
-        _Resources.getInstance().accountManager.getUsernameMap(TAG, (Utilities.GrantAccess<Map<Integer, String>>) usernames -> {
+        _Resources.getInstance().account.getUsernameMap(TAG, (Utilities.GrantAccess<Map<Integer, String>>) usernames -> {
 
             for (FriendData friend : pendingRelations) {
 
@@ -585,7 +585,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
     public static int getOnlineStatus(int userID) {
 
-        long lastAccessTime = _Resources.getInstance().requestManager.getLastAccessTime(userID);
+        long lastAccessTime = _Resources.getInstance().requestHandler.getLastAccessTime(userID);
 
         long currentTime = System.currentTimeMillis();
 
@@ -721,7 +721,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
         if (onlineFriendIDs.size() > 0) {
 
             String receiverLanguage = _Resources.getInstance()
-                    .accountPropertyManager.getLanguage(userID, appName);
+                    .accountSession.getLanguage(userID, appName);
 
             if (onlineFriendIDs.size() > 1) {
 
@@ -735,7 +735,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             } else {
 
                 String gamerTag = _Resources.getInstance()
-                        .accountManager.getUsername(onlineFriendIDs.get(0));
+                        .account.getUsername(onlineFriendIDs.get(0));
 
                 String message = Messages.get("FRIENDSHIP", Messages.Friendship.
                         GAMERTAG_IS_ONLINE, receiverLanguage, gamerTag);
@@ -744,12 +744,12 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             }
         }
 
-        String gamerTag = _Resources.getInstance().accountManager.getUsername(userID);
+        String gamerTag = _Resources.getInstance().account.getUsername(userID);
 
         for (int friendID : onlineFriendIDs) {
 
             String receiverLanguage = _Resources.getInstance()
-                    .accountPropertyManager.getLanguage(friendID, appName);
+                    .accountSession.getLanguage(friendID, appName);
 
             String message = Messages.get("FRIENDSHIP", Messages.Friendship.
                     GAMERTAG_IS_NOW_ONLINE, receiverLanguage, gamerTag);

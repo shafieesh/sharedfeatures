@@ -2,7 +2,7 @@ package com.chainedminds.api.accounting;
 
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
@@ -17,14 +17,14 @@ public class _Coins {
 
     public void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("ChargeCoins")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
                 .setTimingListener(task -> chargeCoins())
                 .schedule());
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("ChargePremiumCoins")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 3, 0)
@@ -52,17 +52,17 @@ public class _Coins {
 
     public int getCoins(int userID) {
 
-        return _Resources.getInstance().accountManager.getProperty(userID, FIELD_COINS, Integer.class);
+        return _Resources.getInstance().account.getProperty(userID, FIELD_COINS, Integer.class);
     }
 
     public int getCoins(Connection connection, int userID) {
 
-        return _Resources.getInstance().accountManager.getProperty(connection, userID, FIELD_COINS, Integer.class);
+        return _Resources.getInstance().account.getProperty(connection, userID, FIELD_COINS, Integer.class);
     }
 
     protected boolean setCoins(Connection connection, int userID, int coins) {
 
-        return _Resources.getInstance().accountManager.setProperty(connection, userID, FIELD_COINS, coins);
+        return _Resources.getInstance().account.setProperty(connection, userID, FIELD_COINS, coins);
     }
 
     public boolean changeCoins(Connection connection, int userID, int amount) {

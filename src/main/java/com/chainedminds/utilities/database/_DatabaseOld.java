@@ -1,6 +1,6 @@
 package com.chainedminds.utilities.database;
 
-import com.chainedminds.utilities._ConnectionManagerOld;
+import com.chainedminds.utilities._ConnectionOld;
 import com.chainedminds.utilities._Logs;
 import com.chainedminds.utilities.Utilities;
 
@@ -52,11 +52,11 @@ public class _DatabaseOld {
 
     public static boolean query(String tag, String statement, Map<Integer, Object> parameters) {
 
-        Connection connection = _ConnectionManagerOld.getConnection();
+        Connection connection = _ConnectionOld.get();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters);
 
-        _ConnectionManagerOld.close(connection);
+        _ConnectionOld.close(connection);
 
         return wasSuccessful;
     }
@@ -77,22 +77,22 @@ public class _DatabaseOld {
 
     public static boolean query(String tag, String statement, Map<Integer, Object> parameters, QueryCallback queryCallback) {
 
-        Connection connection = _ConnectionManagerOld.getConnection();
+        Connection connection = _ConnectionOld.get();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
 
-        _ConnectionManagerOld.close(connection);
+        _ConnectionOld.close(connection);
 
         return wasSuccessful;
     }
 
     public static boolean query(String tag, String statement, Map<Integer, Object> parameters, TwoStepQueryCallback queryCallback) {
 
-        Connection connection = _ConnectionManagerOld.getConnection();
+        Connection connection = _ConnectionOld.get();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
 
-        _ConnectionManagerOld.close(connection);
+        _ConnectionOld.close(connection);
 
         return wasSuccessful;
     }
@@ -308,11 +308,11 @@ public class _DatabaseOld {
 
     public static boolean update(String tag, String statement, Map<Integer, Object> parameters, UpdateCallback updateCallback) {
 
-        Connection connection = _ConnectionManagerOld.getConnection();
+        Connection connection = _ConnectionOld.get();
 
         boolean wasSuccessful = update(connection, tag, statement, parameters, updateCallback);
 
-        _ConnectionManagerOld.close(connection);
+        _ConnectionOld.close(connection);
 
         return wasSuccessful;
     }
@@ -422,11 +422,11 @@ public class _DatabaseOld {
 
     public static boolean insert(String tag, String statement, Map<Integer, Object> parameters, InsertCallback insertCallback) {
 
-        Connection connection = _ConnectionManagerOld.getConnection();
+        Connection connection = _ConnectionOld.get();
 
         boolean wasSuccessful = insert(connection, tag, statement, parameters, insertCallback);
 
-        _ConnectionManagerOld.close(connection);
+        _ConnectionOld.close(connection);
 
         return wasSuccessful;
     }

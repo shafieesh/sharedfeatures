@@ -8,7 +8,7 @@ import com.chainedminds.models._Data;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.json.JsonException;
-import com.chainedminds.utilities.json.JsonHelper;
+import com.chainedminds.utilities.json.Json;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -138,12 +138,12 @@ public class _RequestHandler<Data> {
 
             if (data instanceof byte[]) {
 
-                request = JsonHelper.getObjectUnsafe((byte[]) data, mappedClass);
+                request = Json.getObjectUnsafe((byte[]) data, mappedClass);
             }
 
             if (data instanceof String) {
 
-                request = JsonHelper.getObjectUnsafe((String) data, mappedClass);
+                request = Json.getObjectUnsafe((String) data, mappedClass);
             }
 
         } catch (JsonException ignore) {
@@ -181,7 +181,7 @@ public class _RequestHandler<Data> {
 
         } else {
 
-            bakedResponse = JsonHelper.getBytes(response);
+            bakedResponse = Json.getBytes(response);
         }
 
         if (originalRequest instanceof byte[]) {

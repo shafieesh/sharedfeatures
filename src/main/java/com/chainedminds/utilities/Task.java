@@ -9,19 +9,19 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class TaskManager {
+public class Task {
 
-    private static final String TAG = TaskManager.class.getSimpleName();
+    private static final String TAG = Task.class.getSimpleName();
 
     private static final String COLUMN_TASK_NAME = "Name";
     private static final String COLUMN_TASK_TIME = "DateTime";
-    private static final List<Task> TASKS = new ArrayList<>();
+    private static final List<Data> TASKS = new ArrayList<>();
 
     private static final ExecutorService TASK_EXECUTOR = Executors.newCachedThreadPool();
 
     public static void start() {
 
-        new Thread(TaskManager::run).start();
+        new Thread(Task::run).start();
     }
 
     public static int randomSecond() {
@@ -29,7 +29,7 @@ public class TaskManager {
         return new Random().nextInt(60);
     }
 
-    public static void addTask(Task task) {
+    public static void add(Data task) {
 
         if (!task.finalized) {
 
@@ -53,7 +53,7 @@ public class TaskManager {
         TASKS.add(task);
     }
 
-    private static void calibrateTime(Task task) {
+    private static void calibrateTime(Data task) {
 
         long currentTime = System.currentTimeMillis();
 
@@ -63,13 +63,13 @@ public class TaskManager {
         }
     }
 
-    private static void addInterval(Task task) {
+    private static void addInterval(Data task) {
 
         task.time += task.interval;
         task.nextRun = task.time;
     }
 
-    private static void startTask(Task task) {
+    private static void startTask(Data task) {
 
         if (task.saveRecord) {
 
@@ -82,7 +82,7 @@ public class TaskManager {
         }
     }
 
-    private static void startTaskAsync(Task task) {
+    private static void startTaskAsync(Data task) {
 
         if (task.saveRecord) {
 
@@ -95,7 +95,7 @@ public class TaskManager {
         }
     }
 
-    private static void saveTaskInvokeTime(Task task) {
+    private static void saveTaskInvokeTime(Data task) {
 
         String insertStatement = "INSERT " + _Config.TABLE_TASKS_HISTORY + " (" +
                 COLUMN_TASK_NAME + ", " + COLUMN_TASK_TIME + ") " + "VALUES (?, ?)";
@@ -117,7 +117,7 @@ public class TaskManager {
 
             for (int index = TASKS.size() - 1; index >= 0; index--) {
 
-                Task task = TASKS.get(index);
+                Data task = TASKS.get(index);
 
                 if (currentTimeMillis > task.nextRun) {
 
@@ -133,10 +133,10 @@ public class TaskManager {
 
     public interface TimingListener {
 
-        void onStartedTask(Task task);
+        void onStartedTask(Data task);
     }
 
-    public static class Task {
+    public static class Data {
 
         private String name;
 
@@ -152,15 +152,15 @@ public class TaskManager {
         private boolean saveRecord = false;
         private boolean finalized = false;
 
-        public static Task build() {
+        public static Data build() {
 
-            Task task = new Task();
+            Data task = new Data();
             task.time = System.currentTimeMillis();
 
             return task;
         }
 
-        public Task setTime(int hour, int minute, int second) {
+        public Data setTime(int hour, int minute, int second) {
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(this.time);
@@ -175,7 +175,7 @@ public class TaskManager {
             return this;
         }
 
-        public Task setInterval(int day, int hour, int minute, int second) {
+        public Data setInterval(int day, int hour, int minute, int second) {
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(this.time);
@@ -193,14 +193,14 @@ public class TaskManager {
             return this;
         }
 
-        public Task setName(String name) {
+        public Data setName(String name) {
 
             this.name = name;
 
             return this;
         }
 
-        public Task saveRecord(boolean saveRecord) {
+        public Data saveRecord(boolean saveRecord) {
 
             this.saveRecord = saveRecord;
 
@@ -208,7 +208,7 @@ public class TaskManager {
         }
 
         @Deprecated
-        public Task startAndSchedule() {
+        public Data startAndSchedule() {
 
             this.runNow = true;
             finalized = true;
@@ -217,7 +217,7 @@ public class TaskManager {
         }
 
         @Deprecated
-        public Task startAsyncAndSchedule() {
+        public Data startAsyncAndSchedule() {
 
             this.runAsyncNow = true;
             finalized = true;
@@ -225,7 +225,7 @@ public class TaskManager {
             return this;
         }
 
-        public Task runNow() {
+        public Data runNow() {
 
             this.runNow = true;
             this.runAsyncNow = false;
@@ -233,7 +233,7 @@ public class TaskManager {
             return this;
         }
 
-        public Task runAsyncNow() {
+        public Data runAsyncNow() {
 
             this.runNow = false;
             this.runAsyncNow = true;
@@ -241,13 +241,13 @@ public class TaskManager {
             return this;
         }
 
-        public Task schedule() {
+        public Data schedule() {
 
             finalized = true;
             return this;
         }
 
-        public Task setTimingListener(TimingListener listener) {
+        public Data setTimingListener(TimingListener listener) {
 
             this.timingListener = listener;
 

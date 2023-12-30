@@ -28,7 +28,7 @@ public class DynamicConfig {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("DynamicConfig")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)

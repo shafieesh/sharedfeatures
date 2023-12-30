@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _AccountManager<Data extends _Data<?>> {
+public class _Account<Data extends _Data<?>> {
 
-    private static final String TAG = _AccountManager.class.getSimpleName();
+    private static final String TAG = _Account.class.getSimpleName();
 
     protected static final String FIELD_USER_ID = "UserID";
     protected static final String FIELD_USERNAME = "Username";
@@ -37,8 +37,8 @@ public class _AccountManager<Data extends _Data<?>> {
     protected static final String FIELD_REGISTRATION_TIME = "RegistrationTime";
     protected static final String FIELD_LAST_UPDATE = "LastUpdate";
 
-    private static final CacheManager<String, Integer> LOGIN_ATTEMPTS_CACHE =
-            new CacheManager<>(_Config.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
+    private static final Cache<String, Integer> LOGIN_ATTEMPTS_CACHE =
+            new Cache<>(_Config.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
 
     protected final Map<Integer, String> MAPPING_USERNAME = new HashMap<>();
     protected final Set<String> INDEX_USERNAME = new HashSet<>();
@@ -47,7 +47,7 @@ public class _AccountManager<Data extends _Data<?>> {
 
     public void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("FetchUsers")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)
@@ -211,7 +211,7 @@ public class _AccountManager<Data extends _Data<?>> {
 
     public boolean setPassword(int userID, String newPassword) {
 
-        Connection connection = _ConnectionManagerOld.getConnection(_ConnectionManagerOld.MANUAL_COMMIT);
+        Connection connection = _ConnectionOld.get(_ConnectionOld.MANUAL_COMMIT);
 
         String oldPassword = getPassword(connection, userID);
 
@@ -221,14 +221,14 @@ public class _AccountManager<Data extends _Data<?>> {
 
         if (wasSuccessful) {
 
-            _ConnectionManagerOld.commit(connection);
+            _ConnectionOld.commit(connection);
 
         } else {
 
-            _ConnectionManagerOld.rollback(connection);
+            _ConnectionOld.rollback(connection);
         }
 
-        _ConnectionManagerOld.close(connection);
+        _ConnectionOld.close(connection);
 
         return wasSuccessful;
     }
@@ -357,7 +357,7 @@ public class _AccountManager<Data extends _Data<?>> {
 
         if (appName != null) {
 
-            Set<Integer> userIDs = _Resources.getInstance().accountPropertyManager.getUserIDs(appName);
+            Set<Integer> userIDs = _Resources.getInstance().accountSession.getUserIDs(appName);
 
             getUsernameMap(TAG, usernames -> userIDs.forEach(userID -> {
 
@@ -417,7 +417,7 @@ public class _AccountManager<Data extends _Data<?>> {
 
     public boolean isBruteForcing(String address) {
 
-        LOGIN_ATTEMPTS_CACHE.putIfAbsent(address, new CacheManager.Record<>(0)
+        LOGIN_ATTEMPTS_CACHE.putIfAbsent(address, new Cache.Record<>(0)
                 .accessLifetime(_Config.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER)
                 .expirationTime(_Config.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER));
 
@@ -505,17 +505,8 @@ public class _AccountManager<Data extends _Data<?>> {
 
         data.response = _Codes.RESPONSE_NOK;
 
-//        String uuid = data.client.uuid;
-//
-//        if (BaseBlackListManager.isBlocked(uuid, BaseBlackListManager.TYPE_UUID,
-//                BaseBlackListManager.REASON_ADMIN_KICK) == BaseBlackListManager.STATE_KICKED) {
-//
-//            data.message = Messages.get("GENERAL", Messages.General.YOU_ARE_BLOCKED_FOR_SOME_TIMES, data.client.language);
-//
-//            return data;
-//        }
-
-        if (data.account == null || data.account.username == null || data.account.password == null) {
+        if (data.account == null || data.account.username == null || data.account.password == null ||
+                data.client.appName == null || data.client.platform == null) {
 
             data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
@@ -567,9 +558,8 @@ public class _AccountManager<Data extends _Data<?>> {
 
                     String credential = BackendHelper.generateCredential();
 
-                    Connection connection = _ConnectionManagerOld.getConnection(_ConnectionManagerOld.MANUAL_COMMIT);
-
-                    boolean wasSuccessful = _Resources.getInstance().accountPropertyManager.setCredential(connection, userID, appName, platform, credential);
+                    boolean wasSuccessful = _Resources.getInstance().accountSession
+                            .addCredential(userID, credential, appName, platform, appVersion, language);
 
                     if (wasSuccessful) {
 
@@ -578,17 +568,6 @@ public class _AccountManager<Data extends _Data<?>> {
 
                         data.response = _Codes.RESPONSE_OK;
                     }
-
-                    if (wasSuccessful) {
-
-                        _ConnectionManagerOld.commit(connection);
-
-                    } else {
-
-                        _ConnectionManagerOld.rollback(connection);
-                    }
-
-                    _ConnectionManagerOld.close(connection);
 
                 } else {
 
@@ -624,11 +603,6 @@ public class _AccountManager<Data extends _Data<?>> {
 
         int userID = data.account.id;
         String credential = data.account.credential;
-        String appName = data.client.appName;
-        String platform = data.client.platform;
-        int appVersion = data.client.appVersion;
-        String language = data.client.language;
-        int subRequest = data.subRequest;
 
         //---------CHECK IF USER ID IS VALID-------
 
@@ -642,8 +616,7 @@ public class _AccountManager<Data extends _Data<?>> {
 
             //---------CHECK IF CREDENTIAL IS VALID-------
 
-            Boolean credentialIsValid = _Resources.getInstance().accountPropertyManager
-                    .validateCredential(userID, appName, platform, credential);
+            Boolean credentialIsValid = _Resources.getInstance().accountSession.validateCredential(userID, credential);
 
             if (credentialIsValid == null) {
 
@@ -661,9 +634,9 @@ public class _AccountManager<Data extends _Data<?>> {
         //------------------------------------------------
         //------------UPDATE USER'S ACCOUNT---------------
 
-        if (!_Resources.getInstance().accountPropertyManager.CACHED_USERS_INFO.contains(userID)) {
+        if (!_Resources.getInstance().accountSession.CACHED_USERS_INFO.contains(credential)) {
 
-            NettyServer.execute(() -> _Resources.getInstance().accountPropertyManager.updateAccount(data));
+            NettyServer.execute(() -> _Resources.getInstance().accountSession.updateAccount(data));
         }
 
         ActivityListener.setBecameOnline(userID);
@@ -701,8 +674,6 @@ public class _AccountManager<Data extends _Data<?>> {
         String username = data.account.username;
         String password = data.account.password;
         String name = data.account.name;
-        String appName = data.client.appName;
-        String platform = data.client.platform;
         String language = data.client.language;
 
         if (username.length() < 4) {
@@ -720,11 +691,7 @@ public class _AccountManager<Data extends _Data<?>> {
         }
 
         username = Utilities.replaceLocalizedNumbers(username);
-
-        if (password != null) {
-
-            password = Utilities.replaceLocalizedNumbers(password);
-        }
+        password = Utilities.replaceLocalizedNumbers(password);
 
         if (!checkIfUsernameRegistered(username)) {
 
@@ -745,15 +712,8 @@ public class _AccountManager<Data extends _Data<?>> {
 
             if (userID != -1) {
 
-                String credential = BackendHelper.generateCredential();
-
-                if (_Resources.getInstance().accountPropertyManager.setCredential(userID, appName, platform, credential)) {
-
-                    data.account.id = userID;
-                    data.account.credential = credential;
-
-                    data.response = _Codes.RESPONSE_OK;
-                }
+                data.account.id = userID;
+                data.response = _Codes.RESPONSE_OK;
             }
 
         } else {

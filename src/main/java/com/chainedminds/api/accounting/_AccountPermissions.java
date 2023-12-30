@@ -2,7 +2,7 @@ package com.chainedminds.api.accounting;
 
 import com.chainedminds._Config;
 import com.chainedminds.models._PermissionData;
-import com.chainedminds.utilities.TaskManager;
+import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
@@ -37,7 +37,7 @@ public class _AccountPermissions {
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("AccountPermissionsManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)

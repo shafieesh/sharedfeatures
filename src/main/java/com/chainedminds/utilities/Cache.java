@@ -1,38 +1,35 @@
 package com.chainedminds.utilities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unused")
-public class CacheManager<Key, Value> {
+public class Cache<Key, Value> {
 
-    private static final List<CacheManager<?, ?>> CACHE_MANAGERS = new ArrayList<>();
+    private static final List<Cache<?, ?>> CACHE_MANAGERS = new ArrayList<>();
 
     private final Map<Key, Record<Value>> cache = new HashMap<>();
 
     private long LIFETIME = 60 * 60 * 1000;
 
-    public CacheManager(long recordLifetime) {
+    public Cache(long recordLifetime) {
 
         this.LIFETIME = recordLifetime;
 
         CACHE_MANAGERS.add(this);
     }
 
-    public CacheManager() {
+    public Cache() {
 
         CACHE_MANAGERS.add(this);
     }
 
     public static void start() {
 
-        TaskManager.addTask(TaskManager.Task.build()
+        Task.add(Task.Data.build()
                 .setName("CacheManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 0, 1)
-                .setTimingListener(task -> CACHE_MANAGERS.forEach(CacheManager::cleanCache))
+                .setTimingListener(task -> CACHE_MANAGERS.forEach(Cache::cleanStale))
                 .schedule());
     }
 
@@ -132,12 +129,17 @@ public class CacheManager<Key, Value> {
         cache.remove(key);
     }
 
-    public void invalidateCache() {
+    public void remove(Collection<Key> keys) {
+
+        keys.forEach(cache::remove);
+    }
+
+    public void invalidate() {
 
         cache.clear();
     }
 
-    private void cleanCache() {
+    private void cleanStale() {
 
         long currentTime = System.currentTimeMillis();
 
