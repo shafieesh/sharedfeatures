@@ -50,8 +50,8 @@ public class Resources extends _Resources<
         super.file = new _File();
         super.iabPayment = new _IABPayment<>();
         super.ipgPayment = new _IPGPayment<>();
-        super.iabProductPurchasesManager = new _IABProductPurchase<>();
-        super.ipgProductPurchasesManager = new _IPGProductPurchase<>();
+        super.iabProductPurchase = new _IABProductPurchase<>();
+        super.ipgProductPurchase = new _IPGProductPurchase<>();
         super.iabSubscriptionPurchase = new _IABSubscriptionPurchase<>();
         super.ipgSubscriptionPurchase = new _IPGSubscriptionPurchase<>();
         super.product = new _Product<>();
@@ -76,8 +76,8 @@ public class Resources extends _Resources<
         resources.file = super.file;
         resources.iabPayment = super.iabPayment;
         resources.ipgPayment = super.ipgPayment;
-        resources.iabProductPurchasesManager = super.iabProductPurchasesManager;
-        resources.ipgProductPurchasesManager = super.ipgProductPurchasesManager;
+        resources.iabProductPurchase = super.iabProductPurchase;
+        resources.ipgProductPurchase = super.ipgProductPurchase;
         resources.iabSubscriptionPurchase = super.iabSubscriptionPurchase;
         resources.ipgSubscriptionPurchase = super.ipgSubscriptionPurchase;
         resources.product = super.product;

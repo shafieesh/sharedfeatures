@@ -181,6 +181,7 @@ public class Messages {
         public static String SOMETHING_WENT_WRONG = "SOMETHING_WENT_WRONG";
         public static String SOMETHING_WENT_WRONG_TRY_AGAIN = "SOMETHING_WENT_WRONG_TRY_AGAIN";
         public static String TOO_MANY_ATTEMPTS = "TOO_MANY_ATTEMPTS";
+        public static String CREDENTIAL_EXPIRED = "CREDENTIAL_EXPIRED";
         public static String ACCOUNT_DEACTIVATED = "ACCOUNT_DEACTIVATED";
 
         public static String USERNAME_HAS_REGISTERED_BEFORE = "USERNAME_HAS_REGISTERED_BEFORE";

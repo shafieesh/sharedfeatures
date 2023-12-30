@@ -227,7 +227,7 @@ public class _IABPayment<
         List<_IABTransactionData> pendingTransactionsList = new ArrayList<>();
 
         pendingTransactionsList.addAll(_Resources.getInstance()
-                .iabProductPurchasesManager.getPendingTransactions());
+                .iabProductPurchase.getPendingTransactions());
 
         pendingTransactionsList.addAll(_Resources.getInstance()
                 .iabSubscriptionPurchase.getPendingTransactions());
@@ -660,7 +660,7 @@ public class _IABPayment<
 
             if (_Product.CATEGORY_PRODUCT.equals(productCategory)) {
 
-                wasSuccessful = _Resources.getInstance().iabProductPurchasesManager
+                wasSuccessful = _Resources.getInstance().iabProductPurchase
                         .updateTransactionState(null, transaction.id, transaction.state);
             }
 
@@ -722,7 +722,7 @@ public class _IABPayment<
 
                     if (_Product.CATEGORY_PRODUCT.equals(originalProduct.category)) {
 
-                        wasSuccessful &= _Resources.getInstance().iabProductPurchasesManager
+                        wasSuccessful &= _Resources.getInstance().iabProductPurchase
                                 .updateTransactionState(connection, transaction.id, PURCHASE_STATE_APPLIED);
                     }
 

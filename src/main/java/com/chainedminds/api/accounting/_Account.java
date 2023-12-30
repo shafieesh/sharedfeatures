@@ -610,6 +610,7 @@ public class _Account<Data extends _Data<?>> {
 
             if (!validateUserID(userID)) {
 
+                data.message = Messages.get("GENERAL", Messages.General.CREDENTIAL_EXPIRED, data.client.language);
                 data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
                 return data;
             }
@@ -626,6 +627,7 @@ public class _Account<Data extends _Data<?>> {
 
             if (!credentialIsValid) {
 
+                data.message = Messages.get("GENERAL", Messages.General.CREDENTIAL_EXPIRED, data.client.language);
                 data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
                 return data;
             }

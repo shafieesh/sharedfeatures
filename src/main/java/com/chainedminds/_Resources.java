@@ -86,8 +86,8 @@ public class _Resources<
     public File file;
     public IABPayment iabPayment;
     public IPGPayment ipgPayment;
-    public IABProductPurchase iabProductPurchasesManager;
-    public IPGProductPurchase ipgProductPurchasesManager;
+    public IABProductPurchase iabProductPurchase;
+    public IPGProductPurchase ipgProductPurchase;
     public IABSubscriptionPurchase iabSubscriptionPurchase;
     public IPGSubscriptionPurchase ipgSubscriptionPurchase;
     public Product product;
