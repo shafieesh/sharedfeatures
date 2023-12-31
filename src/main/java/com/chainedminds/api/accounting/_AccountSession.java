@@ -24,7 +24,7 @@ public class _AccountSession {
     protected static final String FIELD_CREDENTIAL = "Credential";
     protected static final String FIELD_APP_NAME = "AppName";
     protected static final String FIELD_PLATFORM = "Platform";
-    protected static final String FIELD_APP_VERSION = "AppVersion";
+    protected static final String FIELD_VERSION = "AppVersion";
     protected static final String FIELD_LANGUAGE = "Language";
     protected static final String FIELD_FIREBASE_ID = "FirebaseID";
     protected static final String FIELD_IP_ADDRESS = "IPAddress";
@@ -118,11 +118,11 @@ public class _AccountSession {
     }
 
     public boolean addCredential(int userID, String credential, String appName,
-                                 String platform, int appVersion, String language) {
+                                 String platform, String version, String language) {
 
         String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_SESSIONS + " (" +
                 FIELD_USER_ID + ", " + FIELD_CREDENTIAL + ", " + FIELD_APP_NAME + ", " +
-                FIELD_PLATFORM + ", " + FIELD_APP_VERSION + ", " + FIELD_LANGUAGE +
+                FIELD_PLATFORM + ", " + FIELD_VERSION + ", " + FIELD_LANGUAGE +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
@@ -130,7 +130,7 @@ public class _AccountSession {
         parameters.put(2, credential);
         parameters.put(3, appName);
         parameters.put(4, platform);
-        parameters.put(5, appVersion);
+        parameters.put(5, version);
         parameters.put(6, language);
 
         boolean wasSuccessful = _DatabaseOld.insert(TAG, updateStatement, parameters);
@@ -338,7 +338,7 @@ public class _AccountSession {
                     session.credential = resultSet.getString(FIELD_CREDENTIAL);
                     session.appName = resultSet.getString(FIELD_APP_NAME);
                     session.platform = resultSet.getString(FIELD_PLATFORM);
-                    session.appVersion = resultSet.getInt(FIELD_APP_VERSION);
+                    session.appVersion = resultSet.getInt(FIELD_VERSION);
                     session.language = resultSet.getString(FIELD_LANGUAGE);
                     session.firebaseID = resultSet.getString(FIELD_FIREBASE_ID);
                     session.ipAddress = resultSet.getString(FIELD_IP_ADDRESS);
@@ -699,7 +699,7 @@ public class _AccountSession {
         data.response = _Codes.RESPONSE_NOK;
 
         String credential = data.account.credential;
-        int appVersion = data.client.appVersion;
+        String version = data.client.version;
         String language = data.client.language;
         String firebaseID = data.client.firebaseID;
         String ipAddress = data.client.address;
@@ -711,13 +711,13 @@ public class _AccountSession {
         }
 
         String statement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
-                FIELD_APP_VERSION + " = ?, " + FIELD_LANGUAGE + " = ?, " +
+                FIELD_VERSION + " = ?, " + FIELD_LANGUAGE + " = ?, " +
                 FIELD_FIREBASE_ID + " = ?, " + FIELD_IP_ADDRESS + " = ?, " +
                 FIELD_COUNTRY + " = ?, " + FIELD_LAST_UPDATE +
                 " = NOW() WHERE " + FIELD_CREDENTIAL + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, appVersion);
+        parameters.put(1, version);
         parameters.put(2, language);
         parameters.put(3, firebaseID);
         parameters.put(4, ipAddress);

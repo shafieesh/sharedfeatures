@@ -506,7 +506,7 @@ public class _Account<Data extends _Data<?>> {
         data.response = _Codes.RESPONSE_NOK;
 
         if (data.account == null || data.account.username == null || data.account.password == null ||
-                data.client.appName == null || data.client.platform == null) {
+                data.client.appName == null || data.client.platform == null || data.client.version == null) {
 
             data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
@@ -519,7 +519,7 @@ public class _Account<Data extends _Data<?>> {
         String platform = data.client.platform;
         String language = data.client.language;
         String address = data.client.address;
-        int appVersion = data.client.appVersion;
+        String version = data.client.version;
 
         if (isBruteForcing(address)) {
 
@@ -559,7 +559,7 @@ public class _Account<Data extends _Data<?>> {
                     String credential = BackendHelper.generateCredential();
 
                     boolean wasSuccessful = _Resources.getInstance().accountSession
-                            .addCredential(userID, credential, appName, platform, appVersion, language);
+                            .addCredential(userID, credential, appName, platform, version, language);
 
                     if (wasSuccessful) {
 

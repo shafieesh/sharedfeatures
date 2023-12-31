@@ -60,15 +60,18 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);
 
-                ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
+                if (responseData != null) {
 
-                if (NettyServer.KEEP_ALIVE_CHANNELS_LIST.contains(channelID)) {
+                    ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
 
-                    NettyServer.KEEP_ALIVE_CHANNELS_LIST.remove(channelID);
+                    if (NettyServer.KEEP_ALIVE_CHANNELS_LIST.contains(channelID)) {
 
-                } else {
+                        NettyServer.KEEP_ALIVE_CHANNELS_LIST.remove(channelID);
 
-                    //writeFuture.addListener(ChannelFutureListener.CLOSE);
+                    } else {
+
+                        //writeFuture.addListener(ChannelFutureListener.CLOSE);
+                    }
                 }
             };
 
