@@ -331,7 +331,7 @@ public class _AccountSession {
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
 
-                if (resultSet.next()) {
+                while (resultSet.next()) {
 
                     SessionData session = new SessionData();
                     session.userID = resultSet.getInt(FIELD_USER_ID);
@@ -406,7 +406,7 @@ public class _AccountSession {
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
 
-                if (resultSet.next()) {
+                while (resultSet.next()) {
 
                     credentials.add(resultSet.getString(FIELD_CREDENTIAL));
                 }

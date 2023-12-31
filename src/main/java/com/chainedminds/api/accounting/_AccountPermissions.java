@@ -4,15 +4,14 @@ import com.chainedminds._Config;
 import com.chainedminds.models._PermissionData;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -158,27 +157,6 @@ public class _AccountPermissions {
         });
 
         return permissions;
-    }
-
-    public static String getCurrentPermission(int userID) {
-
-        AtomicReference<String> userPermission = new AtomicReference<>("EMPTY");
-
-        String selectStatement = "SELECT " + FIELD_PERMISSION + " FROM " + _Config.TABLE_ACCOUNTS_PERMISSIONS +
-                " WHERE " + FIELD_USER_ID + " = ?";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, userID);
-
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
-
-            if (resultSet.next()) {
-
-                userPermission.set(resultSet.getString(FIELD_PERMISSION));
-            }
-        });
-
-        return userPermission.get();
     }
 
     public static Set<String> getPermissions(int userID, String appName) {
