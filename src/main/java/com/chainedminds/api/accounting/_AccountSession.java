@@ -24,7 +24,7 @@ public class _AccountSession {
     protected static final String FIELD_CREDENTIAL = "Credential";
     protected static final String FIELD_APP_NAME = "AppName";
     protected static final String FIELD_PLATFORM = "Platform";
-    protected static final String FIELD_VERSION = "AppVersion";
+    protected static final String FIELD_VERSION = "Version";
     protected static final String FIELD_LANGUAGE = "Language";
     protected static final String FIELD_FIREBASE_ID = "FirebaseID";
     protected static final String FIELD_IP_ADDRESS = "IPAddress";
