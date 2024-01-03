@@ -338,7 +338,7 @@ public class _AccountSession {
                     session.credential = resultSet.getString(FIELD_CREDENTIAL);
                     session.appName = resultSet.getString(FIELD_APP_NAME);
                     session.platform = resultSet.getString(FIELD_PLATFORM);
-                    session.appVersion = resultSet.getInt(FIELD_VERSION);
+                    session.version = resultSet.getString(FIELD_VERSION);
                     session.language = resultSet.getString(FIELD_LANGUAGE);
                     session.firebaseID = resultSet.getString(FIELD_FIREBASE_ID);
                     session.ipAddress = resultSet.getString(FIELD_IP_ADDRESS);
@@ -912,7 +912,7 @@ public class _AccountSession {
         public String credential;
         public String appName;
         public String platform;
-        public int appVersion;
+        public String version;
         public String language;
         public String firebaseID;
         public String ipAddress;
