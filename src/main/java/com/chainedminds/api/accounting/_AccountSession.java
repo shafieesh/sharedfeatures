@@ -378,6 +378,7 @@ public class _AccountSession {
 
             Map<Integer, Object> parameters = new HashMap<>();
             parameters.put(1, userID);
+            parameters.put(2, credential);
 
             boolean wasSuccessful = _DatabaseOld.update(TAG, statement, parameters);
 
@@ -424,10 +425,10 @@ public class _AccountSession {
 
         if (!staleCredentials.isEmpty()) {
 
-            String credentialsArray = String.join(", ", staleCredentials);
+            String credentialsArray = String.join("', '", staleCredentials);
 
             statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS + " WHERE " +
-                    FIELD_CREDENTIAL + " IN (" + credentialsArray + ")";
+                    FIELD_CREDENTIAL + " IN ('" + credentialsArray + "')";
 
             boolean wasSuccessful = _DatabaseOld.update(TAG, statement);
 
@@ -472,7 +473,6 @@ public class _AccountSession {
 
         return value.get();
     }
-
 
     public <T> DBResult<T> getProperty(String credential, String field, Class<T> T) {
 
