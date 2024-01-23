@@ -251,6 +251,7 @@ public class _Account<Data extends _Data<?>> {
 
         return getProperty(userID, FIELD_IS_ACTIVE, Boolean.class);
     }
+
     //------------------------
 
     public <AccountData extends _AccountData> AccountData getAccount(int userID) {

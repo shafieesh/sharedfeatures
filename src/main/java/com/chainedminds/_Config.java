@@ -86,6 +86,8 @@ public class _Config {
     public static int BRUTE_FORCE_ALLOWED_ATTEMPTS = 7;
     public static int BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER = FIFTEEN_MINUTES;
 
+    public static int CACHED_USERS_INFO_REFRESH_RATE = FIVE_MINUTES;
+
     //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_WHEEL_OF_FORTUNE_PRIZES = "wheel_of_fortune_prizes";
     public static String TABLE_WHEEL_OF_FORTUNE_PRIZES;

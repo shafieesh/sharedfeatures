@@ -42,7 +42,7 @@ public class _AccountSession {
         Task.add(Task.Data.build()
                 .setName("Clear Cached Users Info")
                 .setTime(0, 0, 0)
-                .setInterval(0, 0, 5, 0)
+                .setInterval(0, 0, _Config.CACHED_USERS_INFO_REFRESH_RATE, 0)
                 .setTimingListener(task -> CACHED_USERS_INFO.clear())
                 .schedule());
 
