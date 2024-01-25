@@ -718,7 +718,7 @@ public class _AccountSession {
                 FIELD_LAST_UPDATE + " = NOW() WHERE " + FIELD_CREDENTIAL + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, version);
+        parameters.put(1, (version == null || version.equals("0")) ? null : version);
         parameters.put(2, language);
         parameters.put(3, firebaseID);
         parameters.put(4, ipAddress);
