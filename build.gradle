@@ -4,17 +4,17 @@ plugins {
 apply plugin: 'maven'
 
 group 'com.chainedminds'
-version '1.0.67'
+version '1.0.68'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation('com.fasterxml.jackson.core:jackson-databind:2.16.0')
-    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.0')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.16.1')
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1')
     implementation('com.squareup.okhttp3:okhttp:4.12.0')
     implementation('org.brotli:dec:0.1.2')
     implementation('io.netty:netty-all:4.1.106.Final')
-    implementation('com.mysql:mysql-connector-j:8.2.0')
+    implementation('com.mysql:mysql-connector-j:8.3.0')
 }

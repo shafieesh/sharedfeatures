@@ -711,10 +711,11 @@ public class _AccountSession {
         }
 
         String statement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
-                FIELD_VERSION + " = ?, " + FIELD_LANGUAGE + " = ?, " +
-                FIELD_FIREBASE_ID + " = ?, " + FIELD_IP_ADDRESS + " = ?, " +
-                FIELD_COUNTRY + " = ?, " + FIELD_LAST_UPDATE +
-                " = NOW() WHERE " + FIELD_CREDENTIAL + " = ?";
+                FIELD_VERSION + " = COALESCE(?, " + FIELD_VERSION + "), " +
+                FIELD_LANGUAGE + " = COALESCE(?, " + FIELD_LANGUAGE + "), " +
+                FIELD_FIREBASE_ID + " = COALESCE(?, " + FIELD_FIREBASE_ID + "), " +
+                FIELD_IP_ADDRESS + " = ?, " + FIELD_COUNTRY + " = ?, " +
+                FIELD_LAST_UPDATE + " = NOW() WHERE " + FIELD_CREDENTIAL + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, version);
