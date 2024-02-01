@@ -1,5 +1,6 @@
 package com.chainedminds;
 
+import com.chainedminds.api._API;
 import okhttp3.Interceptor;
 
 public class _Config {
@@ -69,19 +70,22 @@ public class _Config {
     public static final int MEDIA_AUDIO = 3;
     public static final int MEDIA_APK = 4;
 
-    public static boolean OKHTTP_FOLLOW_REDIRECTS = true;
-    public static int OKHTTP_DISPATCHER_MAX_REQUESTS = 250;
-    public static int OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST = 50;
-    public static int OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS = 50;
-    public static int OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION = 60;
-    public static long OKHTTP_CALL_TIMEOUT = 3_000;
-    public static long OKHTTP_CONNECT_TIMEOUT = 10_000;
-    public static long OKHTTP_READ_TIMEOUT = 10_000;
-    public static long OKHTTP_WRITE_TIMEOUT = 10_000;
-    public static String OKHTTP_PROXY;
-    public static String OKHTTP_PROXY_ADDRESS;
-    public static int OKHTTP_PROXY_PORT;
-    public static Interceptor OKHTTP_NETWORK_INTERCEPTOR;
+    public static class OkHTTP {
+
+        public boolean OKHTTP_FOLLOW_REDIRECTS = true;
+        public int OKHTTP_DISPATCHER_MAX_REQUESTS = 250;
+        public int OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST = 50;
+        public int OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS = 50;
+        public int OKHTTP_CONNECTION_POOL_KEEP_ALIVE_DURATION = 60;
+        public long OKHTTP_CALL_TIMEOUT = 30_000;
+        public long OKHTTP_CONNECT_TIMEOUT = 10_000;
+        public long OKHTTP_READ_TIMEOUT = 10_000;
+        public long OKHTTP_WRITE_TIMEOUT = 10_000;
+        public String OKHTTP_PROXY;
+        public String OKHTTP_PROXY_ADDRESS;
+        public int OKHTTP_PROXY_PORT;
+        public Interceptor OKHTTP_NETWORK_INTERCEPTOR;
+    }
 
     public static int BRUTE_FORCE_ALLOWED_ATTEMPTS = 7;
     public static int BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER = FIFTEEN_MINUTES;
@@ -338,5 +342,7 @@ public class _Config {
         TABLE_LOGS = DATABASE_NAME + "." + TABLE_NAME_LOGS;
 
         TABLE_LEADERBOARD_DAILY = DATABASE_NAME + "." + TABLE_NAME_LEADERBOARD_DAILY;
+
+        _API.instance().init(new OkHTTP());
     }
 }

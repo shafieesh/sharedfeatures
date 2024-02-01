@@ -2,7 +2,7 @@ package com.chainedminds.api.store;
 
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
-import com.chainedminds.api._Api;
+import com.chainedminds.api._API;
 import com.chainedminds.models._ProductData;
 import com.chainedminds.models.market.CafeBazaarClass;
 import com.chainedminds.models.market.JhoobinClass;
@@ -158,11 +158,11 @@ public class _IABPayment<
             builder.url(url);
             builder.post(requestBody);
 
-            _Api.callAsync(builder, new _Api.ApiCallback() {
+            _API.instance().callAsync(builder, new _API.ApiCallback() {
                 @Override
-                public void onError(String error) {
+                public void onError(String error, String message) {
 
-                    System.err.println(error);
+                    System.err.println(error + " : " + message);
                 }
 
                 @Override
@@ -197,11 +197,11 @@ public class _IABPayment<
             builder.url(url);
             builder.post(requestBody);
 
-            _Api.callAsync(builder, new _Api.ApiCallback() {
+            _API.instance().callAsync(builder, new _API.ApiCallback() {
                 @Override
-                public void onError(String error) {
+                public void onError(String error, String message) {
 
-                    System.err.println(error);
+                    System.err.println(error + " : " + message);
                 }
 
                 @Override
