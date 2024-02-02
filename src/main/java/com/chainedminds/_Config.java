@@ -72,7 +72,7 @@ public class _Config {
 
     public static class OkHTTP {
 
-        public boolean OKHTTP_FOLLOW_REDIRECTS = true;
+        public boolean OKHTTP_FOLLOW_REDIRECTS = false;
         public int OKHTTP_DISPATCHER_MAX_REQUESTS = 250;
         public int OKHTTP_DISPATCHER_MAX_REQUEST_PER_HOST = 50;
         public int OKHTTP_CONNECTION_POOL_IDLE_CONNECTIONS = 50;
@@ -281,7 +281,7 @@ public class _Config {
 
     //-------------------------------------------------------------//
 
-    protected static void config() {
+    public static void config() {
 
         TABLE_GAME_SESSIONS = DATABASE_NAME + "." + TABLE_NAME_GAME_SESSIONS;
         TABLE_CHATS_PRIVATE = DATABASE_NAME + "." + TABLE_NAME_CHATS_PRIVATE;

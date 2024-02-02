@@ -88,6 +88,11 @@ public class _API {
 
     public void callSync(Request.Builder builder, ApiCallback apiCallback) {
 
+        if (okHttp == null) {
+
+            throw new RuntimeException("OkHTTP is not initialized.");
+        }
+
         try {
 
             Request request = builder.build();
@@ -127,11 +132,19 @@ public class _API {
 
                         baseHeaders.forEach(pair -> headers.add(pair.component1().toLowerCase(), pair.component2()));
 
+                        List<String> cookies = new ArrayList<>();
+
+                        List<String> cookieKeys = new ArrayList<>();
+                        List<String> cookieValues = new ArrayList<>();
+                        List<List<String>> cookieAttributes = new ArrayList<>();
+
                         for (_API.HeaderItem header : headers.getAll()) {
 
                             if (header.key.equals("set-cookie")) {
 
                                 apiCallback.onSetCookie(header.value);
+
+                                cookies.add(header.value);
 
                                 String value = header.value;
 
@@ -148,11 +161,25 @@ public class _API {
                                 String[] cookieValueParts = cookieValue.split("=", 2);
                                 String cookieValueKey = cookieValueParts[0];
                                 String cookieValueValue = cookieValueParts[1];
+                                List<String> cookieValueAttributes = new ArrayList<>();
 
-                                String[] attributes = value.split(";");
+                                for (String cookieValueAttribute : value.split(";")) {
 
-                                apiCallback.onSetCookie(cookieValueKey, cookieValueValue, attributes);
+                                    cookieValueAttributes.add(cookieValueAttribute.trim());
+                                }
+
+                                apiCallback.onSetCookie(cookieValueKey, cookieValueValue, cookieValueAttributes);
+
+                                cookieKeys.add(cookieValueKey);
+                                cookieValues.add(cookieValueValue);
+                                cookieAttributes.add(cookieValueAttributes);
                             }
+                        }
+
+                        if (!cookies.isEmpty()) {
+
+                            apiCallback.onSetCookies(cookies);
+                            apiCallback.onSetCookies(cookieKeys, cookieValues, cookieAttributes);
                         }
 
                         apiCallback.onResponse(code, responseString);
@@ -181,6 +208,11 @@ public class _API {
     }
 
     public void callAsync(Request.Builder builder, ApiCallback apiCallback) {
+
+        if (okHttp == null) {
+
+            throw new RuntimeException("OkHTTP is not initialized.");
+        }
 
         Request request = builder.build();
 
@@ -237,11 +269,19 @@ public class _API {
 
                             baseHeaders.forEach(pair -> headers.add(pair.component1().toLowerCase(), pair.component2()));
 
+                            List<String> cookies = new ArrayList<>();
+
+                            List<String> cookieKeys = new ArrayList<>();
+                            List<String> cookieValues = new ArrayList<>();
+                            List<List<String>> cookieAttributes = new ArrayList<>();
+
                             for (_API.HeaderItem header : headers.getAll()) {
 
                                 if (header.key.equals("set-cookie")) {
 
                                     apiCallback.onSetCookie(header.value);
+
+                                    cookies.add(header.value);
 
                                     String value = header.value;
 
@@ -258,11 +298,25 @@ public class _API {
                                     String[] cookieValueParts = cookieValue.split("=", 2);
                                     String cookieValueKey = cookieValueParts[0];
                                     String cookieValueValue = cookieValueParts[1];
+                                    List<String> cookieValueAttributes = new ArrayList<>();
 
-                                    String[] attributes = value.split(";");
+                                    for (String cookieValueAttribute : value.split(";")) {
 
-                                    apiCallback.onSetCookie(cookieValueKey, cookieValueValue, attributes);
+                                        cookieValueAttributes.add(cookieValueAttribute.trim());
+                                    }
+
+                                    apiCallback.onSetCookie(cookieValueKey, cookieValueValue, cookieValueAttributes);
+
+                                    cookieKeys.add(cookieValueKey);
+                                    cookieValues.add(cookieValueValue);
+                                    cookieAttributes.add(cookieValueAttributes);
                                 }
+                            }
+
+                            if (!cookies.isEmpty()) {
+
+                                apiCallback.onSetCookies(cookies);
+                                apiCallback.onSetCookies(cookieKeys, cookieValues, cookieAttributes);
                             }
 
                             apiCallback.onResponse(code, responseString);
@@ -318,7 +372,15 @@ public class _API {
 
         }
 
-        public void onSetCookie(String key, String value, String[] attributes) {
+        public void onSetCookie(String key, String value, List<String> attributes) {
+
+        }
+
+        public void onSetCookies(List<String> cookies) {
+
+        }
+
+        public void onSetCookies(List<String> keys, List<String> values, List<List<String>> attributes) {
 
         }
     }
