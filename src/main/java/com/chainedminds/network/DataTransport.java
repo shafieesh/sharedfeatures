@@ -167,7 +167,7 @@ public class DataTransport {
             availableBytes += buffer[i] * j;
         }
 
-        if (availableBytes < 0 || availableBytes > 1024 * 1024 * 10) {
+        if (availableBytes < 0) {
 
             throw new IOException("DamagedData");
         }
@@ -215,7 +215,7 @@ public class DataTransport {
             availableBytes += buffer[i] * j;
         }
 
-        if (availableBytes < 0 || availableBytes > 1024 * 1024 * 10) {
+        if (availableBytes < 0) {
 
             throw new IOException("DamagedData");
         }

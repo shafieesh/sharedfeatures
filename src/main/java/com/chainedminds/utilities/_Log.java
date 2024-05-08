@@ -8,9 +8,9 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class _Logs {
+public class _Log {
 
-    private static final String TAG = _Logs.class.getSimpleName();
+    private static final String TAG = _Log.class.getSimpleName();
 
     protected static final String FIELD_USER_ID = "UserID";
     protected static final String FIELD_SECTION = "Section";

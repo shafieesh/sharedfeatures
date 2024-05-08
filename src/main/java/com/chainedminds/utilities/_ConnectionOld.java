@@ -79,7 +79,7 @@ public class _ConnectionOld {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return connection;
@@ -125,7 +125,7 @@ public class _ConnectionOld {
 
             } catch (Exception e) {
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
         }
 
@@ -146,7 +146,7 @@ public class _ConnectionOld {
 
             } catch (Exception e) {
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
         }
 
@@ -326,7 +326,7 @@ public class _ConnectionOld {
 
                 e.printStackTrace();
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
 
             return null;

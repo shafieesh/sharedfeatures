@@ -2,10 +2,10 @@ package com.chainedminds.utilities.database;
 
 import java.sql.ResultSet;
 
-public interface TwoStepQueryCallback {
+public abstract class TwoStepQueryCallback {
 
-    void onFetchingData(ResultSet resultSet) throws Exception;
+    public void onFetchingData(ResultSet resultSet) throws Exception {}
 
-    void onFinishedTask(boolean wasSuccessful, Exception error);
+    public void onFinishedTask(boolean wasSuccessful, Exception error) {}
 }
 

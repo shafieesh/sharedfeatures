@@ -217,7 +217,7 @@ public class _Account<Data extends _Data<?>> {
 
         boolean wasSuccessful = setProperty(connection, userID, FIELD_PASSWORD, newPassword);
 
-        wasSuccessful &= _Logs.log(connection, userID, "Password", oldPassword + " -> " + newPassword);
+        wasSuccessful &= _Log.log(connection, userID, "Password", oldPassword + " -> " + newPassword);
 
         if (wasSuccessful) {
 

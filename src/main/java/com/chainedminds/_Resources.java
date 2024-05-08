@@ -13,6 +13,7 @@ import com.chainedminds.models.account._FriendData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
+import com.chainedminds.utilities._Log;
 
 public class _Resources<
         RequestHandler extends _RequestHandler<?>,
@@ -28,27 +29,54 @@ public class _Resources<
         IABSubscriptionPurchase extends _IABSubscriptionPurchase<? extends _IABTransactionData>,
         IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
         Product extends _Product<? extends _ProductData>,
-        BlackList extends _BlackList> {
+        BlackList extends _BlackList,
+        Log extends _Log> {
 
     private static final _Resources<
-                ? extends _RequestHandler<?>,
-                ? extends _Profile,
-                ? extends _Account<?>,
-                ? extends _AccountSession,
-                ? extends _Friendship<?, ?>,
-                ? extends _File,
-                ? extends _IABPayment<?, ?>,
-                ? extends _IPGPayment<?, ?>,
-                ? extends _IABProductPurchase<?>,
-                ? extends _IPGProductPurchase<?>,
-                ? extends _IABSubscriptionPurchase<?>,
-                ? extends _IPGSubscriptionPurchase<?>,
-                ? extends _Product<?>,
-                ? extends _BlackList
-                > INSTANCE = new _Resources<>();
+            ? extends _RequestHandler<?>,
+            ? extends _Profile,
+            ? extends _Account<?>,
+            ? extends _AccountSession,
+            ? extends _Friendship<?, ?>,
+            ? extends _File,
+            ? extends _IABPayment<?, ?>,
+            ? extends _IPGPayment<?, ?>,
+            ? extends _IABProductPurchase<?>,
+            ? extends _IPGProductPurchase<?>,
+            ? extends _IABSubscriptionPurchase<?>,
+            ? extends _IPGSubscriptionPurchase<?>,
+            ? extends _Product<?>,
+            ? extends _BlackList,
+            ? extends _Log
+            > INSTANCE = new _Resources<>();
 
     public _Resources() {
 
+    }
+
+    @Deprecated
+    public static <
+            RequestHandler extends _RequestHandler<?>,
+            Profile extends _Profile,
+            Account extends _Account<? extends _Data<?>>,
+            AccountSession extends _AccountSession,
+            Friendship extends _Friendship<? extends _Data<?>, ? extends _FriendData>,
+            File extends _File,
+            IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
+            IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
+            IABProductPurchase extends _IABProductPurchase<? extends _IABTransactionData>,
+            IPGProductPurchase extends _IPGProductPurchase<? extends _IPGTransactionData>,
+            IABSubscriptionPurchase extends _IABSubscriptionPurchase<? extends _IABTransactionData>,
+            IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
+            Product extends _Product<? extends _ProductData>,
+            BlackList extends _BlackList,
+            Log extends _Log> _Resources<
+            RequestHandler, Profile, Account, AccountSession,
+            Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
+            IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+            > getInstance() {
+
+        return instance();
     }
 
     public static <
@@ -65,17 +93,18 @@ public class _Resources<
             IABSubscriptionPurchase extends _IABSubscriptionPurchase<? extends _IABTransactionData>,
             IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
             Product extends _Product<? extends _ProductData>,
-            BlackList extends _BlackList> _Resources<
+            BlackList extends _BlackList,
+            Log extends _Log> _Resources<
             RequestHandler, Profile, Account, AccountSession,
             Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
-            IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList
-            > getInstance() {
+            IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+            > instance() {
 
         return (_Resources<
                 RequestHandler, Profile, Account, AccountSession,
                 Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
-                IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList
-                        >) INSTANCE;
+                IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+                >) INSTANCE;
     }
 
     public RequestHandler requestHandler;
@@ -92,4 +121,5 @@ public class _Resources<
     public IPGSubscriptionPurchase ipgSubscriptionPurchase;
     public Product product;
     public BlackList blackList;
+    public Log log;
 }

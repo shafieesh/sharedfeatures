@@ -220,7 +220,7 @@ public class Utilities {
 
             e.printStackTrace();
 
-            _Logs.error("HttpConnection", e);
+            _Log.error("HttpConnection", e);
         }
 
         return wasSuccessful;
@@ -288,19 +288,24 @@ public class Utilities {
 
             e.printStackTrace();
 
-            _Logs.error("HttpConnection", e);
+            _Log.error("HttpConnection", e);
         }
 
         return wasSuccessful;
     }
 
-    /**
-     * Helper method for doing a full try catch in a nested method.<br>
-     * This will also catches any uncaught exceptions and saves the exception with {@link _Logs} utility.
-     *
-     * @param Tag The class name which is requesting this try-catch. This will be used when logging the exceptions.
-     * @param job The nested job that needs to be completed inside a try-catch.
-     */
+    public static void tryAndLog(String Tag, Job job) {
+
+        try {
+
+            job.doJob();
+
+        } catch (Exception e) {
+
+            _Log.error(Tag, e);
+        }
+    }
+
     public static void tryAndCatch(String Tag, Job job) {
 
         try {
@@ -309,7 +314,7 @@ public class Utilities {
 
         } catch (Exception e) {
 
-            _Logs.error(Tag, e);
+            e.printStackTrace();
         }
     }
 
@@ -319,9 +324,7 @@ public class Utilities {
 
             job.doJob();
 
-        } catch (Exception e) {
-
-            e.printStackTrace();
+        } catch (Exception ignore) {
         }
     }
 
@@ -335,7 +338,7 @@ public class Utilities {
 
         } catch (Exception e) {
 
-            _Logs.error(Tag, e);
+            _Log.error(Tag, e);
 
         } finally {
 

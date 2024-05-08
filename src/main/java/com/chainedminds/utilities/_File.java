@@ -185,7 +185,7 @@ public class _File {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return false;
@@ -214,7 +214,7 @@ public class _File {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
     }
 
@@ -261,7 +261,7 @@ public class _File {
 
             } catch (Exception e) {
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
         }
 
@@ -352,7 +352,7 @@ public class _File {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return null;
@@ -389,7 +389,7 @@ public class _File {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return null;
@@ -427,7 +427,7 @@ public class _File {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return null;
@@ -481,7 +481,7 @@ public class _File {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return null;

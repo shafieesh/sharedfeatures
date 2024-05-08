@@ -49,7 +49,7 @@ public class XML {
 
         } catch (Exception e) {
 
-            _Logs.error("XmlException", e);
+            _Log.error("XmlException", e);
         }
 
         return null;
@@ -181,7 +181,7 @@ public class XML {
 
         } catch (Exception e) {
 
-            _Logs.error("XmlException", e, xml);
+            _Log.error("XmlException", e, xml);
         }
 
         return null;

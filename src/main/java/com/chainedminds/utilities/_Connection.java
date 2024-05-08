@@ -99,7 +99,7 @@ public abstract class _Connection {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return connection;
@@ -145,7 +145,7 @@ public abstract class _Connection {
 
             } catch (Exception e) {
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
         }
 
@@ -166,7 +166,7 @@ public abstract class _Connection {
 
             } catch (Exception e) {
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
         }
 
@@ -343,7 +343,7 @@ public abstract class _Connection {
 
                 e.printStackTrace();
 
-                _Logs.error(TAG, e);
+                _Log.error(TAG, e);
             }
 
             return null;

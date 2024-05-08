@@ -179,7 +179,7 @@ public class _IABPayment<
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         try {
@@ -218,7 +218,7 @@ public class _IABPayment<
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
     }
 
@@ -753,7 +753,7 @@ public class _IABPayment<
 
                 } catch (Exception e) {
 
-                    _Logs.error(TAG, e);
+                    _Log.error(TAG, e);
                 }
             }
 

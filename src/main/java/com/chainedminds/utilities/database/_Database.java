@@ -1,6 +1,6 @@
 package com.chainedminds.utilities.database;
 
-import com.chainedminds.utilities._Logs;
+import com.chainedminds.utilities._Log;
 import com.chainedminds.utilities.Utilities;
 
 import java.sql.*;
@@ -170,7 +170,7 @@ public abstract class _Database {
                 payload = preparedStatement.toString();
             }
 
-            _Logs.error(tag, exception, payload);
+            _Log.error(tag, exception, payload);
 
             error.set(exception);
 
@@ -195,11 +195,11 @@ public abstract class _Database {
 
                 if (wasSuccessful) {
 
-                    Utilities.tryAndCatch(tag, () -> queryCallback.onFinishedTask(true, null));
+                    Utilities.tryAndIgnore(() -> queryCallback.onFinishedTask(true, null));
 
                 } else {
 
-                    Utilities.tryAndCatch(tag, () -> queryCallback.onFinishedTask(false, error.get()));
+                    Utilities.tryAndIgnore(() -> queryCallback.onFinishedTask(false, error.get()));
                 }
             }
         }
@@ -270,7 +270,7 @@ public abstract class _Database {
                 payload = preparedStatement.toString();
             }
 
-            _Logs.error(tag, error, payload);
+            _Log.error(tag, error, payload);
 
         } finally {
 
@@ -377,7 +377,7 @@ public abstract class _Database {
                 payload = preparedStatement.toString();
             }
 
-            _Logs.error(tag, exception, payload);
+            _Log.error(tag, exception, payload);
 
             error.set(exception);
 
@@ -397,11 +397,11 @@ public abstract class _Database {
 
                 if (wasSuccessful) {
 
-                    Utilities.tryAndCatch(tag, () -> updateCallback.run(true, null));
+                    Utilities.tryAndIgnore(() -> updateCallback.run(true, null));
 
                 } else {
 
-                    Utilities.tryAndCatch(tag, () -> updateCallback.run(false, error.get()));
+                    Utilities.tryAndIgnore(() -> updateCallback.run(false, error.get()));
                 }
             }
         }
@@ -502,7 +502,7 @@ public abstract class _Database {
                 payload = preparedStatement.toString();
             }
 
-            _Logs.error(tag, exception, payload);
+            _Log.error(tag, exception, payload);
 
             error.set(exception);
 
@@ -527,11 +527,11 @@ public abstract class _Database {
 
                 if (wasSuccessful) {
 
-                    Utilities.tryAndCatch(tag, () -> insertCallback.onFinishedTask(true, generatedID.get(), null));
+                    Utilities.tryAndIgnore(() -> insertCallback.onFinishedTask(true, generatedID.get(), null));
 
                 } else {
 
-                    Utilities.tryAndCatch(tag, () -> insertCallback.onFinishedTask(false, 0, error.get()));
+                    Utilities.tryAndIgnore(() -> insertCallback.onFinishedTask(false, 0, error.get()));
                 }
             }
         }

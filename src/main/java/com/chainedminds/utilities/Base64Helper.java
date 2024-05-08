@@ -21,7 +21,7 @@ public class Base64Helper {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return data;
@@ -59,7 +59,7 @@ public class Base64Helper {
 
         } catch (Exception e) {
 
-            _Logs.error(TAG, e);
+            _Log.error(TAG, e);
         }
 
         return encodedString;

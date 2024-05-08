@@ -7,7 +7,7 @@ import com.chainedminds.models.notification._MessageData;
 import com.chainedminds.models.notification._NotificationData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
-import com.chainedminds.utilities._Logs;
+import com.chainedminds.utilities._Log;
 
 public class _Classes {
 
@@ -41,7 +41,7 @@ public class _Classes {
 
             e.printStackTrace();
 
-            _Logs.severe(TAG, e);
+            _Log.severe(TAG, e);
         }
 
         throw new NullPointerException("Cannot construct from class " + mappedClass);
