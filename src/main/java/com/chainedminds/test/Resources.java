@@ -16,6 +16,7 @@ import com.chainedminds.models.notification._NotificationData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
+import com.chainedminds.utilities._Log;
 
 public class Resources extends _Resources<
         RequestHandler,
@@ -31,7 +32,8 @@ public class Resources extends _Resources<
         _IABSubscriptionPurchase<_IABTransactionData>,
         _IPGSubscriptionPurchase<_IPGTransactionData>,
         _Product<_ProductData>,
-        _BlackList> {
+        _BlackList,
+        _Log> {
 
     private static final Resources INSTANCE = new Resources();
 
@@ -56,6 +58,7 @@ public class Resources extends _Resources<
         super.ipgSubscriptionPurchase = new _IPGSubscriptionPurchase<>();
         super.product = new _Product<>();
         super.blackList = new _BlackList();
+        super.log = new _Log();
 
         _Resources<RequestHandler, _Profile, _Account<Data>, _AccountSession,
                         _Friendship<Data, _FriendData>,
@@ -66,7 +69,7 @@ public class Resources extends _Resources<
                         _IABSubscriptionPurchase<_IABTransactionData>,
                         _IPGSubscriptionPurchase<_IPGTransactionData>,
                         _Product<_ProductData>,
-                        _BlackList> resources = _Resources.getInstance();
+                        _BlackList, _Log> resources = _Resources.getInstance();
 
         resources.requestHandler = super.requestHandler;
         resources.profile = super.profile;
@@ -82,6 +85,7 @@ public class Resources extends _Resources<
         resources.ipgSubscriptionPurchase = super.ipgSubscriptionPurchase;
         resources.product = super.product;
         resources.blackList = super.blackList;
+        resources.log = super.log;
 
         _Classes classes = _Classes.getInstance();
 
