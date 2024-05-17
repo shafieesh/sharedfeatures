@@ -108,7 +108,7 @@ public class _Authentication {
 
         //------------------------
 
-        public static _Data authenticate(_Data data) {
+        public static void authenticate(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -116,8 +116,7 @@ public class _Authentication {
                     data.client.appName == null || data.client.platform == null || data.client.version == null) {
 
                 data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
-
-                return data;
+                return;
             }
 
             String username = data.account.username;
@@ -132,7 +131,7 @@ public class _Authentication {
 
                 data.response = _Codes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
                 data.message = Messages.get("GENERAL", Messages.General.TOO_MANY_ATTEMPTS, language);
-                return data;
+                return;
             }
 
             username = Utilities.replaceLocalizedNumbers(username);
@@ -153,7 +152,7 @@ public class _Authentication {
                         if (isActive != null && !isActive) {
 
                             data.message = Messages.get("GENERAL", Messages.General.ACCOUNT_DEACTIVATED, language);
-                            return data;
+                            return;
                         }
 
                         String credential = BackendHelper.generateCredential();
@@ -185,19 +184,16 @@ public class _Authentication {
                 data.message = Messages.get("GENERAL",
                         Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
             }
-
-            return data;
         }
 
-        public static _Data register(_Data data) {
+        public static void register(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
             if (data.account == null || data.account.username == null || data.account.password == null) {
 
                 data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
-
-                return data;
+                return;
             }
 
             String username = Utilities.replaceLocalizedNumbers(data.account.username);
@@ -208,14 +204,14 @@ public class _Authentication {
 
                 data.message = Messages.get("GENERAL",
                         Messages.General.USERNAME_IS_TOO_SHORT, data.client.language);
-                return data;
+                return;
             }
 
             if (password.length() < 6) {
 
                 data.message = Messages.get("GENERAL",
                         Messages.General.PASSWORD_IS_TOO_SHORT, data.client.language);
-                return data;
+                return;
             }
 
             if (getUserID(username) == _Codes.NOT_FOUND) {
@@ -260,11 +256,9 @@ public class _Authentication {
                 data.message = Messages.get("GENERAL",
                         Messages.General.USERNAME_HAS_REGISTERED_BEFORE, language);
             }
-
-            return data;
         }
 
-        public static _Data setPassword(_Data data) {
+        public static void setPassword(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -272,16 +266,14 @@ public class _Authentication {
 
                 data.message = Messages.get("GENERAL",
                         Messages.General.MISSING_DATA, data.client.language);
-
-                return data;
+                return;
             }
 
             if (data.account.password.length() < 6) {
 
                 data.message = Messages.get("GENERAL",
                         Messages.General.PASSWORD_IS_TOO_SHORT, data.client.language);
-
-                return data;
+                return;
             }
 
             int userID = data.account.id;
@@ -293,8 +285,6 @@ public class _Authentication {
 
                 data.response = _Codes.RESPONSE_OK;
             }
-
-            return data;
         }
 
         //------------------------
