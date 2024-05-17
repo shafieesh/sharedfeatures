@@ -52,17 +52,17 @@ public class _Coins {
 
     public int getCoins(int userID) {
 
-        return _Resources.getInstance().account.getProperty(userID, FIELD_COINS, Integer.class);
+        return _Resources.get().account.getProperty(userID, FIELD_COINS, Integer.class);
     }
 
     public int getCoins(Connection connection, int userID) {
 
-        return _Resources.getInstance().account.getProperty(connection, userID, FIELD_COINS, Integer.class);
+        return _Resources.get().account.getProperty(connection, userID, FIELD_COINS, Integer.class);
     }
 
     protected boolean setCoins(Connection connection, int userID, int coins) {
 
-        return _Resources.getInstance().account.setProperty(connection, userID, FIELD_COINS, coins);
+        return _Resources.get().account.setProperty(connection, userID, FIELD_COINS, coins);
     }
 
     public boolean changeCoins(Connection connection, int userID, int amount) {

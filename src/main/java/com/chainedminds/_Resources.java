@@ -76,7 +76,7 @@ public class _Resources<
             IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
             > getInstance() {
 
-        return instance();
+        return get();
     }
 
     public static <
@@ -98,7 +98,7 @@ public class _Resources<
             RequestHandler, Profile, Account, AccountSession,
             Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
             IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
-            > instance() {
+            > get() {
 
         return (_Resources<
                 RequestHandler, Profile, Account, AccountSession,

@@ -47,7 +47,7 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
         Runnable task = () -> {
 
-            Object responseData = _Resources.getInstance().requestHandler
+            Object responseData = _Resources.get().requestHandler
                     .processRequest(context, remoteAddress, requestData);
 
             if (responseData != null) {
@@ -69,7 +69,7 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
         if (!NettyServer.execute(task)) {
 
-            Object responseData = _Resources.getInstance().requestHandler
+            Object responseData = _Resources.get().requestHandler
                     .sendServerBusyResponse(requestData);
 
             _RequestHandler.optimizeReadTimeout(context, responseData);

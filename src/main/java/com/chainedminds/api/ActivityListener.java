@@ -52,7 +52,7 @@ public class ActivityListener {
 
             for (int targetID : relations.keySet()) {
 
-                targetNames.put(targetID, _Resources.getInstance().account.getName(targetID));
+                targetNames.put(targetID, _Resources.get().account.getUsername(targetID));
             }
 
             for (int targetID : RELATIONS.keySet()) {

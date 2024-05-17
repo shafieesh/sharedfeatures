@@ -101,7 +101,7 @@ public class _AccountSession {
 
         if (appName != null) {
 
-            Set<Integer> userIDs = _Resources.getInstance().accountSession.getUserIDs(appName);
+            Set<Integer> userIDs = _Resources.get().accountSession.getUserIDs(appName);
 
             for (int userID : userIDs) {
 

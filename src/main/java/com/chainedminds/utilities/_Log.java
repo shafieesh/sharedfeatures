@@ -59,7 +59,7 @@ public class _Log {
 
         String fileNameAndExtension = fileName + "-" + System.currentTimeMillis() + ".log";
 
-        _Resources.getInstance().file.saveFile(_File.SECTION_LOG_INFO, fileNameAndExtension, content.getBytes());
+        _Resources.get().file.saveFile(_File.SECTION_LOG_INFO, fileNameAndExtension, content.getBytes());
     }
 
     public static boolean log(Connection connection, int userID, String section, String action) {

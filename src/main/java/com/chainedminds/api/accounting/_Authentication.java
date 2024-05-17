@@ -158,7 +158,7 @@ public class _Authentication {
 
                         String credential = BackendHelper.generateCredential();
 
-                        boolean wasSuccessful = _Resources.getInstance().accountSession
+                        boolean wasSuccessful = _Resources.get().accountSession
                                 .addCredential(userID, credential, appName, platform, version, language);
 
                         if (wasSuccessful) {
@@ -202,7 +202,6 @@ public class _Authentication {
 
             String username = Utilities.replaceLocalizedNumbers(data.account.username);
             String password = Utilities.replaceLocalizedNumbers(data.account.password);
-            String name = data.account.name;
             String language = data.client.language;
 
             if (username.length() < 4) {
@@ -221,7 +220,7 @@ public class _Authentication {
 
             if (getUserID(username) == _Codes.NOT_FOUND) {
 
-                int userID = Resources.getInstance().account.registerAccount(name);
+                int userID = Resources.getInstance().account.registerAccount(username);
 
                 if (userID != -1) {
 
@@ -250,13 +249,8 @@ public class _Authentication {
 
                             data.account.id = userID;
                             data.response = _Codes.RESPONSE_OK;
-
-
                         }
                     });
-
-
-
                 }
 
             } else {
@@ -301,43 +295,6 @@ public class _Authentication {
             }
 
             return data;
-        }
-
-        public static List<_AccountData> searchUsernames(String username) {
-
-            List<_AccountData> foundAccounts = new ArrayList<>();
-
-            if (username == null) {
-
-                return foundAccounts;
-            }
-
-            String query = username.toLowerCase();
-
-            getUsernameMap(TAG, usernames -> usernames.forEach((loopingUsername, loopingData) -> {
-
-                if (loopingUsername.toLowerCase().contains(query)) {
-
-                    _AccountData account = new _AccountData();
-                    account.id = loopingData.userID;
-                    account.username = loopingUsername;
-
-                    foundAccounts.add(account);
-                }
-            }));
-
-            Comparator<_AccountData> comparator = Comparator.comparingInt(account -> account.username.length());
-
-            foundAccounts.sort(comparator);
-
-            if (foundAccounts.size() > 100) {
-
-                return foundAccounts.subList(0, 99);
-
-            } else {
-
-                return foundAccounts;
-            }
         }
 
         //------------------------

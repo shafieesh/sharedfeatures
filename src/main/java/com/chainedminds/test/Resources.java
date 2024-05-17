@@ -69,7 +69,7 @@ public class Resources extends _Resources<
                         _IABSubscriptionPurchase<_IABTransactionData>,
                         _IPGSubscriptionPurchase<_IPGTransactionData>,
                         _Product<_ProductData>,
-                        _BlackList, _Log> resources = _Resources.getInstance();
+                        _BlackList, _Log> resources = _Resources.get();
 
         resources.requestHandler = super.requestHandler;
         resources.profile = super.profile;

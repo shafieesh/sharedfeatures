@@ -116,7 +116,7 @@ public class _IABPayment<
                 .setName("RefreshSubscriptions")
                 .setTime(0, 0, 0)
                 .setInterval(1, 0, 0, 0)
-                .setTimingListener(task -> _Resources.getInstance().iabSubscriptionPurchase.checkSubscriptions())
+                .setTimingListener(task -> _Resources.get().iabSubscriptionPurchase.checkSubscriptions())
                 .schedule());
     }
 
@@ -226,10 +226,10 @@ public class _IABPayment<
 
         List<_IABTransactionData> pendingTransactionsList = new ArrayList<>();
 
-        pendingTransactionsList.addAll(_Resources.getInstance()
+        pendingTransactionsList.addAll(_Resources.get()
                 .iabProductPurchase.getPendingTransactions());
 
-        pendingTransactionsList.addAll(_Resources.getInstance()
+        pendingTransactionsList.addAll(_Resources.get()
                 .iabSubscriptionPurchase.getPendingTransactions());
 
         for (_IABTransactionData transaction : pendingTransactionsList) {
@@ -385,7 +385,7 @@ public class _IABPayment<
         String appName = transaction.appName;
         String packageName = DynamicConfig.getMap("PackageName", appName + "-" + market);
 
-        ProductData originalProduct = (ProductData) _Resources.getInstance().product.getProduct(market, sku);
+        ProductData originalProduct = (ProductData) _Resources.get().product.getProduct(market, sku);
 
         if (originalProduct == null) {
 
@@ -660,13 +660,13 @@ public class _IABPayment<
 
             if (_Product.CATEGORY_PRODUCT.equals(productCategory)) {
 
-                wasSuccessful = _Resources.getInstance().iabProductPurchase
+                wasSuccessful = _Resources.get().iabProductPurchase
                         .updateTransactionState(null, transaction.id, transaction.state);
             }
 
             if (_Product.CATEGORY_SUBSCRIPTION.equals(productCategory)) {
 
-                wasSuccessful = _Resources.getInstance().iabSubscriptionPurchase
+                wasSuccessful = _Resources.get().iabSubscriptionPurchase
                         .updateTransactionState(null, transaction.id, transaction.state,
                                 transaction.purchaseDate, transaction.expirationDate);
             }
@@ -708,7 +708,7 @@ public class _IABPayment<
                     String market = transaction.market;
                     String sku = transaction.sku;
 
-                    ProductData originalProduct = (ProductData) _Resources.getInstance()
+                    ProductData originalProduct = (ProductData) _Resources.get()
                             .product.getProduct(market, sku);
 
                     if (originalProduct == null) {
@@ -722,13 +722,13 @@ public class _IABPayment<
 
                     if (_Product.CATEGORY_PRODUCT.equals(originalProduct.category)) {
 
-                        wasSuccessful &= _Resources.getInstance().iabProductPurchase
+                        wasSuccessful &= _Resources.get().iabProductPurchase
                                 .updateTransactionState(connection, transaction.id, PURCHASE_STATE_APPLIED);
                     }
 
                     if (_Product.CATEGORY_SUBSCRIPTION.equals(originalProduct.category)) {
 
-                        wasSuccessful &= _Resources.getInstance().iabSubscriptionPurchase
+                        wasSuccessful &= _Resources.get().iabSubscriptionPurchase
                                 .updateTransactionState(connection, transaction.id, PURCHASE_STATE_APPLIED,
                                         transaction.purchaseDate, transaction.expirationDate);
                     }

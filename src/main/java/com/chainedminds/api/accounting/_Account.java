@@ -27,6 +27,7 @@ public class _Account<Data extends _Data<?>> {
     private static final String TAG = _Account.class.getSimpleName();
 
     protected static final String FIELD_USER_ID = "UserID";
+    protected static final String FIELD_USERNAME = "Username";
     protected static final String FIELD_IS_ACTIVE = "IsActive";
     protected static final String FIELD_NAME = "Name";
     protected static final String FIELD_PHONE_NUMBER = "PhoneNumber";
@@ -37,6 +38,7 @@ public class _Account<Data extends _Data<?>> {
     protected final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     protected static final Map<Integer, String> MAPPING_USER_ID = new HashMap<>();
+    protected static final Map<String, Integer> MAPPING_USERNAME = new HashMap<>();
 
     public void start() {
 
@@ -66,6 +68,7 @@ public class _Account<Data extends _Data<?>> {
         _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Map<Integer, String> mappingUserIDs = new HashMap<>();
+            private final Map<String, Integer> mappingUsernames = new HashMap<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -73,9 +76,10 @@ public class _Account<Data extends _Data<?>> {
                 while (resultSet.next()) {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
-                    String name = resultSet.getString(FIELD_NAME);
+                    String username = resultSet.getString(FIELD_USERNAME);
 
-                    mappingUserIDs.put(userID, name);
+                    mappingUserIDs.put(userID, username);
+                    mappingUsernames.put(username.toLowerCase(), userID);
                 }
             }
 
@@ -88,6 +92,9 @@ public class _Account<Data extends _Data<?>> {
 
                         MAPPING_USER_ID.clear();
                         MAPPING_USER_ID.putAll(mappingUserIDs);
+
+                        MAPPING_USERNAME.clear();
+                        MAPPING_USERNAME.putAll(mappingUsernames);
                     });
                 }
             }
@@ -112,9 +119,13 @@ public class _Account<Data extends _Data<?>> {
         return getProperty(userID, FIELD_IS_ACTIVE, Boolean.class);
     }
 
-    public String getName(int userID) {
+    public String getUsername(int userID) {
 
-        return getProperty(userID, FIELD_NAME, String.class);
+        AtomicReference<String> username = new AtomicReference<>();
+
+        Utilities.lock(TAG, LOCK.readLock(), () -> username.set(MAPPING_USER_ID.get(userID)));
+        
+        return username.get();
     }
 
     //------------------------
@@ -137,6 +148,7 @@ public class _Account<Data extends _Data<?>> {
                         .construct(_Classes.getInstance().accountClass);
 
                 foundAccount.id = userID;
+                foundAccount.username = resultSet.getString(FIELD_USERNAME);
                 foundAccount.isActive = resultSet.getBoolean(FIELD_IS_ACTIVE);
                 foundAccount.name = resultSet.getString(FIELD_NAME);
                 foundAccount.phoneNumber = resultSet.getLong(FIELD_PHONE_NUMBER);
@@ -148,7 +160,6 @@ public class _Account<Data extends _Data<?>> {
 
                 if (authData != null) {
 
-                    foundAccount.username = authData.username;
                     foundAccount.password = authData.password;
                 }
 
@@ -159,14 +170,51 @@ public class _Account<Data extends _Data<?>> {
         return account.get();
     }
 
-    protected int registerAccount(String name) {
+    public List<_AccountData> searchUsernames(String username) {
+
+        List<_AccountData> foundAccounts = new ArrayList<>();
+
+        if (username == null) {
+
+            return foundAccounts;
+        }
+
+        String query = username.toLowerCase();
+
+        getUsernameMap(TAG, usernames -> usernames.forEach((loopingUsername, loopingUserID) -> {
+
+            if (loopingUsername.toLowerCase().contains(query)) {
+
+                _AccountData account = new _AccountData();
+                account.id = loopingUserID;
+                account.username = loopingUsername;
+
+                foundAccounts.add(account);
+            }
+        }));
+
+        Comparator<_AccountData> comparator = Comparator.comparingInt(account -> account.username.length());
+
+        foundAccounts.sort(comparator);
+
+        if (foundAccounts.size() > 100) {
+
+            return foundAccounts.subList(0, 99);
+
+        } else {
+
+            return foundAccounts;
+        }
+    }
+
+    protected int registerAccount(String username) {
 
         AtomicInteger userID = new AtomicInteger(_Config.NOT_FOUND);
 
-        String insertStatement = "INSERT " + _Config.TABLE_ACCOUNTS + " (" + FIELD_NAME + ") VALUES (?)";
+        String insertStatement = "INSERT " + _Config.TABLE_ACCOUNTS + " (" + FIELD_USERNAME + ") VALUES (?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, name);
+        parameters.put(1, username);
 
         _DatabaseOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
@@ -176,7 +224,8 @@ public class _Account<Data extends _Data<?>> {
 
                 Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                    MAPPING_USER_ID.put(generatedID, name);
+                    MAPPING_USER_ID.put(generatedID, username);
+                    MAPPING_USERNAME.put(username.toLowerCase(), generatedID);
                 });
             }
         });
@@ -225,6 +274,11 @@ public class _Account<Data extends _Data<?>> {
     public void getUserIDMap(String tag, Utilities.GrantAccess<Map<Integer, String>> job) {
 
         Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(MAPPING_USER_ID));
+    }
+
+    public void getUsernameMap(String tag, Utilities.GrantAccess<Map<String, Integer>> job) {
+
+        Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(MAPPING_USERNAME));
     }
 
     //------------------------------------------------------------------------------------
@@ -328,7 +382,7 @@ public class _Account<Data extends _Data<?>> {
 
             //---------CHECK IF CREDENTIAL IS VALID-------
 
-            Boolean credentialIsValid = _Resources.getInstance().accountSession.validateCredential(userID, credential);
+            Boolean credentialIsValid = _Resources.get().accountSession.validateCredential(userID, credential);
 
             if (credentialIsValid == null) {
 
@@ -347,9 +401,9 @@ public class _Account<Data extends _Data<?>> {
         //------------------------------------------------
         //------------UPDATE USER'S ACCOUNT---------------
 
-        if (!_Resources.getInstance().accountSession.CACHED_USERS_INFO.contains(credential)) {
+        if (!_Resources.get().accountSession.CACHED_USERS_INFO.contains(credential)) {
 
-            NettyServer.execute(() -> _Resources.getInstance().accountSession.updateAccount(data));
+            NettyServer.execute(() -> _Resources.get().accountSession.updateAccount(data));
         }
 
         ActivityListener.setBecameOnline(userID);

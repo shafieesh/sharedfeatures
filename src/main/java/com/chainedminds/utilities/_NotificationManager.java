@@ -322,7 +322,7 @@ public class _NotificationManager {
 
     public static void notifyUser(int userID, String appName, String title, String content) {
 
-        String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
+        String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
 
         if (firebaseID != null) {
 
@@ -351,7 +351,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -374,7 +374,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -414,7 +414,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
+            String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -582,7 +582,7 @@ public class _NotificationManager {
 
                         if ("NotRegistered".equals(error) || "InvalidRegistration".equals(error)) {
 
-                            _Resources.getInstance().accountSession.removeFirebaseID(userID, content.to);
+                            _Resources.get().accountSession.removeFirebaseID(userID, content.to);
                         }
                     }
                 }
