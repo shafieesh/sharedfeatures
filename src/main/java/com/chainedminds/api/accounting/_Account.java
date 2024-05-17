@@ -128,6 +128,28 @@ public class _Account<Data extends _Data<?>> {
         return username.get();
     }
 
+    public int getUserID(String username) {
+
+        AtomicInteger userID = new AtomicInteger(_Config.NOT_FOUND);
+
+        if (username == null || username.isEmpty()) {
+
+            return userID.get();
+        }
+
+        Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+            String lowercaseUsername = username.toLowerCase();
+
+            if (MAPPING_USERNAME.containsKey(lowercaseUsername)) {
+
+                userID.set(MAPPING_USERNAME.get(lowercaseUsername));
+            }
+        });
+
+        return userID.get();
+    }
+
     //------------------------
 
     public <AccountData extends _AccountData> AccountData getAccount(int userID) {
