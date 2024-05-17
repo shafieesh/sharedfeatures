@@ -420,7 +420,7 @@ public class _Authentication {
 
             AtomicReference<T> value = new AtomicReference<>();
 
-            String statement = "SELECT " + field + " FROM " + _Config.TABLE_ACCOUNTS +
+            String statement = "SELECT " + field + " FROM " + _Config.TABLE_AUTH_USERNAME +
                     " WHERE " + FIELD_USER_ID + " = ?";
 
             Map<Integer, Object> parameters = new HashMap<>();
@@ -462,7 +462,7 @@ public class _Authentication {
 
         protected static boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
 
-            String statement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " +
+            String statement = "UPDATE " + _Config.TABLE_AUTH_USERNAME + " SET " +
                     fieldName + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
             Map<Integer, Object> parameters = new HashMap<>();
