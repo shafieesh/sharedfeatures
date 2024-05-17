@@ -65,8 +65,7 @@ public class _Authentication {
 
         protected static void fetch() {
 
-            String selectStatement = "SELECT " + FIELD_USER_ID + ", " +
-                    FIELD_USERNAME + " FROM " + _Config.TABLE_AUTH_USERNAME;
+            String selectStatement = "SELECT * FROM " + _Config.TABLE_AUTH_USERNAME;
 
             _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 

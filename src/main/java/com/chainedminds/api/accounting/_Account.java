@@ -63,7 +63,7 @@ public class _Account<Data extends _Data<?>> {
 
     protected void fetch() {
 
-        String selectStatement = "SELECT " + FIELD_USER_ID + " FROM " + _Config.TABLE_ACCOUNTS;
+        String selectStatement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS;
 
         _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
