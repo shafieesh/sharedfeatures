@@ -108,7 +108,7 @@ public class _Authentication {
 
         //------------------------
 
-        public static _Data authenticateUsername(_Data data) {
+        public static _Data authenticate(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -189,7 +189,7 @@ public class _Authentication {
             return data;
         }
 
-        public static _Data registerAccount(_Data data) {
+        public static _Data register(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
