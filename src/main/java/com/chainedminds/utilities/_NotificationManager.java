@@ -410,58 +410,6 @@ public class _NotificationManager {
         }
     }
 
-    public static void sendNotification(String username, String appName, String title, String message) {
-
-        NettyServer.execute(() -> {
-
-            int userID = _Resources.getInstance().account.findUserID(username);
-
-            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
-
-            if (firebaseID != null) {
-
-                FirebaseMessageData content = new FirebaseMessageData();
-                content.priority = "high";
-                content.to = firebaseID;
-
-                content.data = new HashMap<>();
-                content.data.put("action", "NOTIFY");
-                content.data.put("notification_title", title);
-                content.data.put("notification_message", message);
-
-                sendToFirebase(userID, content);
-            }
-        });
-    }
-
-    public static void sendMessage(String username, String appName, String message) {
-
-        NettyServer.execute(() -> {
-
-            int userID = _Resources.getInstance().account.findUserID(username);
-
-            String firebaseID = _Resources.getInstance().accountSession.getFirebaseID(userID, appName);
-
-            if (firebaseID != null) {
-
-                FirebaseMessageData content = new FirebaseMessageData();
-                content.priority = "high";
-                content.to = firebaseID;
-
-                Action action = new Action();
-                action.request = _Codes.REQUEST_BROADCAST_MESSAGE;
-                action.message = new _MessageData();
-                action.message.message = message;
-
-                content.data = new HashMap<>();
-                content.data.put("type", "ACTION");
-                content.data.put("action", Json.getString(action));
-
-                sendToFirebase(userID, content);
-            }
-        });
-    }
-
     public static void sendMessage(int userID, String appName, String message) {
 
         NettyServer.execute(() -> {
@@ -640,30 +588,6 @@ public class _NotificationManager {
                 }
             }
         });
-    }
-
-    public static void reportBruteForce(String address, String username, String password) {
-
-        String notificationTitle = "Brute Force Attempt";
-        String notificationMessage = "IP Address : " + address + "\n" + "Username : " + username + "\n" + "Password : " + password;
-
-        for (String admin : _Config.ADMINS) {
-
-            sendNotification(admin, _Config.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
-        }
-    }
-
-    public static void reportLogin(String username, String password, Boolean status, String address) {
-
-        String loginStatus = status != null ? status + "" : "false";
-
-        String notificationTitle = "Login Attempt";
-        String notificationMessage = "Username : " + username + "\n" + "Password : " + password + "\n" + "Authenticated : " + loginStatus + "\n" + "IP Address : " + address;
-
-        for (String admin : _Config.ADMINS) {
-
-            sendNotification(admin, _Config.APP_NAME_CAFE_GAME, notificationTitle, notificationMessage);
-        }
     }
 
     public static void reportError(String appName, String error) {

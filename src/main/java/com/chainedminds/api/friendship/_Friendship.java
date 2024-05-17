@@ -206,14 +206,14 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 int receiverID = friendID;
                 int senderID = userID;
 
-                String requestingUserName = _Resources.getInstance().account.getUsername(senderID);
+                String requestingName = _Resources.getInstance().account.getName(senderID);
                 String receiverLanguage = _Resources.getInstance()
                         .accountSession.getLanguage(receiverID, appName);
 
                 String tag = Messages.Notification.Friendship.TAG_NEW_FRIEND_REQUEST;
 
                 String title = Messages.get("NOTIFICATION", Messages.Notification.
-                        Friendship.NEW_FRIEND_REQUEST, receiverLanguage, requestingUserName);
+                        Friendship.NEW_FRIEND_REQUEST, receiverLanguage, requestingName);
 
                 String message = Messages.get("NOTIFICATION", Messages.Notification.
                         TOUCH_HERE_TO_OPEN, receiverLanguage);
@@ -291,7 +291,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 int receiverID = friendID;
                 int acceptingUserID = userID;
 
-                String requestingUserName = _Resources.getInstance().account.getUsername(acceptingUserID);
+                String requestingUserName = _Resources.getInstance().account.getName(acceptingUserID);
                 String receiverLanguage = _Resources.getInstance()
                         .accountSession.getLanguage(receiverID, appName);
 
@@ -534,27 +534,27 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             }
         });
 
-        _Resources.getInstance().account.getUsernameMap(TAG, (Utilities.GrantAccess<Map<Integer, String>>) usernames -> {
+        _Resources.getInstance().account.getUserIDMap(TAG, mappingUserID -> {
 
             for (FriendData friend : pendingRelations) {
 
-                friend.username = usernames.get(friend.id);
+                friend.username = mappingUserID.get(friend.id);
             }
             for (FriendData friend : waitingRelations) {
 
-                friend.username = usernames.get(friend.id);
+                friend.username = mappingUserID.get(friend.id);
             }
             for (FriendData friend : onlineFriends) {
 
-                friend.username = usernames.get(friend.id);
+                friend.username = mappingUserID.get(friend.id);
             }
             for (FriendData friend : awayFriends) {
 
-                friend.username = usernames.get(friend.id);
+                friend.username = mappingUserID.get(friend.id);
             }
             for (FriendData friend : offlineFriends) {
 
-                friend.username = usernames.get(friend.id);
+                friend.username = mappingUserID.get(friend.id);
             }
         });
 
@@ -735,7 +735,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             } else {
 
                 String gamerTag = _Resources.getInstance()
-                        .account.getUsername(onlineFriendIDs.get(0));
+                        .account.getName(onlineFriendIDs.get(0));
 
                 String message = Messages.get("FRIENDSHIP", Messages.Friendship.
                         GAMERTAG_IS_ONLINE, receiverLanguage, gamerTag);
@@ -744,7 +744,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             }
         }
 
-        String gamerTag = _Resources.getInstance().account.getUsername(userID);
+        String gamerTag = _Resources.getInstance().account.getName(userID);
 
         for (int friendID : onlineFriendIDs) {
 
