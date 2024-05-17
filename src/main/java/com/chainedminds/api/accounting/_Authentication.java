@@ -3,19 +3,17 @@ package com.chainedminds.api.accounting;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
+import com.chainedminds.models._Data;
 import com.chainedminds.models.account._AccountData;
-import com.chainedminds.test.Data;
 import com.chainedminds.test.Resources;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 import com.chainedminds.utilities.database._DatabaseOld;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -110,7 +108,7 @@ public class _Authentication {
 
         //------------------------
 
-        public static Data authenticateUsername(Data data) {
+        public static _Data authenticateUsername(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -191,7 +189,7 @@ public class _Authentication {
             return data;
         }
 
-        public Data registerAccount(Data data) {
+        public _Data registerAccount(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -272,7 +270,7 @@ public class _Authentication {
             return data;
         }
 
-        protected Data setPassword(Data data) {
+        protected _Data setPassword(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
