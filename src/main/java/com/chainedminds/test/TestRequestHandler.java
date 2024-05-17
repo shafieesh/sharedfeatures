@@ -7,17 +7,17 @@ import com.chainedminds.utilities.json.Json;
 
 import java.net.Socket;
 
-public class RequestHandler extends _RequestHandler<Data> {
+public class TestRequestHandler extends _RequestHandler<TestData> {
 
-    private static final String TAG = RequestHandler.class.getSimpleName();
+    private static final String TAG = TestRequestHandler.class.getSimpleName();
 
-    public RequestHandler(Class<Data> mappedClass) {
+    public TestRequestHandler(Class<TestData> mappedClass) {
 
         super(mappedClass);
     }
 
     @Override
-    public Object handleRequest(Data data, Socket socket) {
+    public Object handleRequest(TestData data, Socket socket) {
 
         System.out.println(Json.getString(data));
 

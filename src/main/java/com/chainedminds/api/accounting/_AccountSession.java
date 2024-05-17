@@ -6,7 +6,7 @@ import com.chainedminds._Resources;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.models._Data;
 import com.chainedminds.models.account._AccountData;
-import com.chainedminds.test.Resources;
+import com.chainedminds.test.TestResources;
 import com.chainedminds.utilities.Cache;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.database.DBResult;
@@ -105,7 +105,7 @@ public class _AccountSession {
 
             for (int userID : userIDs) {
 
-                _AccountData account = Resources.getInstance().account.getAccount(userID);
+                _AccountData account = TestResources.getInstance().account.getAccount(userID);
 
                 accounts.add(account);
             }

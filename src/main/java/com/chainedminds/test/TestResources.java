@@ -18,12 +18,12 @@ import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
 import com.chainedminds.utilities._Log;
 
-public class Resources extends _Resources<
-        RequestHandler,
+public class TestResources extends _Resources<
+        TestRequestHandler,
         _Profile,
-        _Account<Data>,
+        _Account<TestData>,
         _AccountSession,
-        _Friendship<Data, _FriendData>,
+        _Friendship<TestData, _FriendData>,
         _File,
         _IABPayment<_IABTransactionData, _ProductData>,
         _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -35,16 +35,16 @@ public class Resources extends _Resources<
         _BlackList,
         _Log> {
 
-    private static final Resources INSTANCE = new Resources();
+    private static final TestResources INSTANCE = new TestResources();
 
-    public static Resources getInstance() {
+    public static TestResources getInstance() {
 
         return INSTANCE;
     }
 
     public void config() {
 
-        super.requestHandler = new RequestHandler(Data.class);
+        super.requestHandler = new TestRequestHandler(TestData.class);
         super.profile = new _Profile();
         super.account = new _Account<>();
         super.accountSession = new _AccountSession();
@@ -60,8 +60,8 @@ public class Resources extends _Resources<
         super.blackList = new _BlackList();
         super.log = new _Log();
 
-        _Resources<RequestHandler, _Profile, _Account<Data>, _AccountSession,
-                        _Friendship<Data, _FriendData>,
+        _Resources<TestRequestHandler, _Profile, _Account<TestData>, _AccountSession,
+                        _Friendship<TestData, _FriendData>,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                         _IPGPayment<_IPGTransactionData, _ProductData>,
                         _IABProductPurchase<_IABTransactionData>,
@@ -89,7 +89,7 @@ public class Resources extends _Resources<
 
         _Classes classes = _Classes.getInstance();
 
-        classes.dataClass = Data.class;
+        classes.dataClass = TestData.class;
         classes.accountClass = _AccountData.class;
         classes.friendClass = _FriendData.class;
         classes.fileClass = _FileData.class;

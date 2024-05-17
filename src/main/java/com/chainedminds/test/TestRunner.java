@@ -2,11 +2,11 @@ package com.chainedminds.test;
 
 import com.chainedminds._Config;
 
-class Runner {
+class TestRunner {
 
     public static void main(String[] args) {
 
         _Config.config();
-        Resources.getInstance().config();
+        TestResources.getInstance().config();
     }
 }
