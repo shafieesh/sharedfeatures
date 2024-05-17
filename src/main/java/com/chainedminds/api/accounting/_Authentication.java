@@ -189,7 +189,7 @@ public class _Authentication {
             return data;
         }
 
-        public _Data registerAccount(_Data data) {
+        public static _Data registerAccount(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -270,7 +270,7 @@ public class _Authentication {
             return data;
         }
 
-        protected _Data setPassword(_Data data) {
+        public static _Data setPassword(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -303,7 +303,7 @@ public class _Authentication {
             return data;
         }
 
-        public List<_AccountData> searchUsernames(String username) {
+        public static List<_AccountData> searchUsernames(String username) {
 
             List<_AccountData> foundAccounts = new ArrayList<>();
 
@@ -394,7 +394,7 @@ public class _Authentication {
             return username.get();
         }
 
-        protected static String getPassword(int userID) {
+        public static String getPassword(int userID) {
 
             AtomicReference<String> password = new AtomicReference<>();
 
