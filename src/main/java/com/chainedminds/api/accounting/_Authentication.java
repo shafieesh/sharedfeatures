@@ -4,8 +4,6 @@ import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
 import com.chainedminds.models._Data;
-import com.chainedminds.models.account._AccountData;
-import com.chainedminds.test.Resources;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
@@ -146,7 +144,7 @@ public class _Authentication {
 
                     if (passwordValidated) {
 
-                        Boolean isActive = Resources.getInstance().account.getIsActive(userID);
+                        Boolean isActive = _Resources.getInstance().account.getIsActive(userID);
 
                         if (isActive != null && !isActive) {
 
@@ -215,7 +213,7 @@ public class _Authentication {
 
             if (getUserID(username) == _Codes.NOT_FOUND) {
 
-                int userID = Resources.getInstance().account.registerAccount(username);
+                int userID = _Resources.getInstance().account.registerAccount(username);
 
                 if (userID != -1) {
 
