@@ -195,7 +195,6 @@ public class _Authentication {
 
             String username = Utilities.replaceLocalizedNumbers(data.account.username);
             String password = Utilities.replaceLocalizedNumbers(data.account.password);
-            String language = data.client.language;
 
             if (username.length() < 4) {
 
@@ -251,7 +250,7 @@ public class _Authentication {
                 data.response = _Codes.RESPONSE_IS_REGISTERED_BEFORE;
 
                 data.message = Messages.get("GENERAL",
-                        Messages.General.USERNAME_HAS_REGISTERED_BEFORE, language);
+                        Messages.General.USERNAME_HAS_REGISTERED_BEFORE, data.client.language);
             }
         }
 
@@ -372,7 +371,7 @@ public class _Authentication {
 
         public static boolean setPassword(int userID, String newPassword) {
 
-            Connection connection = _ConnectionOld.get(_ConnectionOld.MANUAL_COMMIT);
+            Connection connection = _DBConnectionOld.connect(_DBConnectionOld.MANUAL_COMMIT);
 
             String oldPassword = getPassword(userID);
 
@@ -382,14 +381,14 @@ public class _Authentication {
 
             if (wasSuccessful) {
 
-                _ConnectionOld.commit(connection);
+                _DBConnectionOld.commit(connection);
 
             } else {
 
-                _ConnectionOld.rollback(connection);
+                _DBConnectionOld.rollback(connection);
             }
 
-            _ConnectionOld.close(connection);
+            _DBConnectionOld.close(connection);
 
             return wasSuccessful;
         }

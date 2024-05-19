@@ -716,7 +716,7 @@ public class _IABPayment<
                         return;
                     }
 
-                    Connection connection = _ConnectionOld.get(_ConnectionOld.MANUAL_COMMIT);
+                    Connection connection = _DBConnectionOld.connect(_DBConnectionOld.MANUAL_COMMIT);
 
                     boolean wasSuccessful = onConsuming(connection, transaction, originalProduct);
 
@@ -735,16 +735,16 @@ public class _IABPayment<
 
                     if (wasSuccessful) {
 
-                        _ConnectionOld.commit(connection);
+                        _DBConnectionOld.commit(connection);
 
                         transaction.state = PURCHASE_STATE_APPLIED;
 
                     } else {
 
-                        _ConnectionOld.rollback(connection);
+                        _DBConnectionOld.rollback(connection);
                     }
 
-                    _ConnectionOld.close(connection);
+                    _DBConnectionOld.close(connection);
 
                     if (wasSuccessful) {
 

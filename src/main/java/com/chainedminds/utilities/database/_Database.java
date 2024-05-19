@@ -15,12 +15,12 @@ public abstract class _Database {
     private int updatesCount = 0;
     private int insertsCount = 0;
 
-    protected Connection getConnection() {
+    protected Connection connect() {
 
         return null;
     }
 
-    protected void closeConnection(Connection connection) {
+    protected void close(Connection connection) {
 
     }
 
@@ -56,11 +56,11 @@ public abstract class _Database {
 
     public final boolean query(String tag, String statement, Map<Integer, Object> parameters) {
 
-        Connection connection = getConnection();
+        Connection connection = connect();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters);
 
-        closeConnection(connection);
+        close(connection);
 
         return wasSuccessful;
     }
@@ -81,22 +81,22 @@ public abstract class _Database {
 
     public final boolean query(String tag, String statement, Map<Integer, Object> parameters, QueryCallback queryCallback) {
 
-        Connection connection = getConnection();
+        Connection connection = connect();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
 
-        closeConnection(connection);
+        close(connection);
 
         return wasSuccessful;
     }
 
     public final boolean query(String tag, String statement, Map<Integer, Object> parameters, TwoStepQueryCallback queryCallback) {
 
-        Connection connection = getConnection();
+        Connection connection = connect();
 
         boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
 
-        closeConnection(connection);
+        close(connection);
 
         return wasSuccessful;
     }
@@ -327,11 +327,11 @@ public abstract class _Database {
 
     public final boolean update(String tag, String statement, Map<Integer, Object> parameters, UpdateCallback updateCallback) {
 
-        Connection connection = getConnection();
+        Connection connection = connect();
 
         boolean wasSuccessful = update(connection, tag, statement, parameters, updateCallback);
 
-        closeConnection(connection);
+        close(connection);
 
         return wasSuccessful;
     }
@@ -441,11 +441,11 @@ public abstract class _Database {
 
     public final boolean insert(String tag, String statement, Map<Integer, Object> parameters, InsertCallback insertCallback) {
 
-        Connection connection = getConnection();
+        Connection connection = connect();
 
         boolean wasSuccessful = insert(connection, tag, statement, parameters, insertCallback);
 
-        closeConnection(connection);
+        close(connection);
 
         return wasSuccessful;
     }

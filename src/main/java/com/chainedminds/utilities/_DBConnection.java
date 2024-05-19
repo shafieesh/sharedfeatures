@@ -1,27 +1,39 @@
 package com.chainedminds.utilities;
 
-import com.chainedminds._Config;
-
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-@Deprecated
-public class _ConnectionOld {
+public abstract class _DBConnection {
 
-    private static final String TAG = _ConnectionOld.class.getSimpleName();
+    private static final String TAG = _DBConnection.class.getSimpleName();
 
     public static final int DEFAULT_OPTIONS = 0;
     public static final int MANUAL_COMMIT = 1;
 
-    private static ConnectionPool automaticConnections = null;
-    private static ConnectionPool manualConnections = null;
+    private ConnectionPool automaticConnections = null;
+    private ConnectionPool manualConnections = null;
 
-    public static void config() {
+    protected String getAddress() {
 
-        automaticConnections = new ConnectionPool("auto", 10);
-        manualConnections = new ConnectionPool("manual", 10);
+        return null;
+    }
+
+    protected String getUsername() {
+
+        return null;
+    }
+
+    protected String getPassword() {
+
+        return null;
+    }
+
+    public final void config(int autoCommitConnectionsPoolSize, int manualCommitConnectionsPoolSize) {
+
+        automaticConnections = new ConnectionPool("auto", autoCommitConnectionsPoolSize);
+        manualConnections = new ConnectionPool("manual", manualCommitConnectionsPoolSize);
 
         ConnectionPool.ConnectionChecker connectionChecker = connection -> {
 
@@ -51,12 +63,12 @@ public class _ConnectionOld {
                 .schedule());
     }
 
-    public static Connection get() {
+    public final Connection connect() {
 
-        return get(DEFAULT_OPTIONS);
+        return connect(DEFAULT_OPTIONS);
     }
 
-    public static Connection get(int options) {
+    public final Connection connect(int options) {
 
         Connection connection = null;
 
@@ -64,12 +76,20 @@ public class _ConnectionOld {
 
             if (options == DEFAULT_OPTIONS) {
 
-                connection = automaticConnections.getConnection();
+                String address = getAddress();
+                String username = getUsername();
+                String password = getPassword();
+
+                connection = automaticConnections.getConnection(address, username, password);
             }
 
             if (options == MANUAL_COMMIT) {
 
-                connection = manualConnections.getConnection();
+                String address = getAddress();
+                String username = getUsername();
+                String password = getPassword();
+
+                connection = manualConnections.getConnection(address, username, password);
 
                 if (connection != null) {
 
@@ -85,7 +105,7 @@ public class _ConnectionOld {
         return connection;
     }
 
-    public static boolean close(Connection connection) {
+    public final boolean close(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -111,7 +131,7 @@ public class _ConnectionOld {
         return wasSuccessful;
     }
 
-    public static boolean commit(Connection connection) {
+    public final boolean commit(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -132,7 +152,7 @@ public class _ConnectionOld {
         return wasSuccessful;
     }
 
-    public static boolean rollback(Connection connection) {
+    public final boolean rollback(Connection connection) {
 
         boolean wasSuccessful = false;
 
@@ -153,7 +173,7 @@ public class _ConnectionOld {
         return wasSuccessful;
     }
 
-    public static boolean commitOrRollback(Connection connection) {
+    public final boolean commitOrRollback(Connection connection) {
 
         boolean wasSuccessful = commit(connection);
 
@@ -165,7 +185,7 @@ public class _ConnectionOld {
         return wasSuccessful;
     }
 
-    public static class ConnectionPool {
+    private static final class ConnectionPool {
 
         private static final int EMPTY_SLOT = 0;
         private static final int READY_SLOT = 1;
@@ -235,7 +255,7 @@ public class _ConnectionOld {
             }
         }
 
-        public Connection getConnection() {
+        public Connection getConnection(String address, String username, String password) {
 
             CustomConnection connection = null;
 
@@ -255,7 +275,7 @@ public class _ConnectionOld {
 
             if (connection == null) {
 
-                connection = CustomConnection.create(name);
+                connection = CustomConnection.create(name, address, username, password);
             }
 
             if (connection != null && connection.getPosition() == -1) {
@@ -309,16 +329,13 @@ public class _ConnectionOld {
         private final Connection connection;
         private long lastCheckTime = System.currentTimeMillis();
 
-        public static CustomConnection create(String name) {
+        public static CustomConnection create(String name, String address, String username, String password) {
 
             //System.out.println("NEW CONNECTION");
 
             try {
 
-                Connection connection = DriverManager.getConnection(
-                        _Config.DATABASE_URL,
-                        _Config.DATABASE_USERNAME,
-                        _Config.DATABASE_PASSWORD);
+                Connection connection = DriverManager.getConnection(address, username, password);
 
                 return new CustomConnection(name, connection);
 
