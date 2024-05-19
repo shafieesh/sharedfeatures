@@ -421,48 +421,10 @@ public class _AccountSession {
 
     protected void removeStaleSessions() {
 
-        List<String> staleCredentials = new ArrayList<>();
-
-        String statement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
+        String statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
                 " WHERE " + FIELD_LAST_UPDATE + " < DATE_SUB(NOW(), INTERVAL 7 DAY)";
 
-        _DatabaseOld.query(TAG, statement, new TwoStepQueryCallback() {
-
-            final List<String> credentials = new ArrayList<>();
-
-            @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
-
-                while (resultSet.next()) {
-
-                    credentials.add(resultSet.getString(FIELD_CREDENTIAL));
-                }
-            }
-
-            @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
-
-                if (wasSuccessful) {
-
-                    staleCredentials.addAll(credentials);
-                }
-            }
-        });
-
-        if (!staleCredentials.isEmpty()) {
-
-            String credentialsArray = String.join("', '", staleCredentials);
-
-            statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS + " WHERE " +
-                    FIELD_CREDENTIAL + " IN ('" + credentialsArray + "')";
-
-            boolean wasSuccessful = _DatabaseOld.update(TAG, statement);
-
-            if (wasSuccessful) {
-
-                CREDENTIALS_CACHE.remove(staleCredentials);
-            }
-        }
+        _DatabaseOld.update(TAG, statement);
     }
 
     //------------------------------------------------------------------------------------

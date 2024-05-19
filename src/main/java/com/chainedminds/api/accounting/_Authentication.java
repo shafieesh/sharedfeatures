@@ -126,7 +126,6 @@ public class _Authentication {
 
             if (isBruteForcing(address)) {
 
-                data.response = _Codes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
                 data.message = Messages.get("GENERAL", Messages.General.TOO_MANY_ATTEMPTS, language);
                 return;
             }
@@ -144,7 +143,7 @@ public class _Authentication {
 
                     if (passwordValidated) {
 
-                        Boolean isActive = _Resources.getInstance().account.getIsActive(userID);
+                        Boolean isActive = _Resources.get().account.getIsActive(userID);
 
                         if (isActive != null && !isActive) {
 
@@ -167,8 +166,7 @@ public class _Authentication {
 
                     } else {
 
-                        data.response = _Codes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
-
+                        data.response = _Codes.RESPONSE_INVALID_LOGIN;
                         data.message = Messages.get("GENERAL",
                                 Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
                     }
@@ -176,8 +174,7 @@ public class _Authentication {
 
             } else {
 
-                data.response = _Codes.RESPONSE_INVALID_USERNAME_OR_PASSWORD;
-
+                data.response = _Codes.RESPONSE_INVALID_LOGIN;
                 data.message = Messages.get("GENERAL",
                         Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
             }
@@ -212,7 +209,7 @@ public class _Authentication {
 
             if (getUserID(username) == _Codes.NOT_FOUND) {
 
-                int userID = _Resources.getInstance().account.registerAccount(username);
+                int userID = _Resources.get().account.registerAccount(username);
 
                 if (userID != -1) {
 
@@ -246,8 +243,6 @@ public class _Authentication {
                 }
 
             } else {
-
-                data.response = _Codes.RESPONSE_IS_REGISTERED_BEFORE;
 
                 data.message = Messages.get("GENERAL",
                         Messages.General.USERNAME_HAS_REGISTERED_BEFORE, data.client.language);
