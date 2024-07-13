@@ -1,13 +1,14 @@
 package com.chainedminds.utilities;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 
 public class Hash {
 
     private static final String TAG = Hash.class.getSimpleName();
 
-    private static byte[] longToBytes(long l) {
+    /*private static byte[] longToBytes(long l) {
 
         byte[] result = new byte[8];
 
@@ -55,43 +56,81 @@ public class Hash {
         }
 
         return hash;
-    }
+    }*/
 
     public static String md5(String input) {
 
-        String hash = null;
+        return md5(input.getBytes());
+    }
+
+    public static String md5Unsafe(String input) throws NoSuchAlgorithmException {
+
+        return md5Unsafe(input.getBytes());
+    }
+
+    public static String md5(byte[] givenBytes) {
+
+        byte[] md5Bytes = md5Bytes(givenBytes);
+
+        if (md5Bytes != null) {
+
+            return getHex(md5Bytes);
+        }
+
+        return null;
+    }
+
+    public static String md5Unsafe(byte[] givenBytes) throws NoSuchAlgorithmException {
+
+        byte[] md5Bytes = md5BytesUnsafe(givenBytes);
+
+        if (md5Bytes != null) {
+
+            return getHex(md5Bytes);
+        }
+
+        return null;
+    }
+
+    public static byte[] md5Bytes(byte[] givenBytes) {
 
         try {
 
-            byte[] givenBytes = input.getBytes();
-
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-
-            messageDigest.update(givenBytes);
-
-            hash = byteToHex(messageDigest.digest());
+            return md5BytesUnsafe(givenBytes);
 
         } catch (Exception e) {
 
-            _Log.error(TAG, e);
+            return null;
         }
-
-        return hash;
     }
 
-    private static String byteToHex(final byte[] hash) {
+    public static byte[] md5BytesUnsafe(byte[] givenBytes) throws NoSuchAlgorithmException {
 
-        Formatter formatter = new Formatter();
+        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
 
-        for (byte b : hash) {
+        messageDigest.update(givenBytes);
 
-            formatter.format("%02x", b);
+        return messageDigest.digest();
+    }
+
+    private static String getHex(final byte[] md5Bytes) {
+
+        if (md5Bytes != null) {
+
+            Formatter formatter = new Formatter();
+
+            for (byte b : md5Bytes) {
+
+                formatter.format("%02x", b);
+            }
+
+            String result = formatter.toString();
+
+            formatter.close();
+
+            return result;
         }
 
-        String result = formatter.toString();
-
-        formatter.close();
-
-        return result;
+        return null;
     }
 }

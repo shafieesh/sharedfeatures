@@ -1,10 +1,14 @@
 plugins {
     id 'java'
 }
-apply plugin: 'maven'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(19)
+    }
+}
 
 group 'com.chainedminds'
-version '1.0.75'
+version '1.0.76'
 
 repositories {
     mavenCentral()
