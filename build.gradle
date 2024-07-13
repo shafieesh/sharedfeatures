@@ -1,6 +1,8 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
@@ -8,7 +10,7 @@ java {
 }
 
 group 'com.chainedminds'
-version '1.0.77'
+version '1.0.78'
 
 repositories {
     mavenCentral()
