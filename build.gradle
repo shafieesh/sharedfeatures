@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'maven-publish'
 }
 
 java {
@@ -10,7 +9,7 @@ java {
 }
 
 group 'com.chainedminds'
-version '1.0.79'
+version '1.0.80'
 
 repositories {
     mavenCentral()
