@@ -1,6 +1,5 @@
 package com.chainedminds.api.accounting;
 
-import com.chainedminds._Classes;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
@@ -8,10 +7,12 @@ import com.chainedminds.api.ActivityListener;
 import com.chainedminds.models._Data;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.network.netty.NettyServer;
-import com.chainedminds.utilities.*;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.Messages;
+import com.chainedminds.utilities.Task;
+import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -152,46 +153,6 @@ public class _Account<Data extends _Data<?>> {
 
     //------------------------
 
-    public <AccountData extends _AccountData> AccountData getAccount(int userID) {
-
-        AtomicReference<AccountData> account = new AtomicReference<>();
-
-        String selectStatement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS +
-                " WHERE " + FIELD_USER_ID + " = ?";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, userID);
-
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
-
-            if (resultSet.next()) {
-
-                AccountData foundAccount = (AccountData) _Classes
-                        .construct(_Classes.getInstance().accountClass);
-
-                foundAccount.id = userID;
-                foundAccount.username = resultSet.getString(FIELD_USERNAME);
-                foundAccount.isActive = resultSet.getBoolean(FIELD_IS_ACTIVE);
-                foundAccount.name = resultSet.getString(FIELD_NAME);
-                foundAccount.phoneNumber = resultSet.getLong(FIELD_PHONE_NUMBER);
-                foundAccount.email = resultSet.getString(FIELD_EMAIL);
-                foundAccount.registrationTime = resultSet.getTimestamp(FIELD_REGISTRATION_TIME).getTime();
-                foundAccount.lastUpdate = resultSet.getTimestamp(FIELD_LAST_UPDATE).getTime();
-
-                _Authentication.Username.AuthData authData = _Authentication.Username.get(userID);
-
-                if (authData != null) {
-
-                    foundAccount.password = authData.password;
-                }
-
-                account.set(foundAccount);
-            }
-        });
-
-        return account.get();
-    }
-
     public List<_AccountData> searchUsernames(String username) {
 
         List<_AccountData> foundAccounts = new ArrayList<>();
@@ -253,44 +214,6 @@ public class _Account<Data extends _Data<?>> {
         });
 
         return userID.get();
-    }
-
-    public List<_AccountData> getAccountsCompact() {
-
-        List<Integer> userIDs = new ArrayList<>();
-        List<_AccountData> accounts = new ArrayList<>();
-
-        Utilities.lock(TAG, LOCK.readLock(), () -> userIDs.addAll(MAPPING_USER_ID.keySet()));
-
-        for (int userID : userIDs) {
-
-            _AccountData account = getAccount(userID);
-
-            accounts.add(account);
-        }
-
-        Comparator<_AccountData> comparator = Comparator.comparing(account -> account.username);
-
-        accounts.sort(comparator);
-
-        return accounts;
-    }
-
-    public _AccountData getAccount(int userID, String appName, int targetUserID) {
-
-        AtomicReference<_AccountData> accountHolder = new AtomicReference<>();
-
-        if (_AccountPermissions.hasPermission(userID, appName, "USER_MANAGEMENT")) {
-
-            _AccountData account = getAccount(targetUserID);
-
-            account.password = null;
-            account.permissions = _AccountPermissions.getPermissions(targetUserID, appName);
-
-            accountHolder.set(account);
-        }
-
-        return accountHolder.get();
     }
 
     public void getUserIDMap(String tag, Utilities.GrantAccess<Map<Integer, String>> job) {
