@@ -7,6 +7,7 @@ import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.models._Data;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.utilities.Utilities;
+import com.chainedminds.utilities._Log;
 import com.chainedminds.utilities.json.JsonException;
 import com.chainedminds.utilities.json.Json;
 import io.netty.channel.ChannelHandlerContext;
@@ -89,35 +90,39 @@ public class _RequestHandler<Data> {
         return responseData;
     }
 
-    public Object handleRequest(Wrapper wrapper) {
-
-        return null;
-    }
-
     public Object processRequest(ChannelHandlerContext channelContext, InetSocketAddress remoteAddress, Object request) {
 
         try {
 
             Wrapper bakedRequest = prepareRequest(channelContext, remoteAddress, request);
 
-            Object pendingObject = handleRequest(bakedRequest);
+            if (bakedRequest != null) {
 
-            if (pendingObject == null && bakedRequest != null) {
+                Object pendingObject = handleRequest(bakedRequest.data, null);
 
-                pendingObject = handleRequest(bakedRequest.data, null);
+                return prepareResponse(request, pendingObject);
+
+            } else {
+
+                _Data pendingObject = new _Data<>();
+
+                pendingObject.response = _Codes.RESPONSE_NOK;
+                pendingObject.message = "The request was not handled. Could not parse request.";
+
+                return prepareResponse(request, pendingObject);
             }
-
-            return prepareResponse(request, pendingObject);
 
         } catch (Exception e) {
 
-            _Data pendingObject = new _Data<>();
-
-            pendingObject.response = _Codes.RESPONSE_NOK;
-            pendingObject.message = "The request was not handled.";
-
-            return prepareResponse(request, pendingObject);
+            _Log.error(TAG, e);
         }
+
+        _Data pendingObject = new _Data<>();
+
+        pendingObject.response = _Codes.RESPONSE_NOK;
+        pendingObject.message = "The request was not handled.";
+
+        return prepareResponse(request, pendingObject);
     }
 
     public Object sendServerBusyResponse(Object request) {

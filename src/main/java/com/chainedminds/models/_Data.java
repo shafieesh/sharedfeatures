@@ -1,5 +1,6 @@
 package com.chainedminds.models;
 
+import com.chainedminds._Config;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.models.account._FriendData;
 
@@ -25,4 +26,6 @@ public class _Data<Account extends _AccountData> {
     public List<_FriendData> friends;
 
     public _DbData database;
+
+    public String engine = _Config.ENGINE_NAME;
 }

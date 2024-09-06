@@ -272,6 +272,8 @@ public class _Config {
 
     //-------------------------------------------------------------//
 
+    public static String ENGINE_NAME;
+
     public static int SERVER_PORT_MAIN;
     public static int SERVER_PORT_TELNET;
 
