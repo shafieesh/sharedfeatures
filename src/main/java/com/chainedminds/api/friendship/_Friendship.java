@@ -206,14 +206,14 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 int receiverID = friendID;
                 int senderID = userID;
 
-                String requestingUsername = _Resources.get().account.getUsername(senderID);
+                String requestingName = _Resources.get().account.getName(senderID);
                 String receiverLanguage = _Resources.get()
                         .accountSession.getLanguage(receiverID, appName);
 
                 String tag = Messages.Notification.Friendship.TAG_NEW_FRIEND_REQUEST;
 
                 String title = Messages.get("NOTIFICATION", Messages.Notification.
-                        Friendship.NEW_FRIEND_REQUEST, receiverLanguage, requestingUsername);
+                        Friendship.NEW_FRIEND_REQUEST, receiverLanguage, requestingName);
 
                 String message = Messages.get("NOTIFICATION", Messages.Notification.
                         TOUCH_HERE_TO_OPEN, receiverLanguage);
@@ -291,14 +291,14 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 int receiverID = friendID;
                 int acceptingUserID = userID;
 
-                String requestingUserName = _Resources.get().account.getUsername(acceptingUserID);
+                String requestingName = _Resources.get().account.getName(acceptingUserID);
                 String receiverLanguage = _Resources.get()
                         .accountSession.getLanguage(receiverID, appName);
 
                 String tag = Messages.Notification.Friendship.TAG_ACCEPTED_YOUR_FRIENDSHIP;
 
                 String title = Messages.get("NOTIFICATION", Messages.Notification.
-                        Friendship.ACCEPTED_YOUR_FRIENDSHIP, receiverLanguage, requestingUserName);
+                        Friendship.ACCEPTED_YOUR_FRIENDSHIP, receiverLanguage, requestingName);
 
                 String message = Messages.get("NOTIFICATION", Messages.Notification.
                         TOUCH_HERE_TO_OPEN, receiverLanguage);
@@ -734,17 +734,17 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
             } else {
 
-                String username = _Resources.get()
-                        .account.getUsername(onlineFriendIDs.get(0));
+                String name = _Resources.get()
+                        .account.getName(onlineFriendIDs.get(0));
 
                 String message = Messages.get("FRIENDSHIP", Messages.Friendship.
-                        GAMERTAG_IS_ONLINE, receiverLanguage, username);
+                        GAMERTAG_IS_ONLINE, receiverLanguage, name);
 
                 _NotificationManager.sendMessage(userID, appName, message);
             }
         }
 
-        String username = _Resources.get().account.getUsername(userID);
+        String name = _Resources.get().account.getName(userID);
 
         for (int friendID : onlineFriendIDs) {
 
@@ -752,7 +752,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                     .accountSession.getLanguage(friendID, appName);
 
             String message = Messages.get("FRIENDSHIP", Messages.Friendship.
-                    GAMERTAG_IS_NOW_ONLINE, receiverLanguage, username);
+                    GAMERTAG_IS_NOW_ONLINE, receiverLanguage, name);
 
             _NotificationManager.sendMessage(friendID, appName, message);
         }

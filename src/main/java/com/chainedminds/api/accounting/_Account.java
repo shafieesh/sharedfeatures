@@ -28,7 +28,6 @@ public class _Account<Data extends _Data<?>> {
     private static final String TAG = _Account.class.getSimpleName();
 
     protected static final String FIELD_USER_ID = "UserID";
-    protected static final String FIELD_USERNAME = "Username";
     protected static final String FIELD_IS_ACTIVE = "IsActive";
     protected static final String FIELD_NAME = "Name";
     protected static final String FIELD_PHONE_NUMBER = "PhoneNumber";
@@ -36,10 +35,9 @@ public class _Account<Data extends _Data<?>> {
     protected static final String FIELD_REGISTRATION_TIME = "RegistrationTime";
     protected static final String FIELD_LAST_UPDATE = "LastUpdate";
 
-    protected final ReadWriteLock LOCK = new ReentrantReadWriteLock();
-
     protected static final Map<Integer, String> MAPPING_USER_ID = new HashMap<>();
-    protected static final Map<String, Integer> MAPPING_USERNAME = new HashMap<>();
+
+    protected final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public void start() {
 
@@ -69,7 +67,6 @@ public class _Account<Data extends _Data<?>> {
         _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
             private final Map<Integer, String> mappingUserIDs = new HashMap<>();
-            private final Map<String, Integer> mappingUsernames = new HashMap<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -77,10 +74,9 @@ public class _Account<Data extends _Data<?>> {
                 while (resultSet.next()) {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
-                    String username = resultSet.getString(FIELD_USERNAME);
+                    String username = resultSet.getString(FIELD_NAME);
 
                     mappingUserIDs.put(userID, username);
-                    mappingUsernames.put(username.toLowerCase(), userID);
                 }
             }
 
@@ -93,9 +89,6 @@ public class _Account<Data extends _Data<?>> {
 
                         MAPPING_USER_ID.clear();
                         MAPPING_USER_ID.putAll(mappingUserIDs);
-
-                        MAPPING_USERNAME.clear();
-                        MAPPING_USERNAME.putAll(mappingUsernames);
                     });
                 }
             }
@@ -120,57 +113,35 @@ public class _Account<Data extends _Data<?>> {
         return getProperty(userID, FIELD_IS_ACTIVE, Boolean.class);
     }
 
-    public String getUsername(int userID) {
+    public String getName(int userID) {
 
-        AtomicReference<String> username = new AtomicReference<>();
+        AtomicReference<String> name = new AtomicReference<>();
 
-        Utilities.lock(TAG, LOCK.readLock(), () -> username.set(MAPPING_USER_ID.get(userID)));
+        Utilities.lock(TAG, LOCK.readLock(), () -> name.set(MAPPING_USER_ID.get(userID)));
         
-        return username.get();
-    }
-
-    public int getUserID(String username) {
-
-        AtomicInteger userID = new AtomicInteger(_Config.NOT_FOUND);
-
-        if (username == null || username.isEmpty()) {
-
-            return userID.get();
-        }
-
-        Utilities.lock(TAG, LOCK.readLock(), () -> {
-
-            String lowercaseUsername = username.toLowerCase();
-
-            if (MAPPING_USERNAME.containsKey(lowercaseUsername)) {
-
-                userID.set(MAPPING_USERNAME.get(lowercaseUsername));
-            }
-        });
-
-        return userID.get();
+        return name.get();
     }
 
     //------------------------
 
-    public List<_AccountData> searchUsernames(String username) {
+    public List<_AccountData> searchNames(String name) {
 
         List<_AccountData> foundAccounts = new ArrayList<>();
 
-        if (username == null) {
+        if (name == null) {
 
             return foundAccounts;
         }
 
-        String query = username.toLowerCase();
+        String query = name.toLowerCase();
 
-        getUsernameMap(TAG, usernames -> usernames.forEach((loopingUsername, loopingUserID) -> {
+        getUserIDMap(TAG, entries -> entries.forEach((loopingUserID, loopingName) -> {
 
-            if (loopingUsername.toLowerCase().contains(query)) {
+            if (loopingName.toLowerCase().contains(query)) {
 
                 _AccountData account = new _AccountData();
                 account.id = loopingUserID;
-                account.username = loopingUsername;
+                account.name = loopingName;
 
                 foundAccounts.add(account);
             }
@@ -190,14 +161,14 @@ public class _Account<Data extends _Data<?>> {
         }
     }
 
-    protected int registerAccount(String username) {
+    protected int registerAccount(String name) {
 
         AtomicInteger userID = new AtomicInteger(_Config.NOT_FOUND);
 
-        String insertStatement = "INSERT " + _Config.TABLE_ACCOUNTS + " (" + FIELD_USERNAME + ") VALUES (?)";
+        String insertStatement = "INSERT " + _Config.TABLE_ACCOUNTS + " (" + FIELD_NAME + ") VALUES (?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, username);
+        parameters.put(1, name);
 
         _DatabaseOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
@@ -207,8 +178,7 @@ public class _Account<Data extends _Data<?>> {
 
                 Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                    MAPPING_USER_ID.put(generatedID, username);
-                    MAPPING_USERNAME.put(username.toLowerCase(), generatedID);
+                    MAPPING_USER_ID.put(generatedID, name);
                 });
             }
         });
@@ -219,11 +189,6 @@ public class _Account<Data extends _Data<?>> {
     public void getUserIDMap(String tag, Utilities.GrantAccess<Map<Integer, String>> job) {
 
         Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(MAPPING_USER_ID));
-    }
-
-    public void getUsernameMap(String tag, Utilities.GrantAccess<Map<String, Integer>> job) {
-
-        Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(MAPPING_USERNAME));
     }
 
     //------------------------------------------------------------------------------------
@@ -280,7 +245,7 @@ public class _Account<Data extends _Data<?>> {
     protected final boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
 
         String statement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " +
-                fieldName + " = ? WHERE " + FIELD_USER_ID + " = ?";
+                fieldName + " = ?, " + FIELD_LAST_UPDATE + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
