@@ -658,8 +658,6 @@ public class _AccountSession {
 
     protected <Data extends _Data<?>> void updateAccount(Data data) {
 
-        data.response = _Codes.RESPONSE_NOK;
-
         String credential = data.account.credential;
         String version = data.client.version;
         String language = data.client.language;
@@ -692,8 +690,6 @@ public class _AccountSession {
         if (wasSuccessful) {
 
             CACHED_USERS_INFO.add(credential);
-
-            data.response = _Codes.RESPONSE_OK;
         }
     }
 
