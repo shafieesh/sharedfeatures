@@ -5,7 +5,8 @@ import com.chainedminds.network.netty.mainPipe.MainPipeServer;
 import com.chainedminds.network.netty.telnetPipe.TelnetChannelDataProcessor;
 import com.chainedminds.network.netty.telnetPipe.TelnetPipeServer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +32,8 @@ public class NettyServer {
 
     public static void start() {
 
-        EventLoopGroup connectionExecutor = new NioEventLoopGroup();
-        EventLoopGroup ioExecutor = new NioEventLoopGroup();
+        EventLoopGroup connectionExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+        EventLoopGroup ioExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 
         MainPipeServer.start(connectionExecutor, ioExecutor);
         TelnetPipeServer.start(connectionExecutor, ioExecutor);
