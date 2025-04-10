@@ -1,6 +1,5 @@
 package com.chainedminds.api.accounting;
 
-import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.models._Data;
@@ -36,6 +35,7 @@ public class _AccountSession {
 
     protected final Set<String> CACHED_USERS_INFO = new HashSet<>();
     public static final Map<String, Map<Integer, Long>> USER_ACTIVITY = new HashMap<>();
+    public static final Map<String, String> APP_VERSIONS = new HashMap<>();
 
     public void start() {
 
@@ -58,9 +58,12 @@ public class _AccountSession {
     public void fetch() {
 
         String selectStatement = "SELECT " + FIELD_USER_ID + ", " + FIELD_APP_NAME +
-                ", " + FIELD_LAST_UPDATE + " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS;
+                ", " + FIELD_VERSION + ", " + FIELD_LAST_UPDATE +
+                " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS;
 
         _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+
+            final Map<String, String> appVersions = new HashMap<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -69,7 +72,13 @@ public class _AccountSession {
 
                     int userID = resultSet.getInt(FIELD_USER_ID);
                     String appName = resultSet.getString(FIELD_APP_NAME);
+                    String version = resultSet.getString(FIELD_VERSION);
                     long lastUpdate = resultSet.getTimestamp(FIELD_LAST_UPDATE).getTime();
+
+                    appVersions.putIfAbsent(appName, version);
+                    String storedVersion = appVersions.get(appName);
+                    String highestVersion = highestVersion(version, storedVersion);
+                    appVersions.put(appName, highestVersion);
 
                     USER_ACTIVITY.putIfAbsent(appName, new HashMap<>());
                     USER_ACTIVITY.get(appName).put(userID, lastUpdate);
@@ -79,11 +88,74 @@ public class _AccountSession {
             @Override
             public void onFinishedTask(boolean wasSuccessful, Exception error) {
 
+                if (wasSuccessful) {
+
+                    APP_VERSIONS.clear();
+                    APP_VERSIONS.putAll(appVersions);
+                }
             }
         });
     }
 
     //------------------------
+
+    public String highestVersion(String version1, String version2) {
+
+        if (version1 == null || version2 == null) {
+
+            return null;
+        }
+        if (version1.equals(version2)) {
+
+            return version1;
+        }
+
+        String[] ver1Parts = version1.split("\\.");
+        String[] ver2Parts = version2.split("\\.");
+
+        int maxLength = Math.max(ver1Parts.length, ver2Parts.length);
+
+        for (int index = 0; index < maxLength; index++) {
+
+            if (ver1Parts.length == index) {
+
+                return version2;
+            }
+            if (ver2Parts.length == index) {
+
+                return version1;
+            }
+
+            int ver1Part = Integer.parseInt(ver1Parts[index]);
+            int ver2Part = Integer.parseInt(ver2Parts[index]);
+
+            if (ver1Part > ver2Part) {
+
+                return version1;
+            }
+            if (ver2Part > ver1Part) {
+
+                return version2;
+            }
+        }
+
+        return version1;
+    }
+
+    public String checkVersion(String appName, String version) {
+
+        APP_VERSIONS.putIfAbsent(appName, version);
+        String storedVersion = APP_VERSIONS.get(appName);
+        String highestVersion = highestVersion(version, storedVersion);
+        APP_VERSIONS.put(appName, highestVersion);
+
+        if (!highestVersion.equals(version)) {
+
+            return highestVersion;
+        }
+
+        return null;
+    }
 
     public Set<Integer> getUserIDs(String appName) {
 

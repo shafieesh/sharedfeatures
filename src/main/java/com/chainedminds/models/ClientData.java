@@ -7,6 +7,7 @@ public class ClientData {
     public String firebaseID;
     public String appName;
     public String version;
+    public String latestVersion;
     public int apiVersion;
     public String platform;
     public String language;
