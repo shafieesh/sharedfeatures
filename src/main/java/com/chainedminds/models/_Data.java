@@ -14,8 +14,7 @@ public class _Data<Account extends _AccountData> {
     public List<Account> accounts;
 
     public int request;
-    public int subRequest;
-    public int lowerSubRequest;
+    public Integer subRequest;
     public int response;
     public String message;
 

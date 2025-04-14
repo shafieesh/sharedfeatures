@@ -11,19 +11,19 @@ public class _AccountData {
     public String name;
     public String username;
     public String password;
-    public boolean isActive;
-    public long phoneNumber;
+    public Boolean isActive;
+    public Long phoneNumber;
     public String email;
     public String language;
     public Set<String> permissions;
     public Set<String> subscriptions;
-    public int onlineStatus;
+    public Integer onlineStatus;
     public String activity;
     public String title;
 
     public String credential;
-    public long registrationTime;
-    public long lastUpdate;
+    public Long registrationTime;
+    public Long lastUpdate;
 
     public List<_TransactionData> transactions;
 

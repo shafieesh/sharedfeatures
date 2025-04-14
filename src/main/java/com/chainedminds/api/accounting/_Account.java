@@ -268,10 +268,9 @@ public class _Account<Data extends _Data<?>> {
 
         data.response = _Codes.RESPONSE_NOK;
 
-        if (data.account == null || data.account.credential == null) {
+        if (data.account == null || data.account.credential == null || data.subRequest == null) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
 
             return data;
         }

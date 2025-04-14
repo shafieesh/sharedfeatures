@@ -8,13 +8,13 @@ public class ClientData {
     public String appName;
     public String version;
     public String latestVersion;
-    public int apiVersion;
+    public Integer apiVersion;
     public String platform;
     public String language;
     public String market;
 
     public String address;
-    public int sdk;
+    public Integer sdk;
     public String brand;
     public String manufacturer;
     public String model;
