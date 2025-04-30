@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 public class MainPipeServer {
@@ -17,7 +18,6 @@ public class MainPipeServer {
 
             final MainChannelProcessor processor = new MainChannelProcessor();
             final MainChannelEncoder encoder = new MainChannelEncoder();
-            final MainChannelDecoder decoder = new MainChannelDecoder();
 
             MainChannelProcessor.KEEP_ALIVE = keepAlive;
 
@@ -29,7 +29,10 @@ public class MainPipeServer {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
 
-                            socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT));
+                            final  IdleStateHandler autoCloser = new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT);
+                            final MainChannelDecoder decoder = new MainChannelDecoder();
+
+                            socketChannel.pipeline().addLast("AUTO_CLOSER", autoCloser);
                             socketChannel.pipeline().addLast("DECODER", decoder);
                             socketChannel.pipeline().addLast("PROCESSOR", processor);
                             socketChannel.pipeline().addLast("ENCODER", encoder);
