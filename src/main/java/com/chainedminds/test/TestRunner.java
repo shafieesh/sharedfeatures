@@ -11,9 +11,5 @@ class TestRunner {
         TestResources.getInstance().config();
 
         _Config.ENGINE_NAME = "SharedFeatures";
-        _Config.SERVER_PORT_TELNET = 23;
-        _Config.SERVER_PORT_MAIN = 4295;
-
-        NettyServer.start(false);
     }
 }
