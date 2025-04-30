@@ -9,16 +9,16 @@ import io.netty.channel.*;
 import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
-public
-class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
+public class TelnetChannelProcessor extends SimpleChannelInboundHandler<String> {
 
-    private static int newConnectionsCount = 0;
+    public static boolean KEEP_ALIVE = false;
+    private static int NEW_CONNECTIONS = 0;
 
-    public static int getNewConnectionsCount() {
+    public static int getNewConnections() {
 
-        int copiedNewConnectionsCount = newConnectionsCount;
+        int copiedNewConnectionsCount = NEW_CONNECTIONS;
 
-        newConnectionsCount = 0;
+        NEW_CONNECTIONS = 0;
 
         return copiedNewConnectionsCount;
     }
@@ -28,7 +28,7 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
         super.channelActive(context);
 
-        newConnectionsCount++;
+        NEW_CONNECTIONS++;
 
         ChannelFuture channelCloseFuture = context.channel().closeFuture();
 
@@ -40,8 +40,6 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelRead0(ChannelHandlerContext context, String requestData) {
-
-        String channelID = context.channel().id().asLongText();
 
         InetSocketAddress remoteAddress = ((InetSocketAddress) context.channel().remoteAddress());
 
@@ -55,15 +53,11 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
                 _RequestHandler.optimizeReadTimeout(context, responseData);
 
                 ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
-            }
 
-            if (NettyServer.KEEP_ALIVE_CHANNELS_LIST.contains(channelID)) {
+                if (!KEEP_ALIVE) {
 
-                NettyServer.KEEP_ALIVE_CHANNELS_LIST.remove(channelID);
-
-            } else {
-
-                //writeFuture.addListener(ChannelFutureListener.CLOSE);
+                    writeFuture.addListener(ChannelFutureListener.CLOSE);
+                }
             }
         };
 
@@ -74,7 +68,12 @@ class TelnetChannelDataProcessor extends SimpleChannelInboundHandler<String> {
 
             _RequestHandler.optimizeReadTimeout(context, responseData);
 
-            context.channel().writeAndFlush(responseData);//.addListener(ChannelFutureListener.CLOSE);
+            ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
+
+            if (!KEEP_ALIVE) {
+
+                writeFuture.addListener(ChannelFutureListener.CLOSE);
+            }
         }
     }
 

@@ -312,7 +312,14 @@ public class _Account<Data extends _Data<?>> {
 
         if (!_Resources.get().accountSession.CACHED_USERS_INFO.contains(credential)) {
 
-            NettyServer.execute(() -> _Resources.get().accountSession.updateAccount(data));
+            String version = data.client.version;
+            String language = data.client.language;
+            String firebaseID = data.client.firebaseID;
+            String ipAddress = data.client.address;
+            String country = data.client.country;
+
+            NettyServer.execute(() -> _Resources.get().accountSession.updateAccount(
+                    credential, version, language, firebaseID, ipAddress, country));
         }
 
         ActivityListener.setBecameOnline(userID);

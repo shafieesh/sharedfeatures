@@ -19,7 +19,6 @@ import com.chainedminds._Config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -31,11 +30,13 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 
 public class TelnetPipeServer {
 
-    private static final StringDecoder CHANNEL_DECODER = new StringDecoder();
-    private static final StringEncoder CHANNEL_ENCODER = new StringEncoder();
-    private static final TelnetChannelDataProcessor CHANNEL_DATA_PROCESSOR = new TelnetChannelDataProcessor();
+    public static void start(EventLoopGroup connectionExecutor, EventLoopGroup ioExecutor, boolean keepAlive) {
 
-    public static void start(EventLoopGroup connectionExecutor, EventLoopGroup ioExecutor) {
+        final StringDecoder decoder = new StringDecoder();
+        final StringEncoder encoder = new StringEncoder();
+        final TelnetChannelProcessor processor = new TelnetChannelProcessor();
+
+        TelnetChannelProcessor.KEEP_ALIVE = keepAlive;
 
         try {
 
@@ -49,14 +50,14 @@ public class TelnetPipeServer {
                             socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT));
                             socketChannel.pipeline().addLast("DELIMITER", new DelimiterBasedFrameDecoder(
                                     8192, Delimiters.lineDelimiter()));
-                            socketChannel.pipeline().addLast("DECODER", CHANNEL_DECODER);
-                            socketChannel.pipeline().addLast("PROCESSOR", CHANNEL_DATA_PROCESSOR);
-                            socketChannel.pipeline().addLast("ENCODER", CHANNEL_ENCODER);
+                            socketChannel.pipeline().addLast("DECODER", decoder);
+                            socketChannel.pipeline().addLast("PROCESSOR", processor);
+                            socketChannel.pipeline().addLast("ENCODER", encoder);
                         }
                     });
 
-            serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
-            serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
+            //serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
+            //serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             //serverBootstrap.childOption(ChannelOption.SO_LINGER, 20);
 
             ChannelFuture channelFuture = serverBootstrap.bind(_Config.SERVER_PORT_TELNET).syncUninterruptibly();

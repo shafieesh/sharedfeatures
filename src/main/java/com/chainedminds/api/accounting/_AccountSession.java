@@ -728,14 +728,9 @@ public class _AccountSession {
 
     //------------------------------------------------------------------------------------
 
-    protected <Data extends _Data<?>> void updateAccount(Data data) {
-
-        String credential = data.account.credential;
-        String version = data.client.version;
-        String language = data.client.language;
-        String firebaseID = data.client.firebaseID;
-        String ipAddress = data.client.address;
-        String country = data.client.country;
+    protected void updateAccount(String credential, String version,
+                                 String language, String firebaseID,
+                                 String ipAddress, String country) {
 
         if (country == null) {
 

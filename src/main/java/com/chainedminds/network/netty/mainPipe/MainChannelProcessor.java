@@ -5,30 +5,30 @@ import com.chainedminds.api._RequestHandler;
 import com.chainedminds.network.netty.ChannelListeners;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
-public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
+public class MainChannelProcessor extends ChannelInboundHandlerAdapter {
 
-    private static int newConnectionsCount = 0;
+    public static boolean KEEP_ALIVE = false;
+    private static int NEW_CONNECTIONS = 0;
 
-    public static int getNewConnectionsCount() {
+    public static int getNewConnections() {
 
-        int copiedNewConnectionsCount = newConnectionsCount;
+        int copiedNewConnectionsCount = NEW_CONNECTIONS;
 
-        newConnectionsCount = 0;
+        NEW_CONNECTIONS = 0;
 
         return copiedNewConnectionsCount;
     }
 
     @Override
-    public void channelActive(@NotNull ChannelHandlerContext context) throws Exception {
+    public void channelActive(ChannelHandlerContext context) throws Exception {
 
         super.channelActive(context);
 
-        newConnectionsCount++;
+        NEW_CONNECTIONS++;
 
         ChannelFuture channelCloseFuture = context.channel().closeFuture();
 
@@ -39,7 +39,7 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext context, @NotNull Object message) {
+    public void channelRead(ChannelHandlerContext context, Object message) {
 
         byte[] requestData = (byte[]) message;
 
@@ -47,9 +47,9 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
         InetSocketAddress remoteAddress = ((InetSocketAddress) context.channel().remoteAddress());
 
-        if (ChannelListeners.REGISTERED_PLAYERS.containsKey(channelID)) {
+        if (ChannelListeners.REGISTERED_CLIENTS.containsKey(channelID)) {
 
-            ChannelListeners.REGISTERED_PLAYERS.get(channelID).onRequestReceived(channelID, requestData);
+            ChannelListeners.REGISTERED_CLIENTS.get(channelID).onRequestReceived(channelID, requestData);
 
         } else {
 
@@ -64,13 +64,9 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
                     ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
 
-                    if (NettyServer.KEEP_ALIVE_CHANNELS_LIST.contains(channelID)) {
+                    if (!KEEP_ALIVE) {
 
-                        NettyServer.KEEP_ALIVE_CHANNELS_LIST.remove(channelID);
-
-                    } else {
-
-                        //writeFuture.addListener(ChannelFutureListener.CLOSE);
+                        writeFuture.addListener(ChannelFutureListener.CLOSE);
                     }
                 }
             };
@@ -82,7 +78,12 @@ public class MainChannelDataProcessor extends ChannelInboundHandlerAdapter {
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);
 
-                context.channel().writeAndFlush(responseData);//.addListener(ChannelFutureListener.CLOSE);
+                ChannelFuture writeFuture = context.channel().writeAndFlush(responseData);
+
+                if (!KEEP_ALIVE) {
+
+                    writeFuture.addListener(ChannelFutureListener.CLOSE);
+                }
             }
         }
     }

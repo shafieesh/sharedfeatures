@@ -1,25 +1,20 @@
 package com.chainedminds.network.netty;
 
-import com.chainedminds.network.netty.mainPipe.MainChannelDataProcessor;
+import com.chainedminds.network.netty.mainPipe.MainChannelProcessor;
 import com.chainedminds.network.netty.mainPipe.MainPipeServer;
-import com.chainedminds.network.netty.telnetPipe.TelnetChannelDataProcessor;
+import com.chainedminds.network.netty.telnetPipe.TelnetChannelProcessor;
 import com.chainedminds.network.netty.telnetPipe.TelnetPipeServer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class NettyServer {
-
-    //public static final Map<String, ChannelHandlerContext> CHANNELS_MAP = new HashMap<>();
-    public static final Set<String> KEEP_ALIVE_CHANNELS_LIST = new HashSet<>();
 
     private static final ThreadPoolExecutor REQUESTS_EXECUTOR = new ThreadPoolExecutor(
             0, 128, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
@@ -32,11 +27,16 @@ public class NettyServer {
 
     public static void start() {
 
+        start(false);
+    }
+
+    public static void start(boolean keepAlive) {
+
         EventLoopGroup connectionExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         EventLoopGroup ioExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 
-        MainPipeServer.start(connectionExecutor, ioExecutor);
-        TelnetPipeServer.start(connectionExecutor, ioExecutor);
+        MainPipeServer.start(connectionExecutor, ioExecutor, keepAlive);
+        TelnetPipeServer.start(connectionExecutor, ioExecutor, keepAlive);
     }
 
     public static boolean execute(Runnable runnable) {
@@ -127,8 +127,8 @@ public class NettyServer {
 
     public static Map<String, Integer> getConnectionsCount() {
 
-        int mainNewConnectionsCount = MainChannelDataProcessor.getNewConnectionsCount();
-        int telnetNewConnectionsCount = TelnetChannelDataProcessor.getNewConnectionsCount();
+        int mainNewConnectionsCount = MainChannelProcessor.getNewConnections();
+        int telnetNewConnectionsCount = TelnetChannelProcessor.getNewConnections();
         //int webNewConnectionsCount = HttpStaticFileServerHandler.getNewConnectionsCount();
         int totalConnectionsCount = mainNewConnectionsCount + telnetNewConnectionsCount;// + webNewConnectionsCount;
         int activeConnectionsCount = REQUESTS_EXECUTOR.getActiveCount();
