@@ -29,7 +29,7 @@ public class Cache<Key, Value> {
                 .setName("CacheManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 0, 1)
-                .setTimingListener(task -> CACHE_MANAGERS.forEach(Cache::cleanStale))
+                .setTimingListener(task -> new ArrayList<>(CACHE_MANAGERS).forEach(Cache::cleanStale))
                 .schedule());
     }
 
