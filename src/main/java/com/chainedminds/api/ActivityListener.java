@@ -30,7 +30,7 @@ public class ActivityListener {
                 .setName("RefreshActivityFinderList")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> fetch())
+                .onEachCycle(ActivityListener::fetch)
                 .runAsyncNow()
                 .schedule());
     }

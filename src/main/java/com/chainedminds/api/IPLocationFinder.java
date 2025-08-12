@@ -22,7 +22,7 @@ public class IPLocationFinder {
                 .setName("CleanUpIPCache")
                 .setTime(0, 0, 0)
                 .setInterval(1, 0, 0, 0)
-                .setTimingListener(task -> {
+                .onEachCycle(() -> {
 
                     Calendar calendar = Calendar.getInstance();
 
@@ -37,10 +37,7 @@ public class IPLocationFinder {
                 .setName("IPFinderCounterReset")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 1, 0)
-                .setTimingListener(task -> {
-
-                    counter.set(0);
-                })
+                .onEachCycle(() -> counter.set(0))
                 .schedule());
     }
 

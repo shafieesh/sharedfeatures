@@ -43,7 +43,7 @@ public class _AccountSession {
                 .setName("Clear Cached Users Info")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, _Config.CACHED_USERS_INFO_REFRESH_RATE, 0)
-                .setTimingListener(task -> CACHED_USERS_INFO.clear())
+                .onEachCycle(CACHED_USERS_INFO::clear)
                 .schedule());
 
 
@@ -51,7 +51,7 @@ public class _AccountSession {
                 .setName("Remove Stale Sessions")
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
-                .setTimingListener(task -> removeStaleSessions())
+                .onEachCycle(this::removeStaleSessions)
                 .schedule());
     }
 

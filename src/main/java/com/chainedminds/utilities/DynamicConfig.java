@@ -29,10 +29,10 @@ public class DynamicConfig {
     public static void start() {
 
         Task.add(Task.Data.build()
-                .setName("DynamicConfig")
+                .setName("Dynamic Config")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)
-                .setTimingListener(task -> fetchRecords())
+                .onEachCycle(DynamicConfig::fetchRecords)
                 .runNow()
                 .schedule());
     }

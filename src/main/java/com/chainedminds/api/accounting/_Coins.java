@@ -21,14 +21,14 @@ public class _Coins {
                 .setName("ChargeCoins")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> chargeCoins())
+                .onEachCycle(this::chargeCoins)
                 .schedule());
 
         Task.add(Task.Data.build()
                 .setName("ChargePremiumCoins")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 3, 0)
-                .setTimingListener(task -> chargePremiumCoins())
+                .onEachCycle(this::chargePremiumCoins)
                 .schedule());
     }
 

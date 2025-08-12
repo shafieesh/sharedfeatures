@@ -101,7 +101,7 @@ public class _IABPayment<
                 .setName("RefreshMarketsAccessTokens")
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
-                .setTimingListener(task -> refreshMarketsAccessTokens())
+                .onEachCycle(_IABPayment::refreshMarketsAccessTokens)
                 .runNow()
                 .schedule());
 
@@ -109,14 +109,14 @@ public class _IABPayment<
                 .setName("CheckPendingIabTransactions")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 2, 0)
-                .setTimingListener(task -> checkPendingTransactions())
+                .onEachCycle(this::checkPendingTransactions)
                 .schedule());
 
         Task.add(Task.Data.build()
                 .setName("RefreshSubscriptions")
                 .setTime(0, 0, 0)
                 .setInterval(1, 0, 0, 0)
-                .setTimingListener(task -> _Resources.get().iabSubscriptionPurchase.checkSubscriptions())
+                .onEachCycle(() -> _Resources.get().iabSubscriptionPurchase.checkSubscriptions())
                 .schedule());
     }
 

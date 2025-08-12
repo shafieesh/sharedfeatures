@@ -50,7 +50,7 @@ public class _Product<ProductData extends _ProductData> {
                 .setName("ProductManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> fetch())
+                .onEachCycle(this::fetch)
                 .runNow()
                 .schedule());
     }

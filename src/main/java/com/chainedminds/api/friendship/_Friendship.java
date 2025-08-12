@@ -59,7 +59,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 .setName("FriendsListManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> fetch())
+                .onEachCycle(this::fetch)
                 .runNow()
                 .schedule());
     }

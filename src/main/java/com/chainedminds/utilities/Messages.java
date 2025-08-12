@@ -33,7 +33,7 @@ public class Messages {
                 .setName(TAG)
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
-                .setTimingListener(task -> fetch())
+                .onEachCycle(Messages::fetch)
                 .runNow()
                 .schedule());
     }

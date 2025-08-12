@@ -54,7 +54,7 @@ public class _BlackList {
                 .setName("BlackListManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> fetch())
+                .onEachCycle(_BlackList::fetch)
                 .runNow()
                 .schedule());
 
@@ -62,7 +62,7 @@ public class _BlackList {
                 .setName("ResetReportedPlayers")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)
-                .setTimingListener(task -> REPORTED_PLAYERS.clear())
+                .onEachCycle(REPORTED_PLAYERS::clear)
                 .schedule());
     }
 

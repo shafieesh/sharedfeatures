@@ -55,7 +55,7 @@ public abstract class _DBConnection {
                 .setName("Ping Connections")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 0, 10)
-                .setTimingListener(task -> {
+                .onEachCycle(() -> {
 
                     automaticConnections.pingConnections();
                     manualConnections.pingConnections();

@@ -45,7 +45,7 @@ public class _Account<Data extends _Data<?>> {
                 .setName("FetchUsers")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 5, 0)
-                .setTimingListener(task -> {
+                .onEachCycle(() -> {
                     fetch();
                     _Authentication.fetch();
                 })

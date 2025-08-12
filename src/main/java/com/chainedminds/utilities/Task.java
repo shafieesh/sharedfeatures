@@ -76,9 +76,16 @@ public class Task {
             TASK_EXECUTOR.execute(() -> saveTaskInvokeTime(task));
         }
 
-        if (task.timingListener != null) {
+        if (task.cycleAction != null) {
 
-            task.timingListener.onStartedTask(task);
+            try {
+
+                task.cycleAction.run();
+
+            } catch (Exception e) {
+
+                task.cycleError.handle(e);
+            }
         }
     }
 
@@ -89,9 +96,19 @@ public class Task {
             TASK_EXECUTOR.execute(() -> saveTaskInvokeTime(task));
         }
 
-        if (task.timingListener != null) {
+        if (task.cycleAction != null) {
 
-            TASK_EXECUTOR.execute(() -> task.timingListener.onStartedTask(task));
+            TASK_EXECUTOR.execute(() -> {
+
+                try {
+
+                    task.cycleAction.run();
+
+                } catch (Exception e) {
+
+                    task.cycleError.handle(e);
+                }
+            });
         }
     }
 
@@ -131,9 +148,13 @@ public class Task {
         }
     }
 
-    public interface TimingListener {
+    public interface CycleAction {
 
-        void onStartedTask(Data task);
+        void run();
+    }
+    public interface CycleError {
+
+        void handle(Exception exception);
     }
 
     public static class Data {
@@ -145,7 +166,8 @@ public class Task {
         private long nextRun;
         private long interval;
 
-        private TimingListener timingListener;
+        private CycleAction cycleAction;
+        private CycleError cycleError;
 
         private boolean runNow;
         private boolean runAsyncNow;
@@ -247,9 +269,22 @@ public class Task {
             return this;
         }
 
-        public Data setTimingListener(TimingListener listener) {
+        @Deprecated
+        public Data setTimingListener(CycleAction action) {
 
-            this.timingListener = listener;
+            return onEachCycle(action);
+        }
+
+        public Data onEachCycle(CycleAction action) {
+
+            this.cycleAction = action;
+
+            return this;
+        }
+
+        public Data onCycleError(CycleError error) {
+
+            this.cycleError = error;
 
             return this;
         }

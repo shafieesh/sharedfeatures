@@ -40,7 +40,7 @@ public class _AccountPermissions {
                 .setName("AccountPermissionsManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 0, 10, 0)
-                .setTimingListener(task -> {
+                .onEachCycle(() -> {
                     fetchPermissions();
                     fetchUserPermissions();
                 })
