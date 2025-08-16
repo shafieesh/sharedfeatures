@@ -84,7 +84,14 @@ public class Task {
 
             } catch (Exception e) {
 
-                task.cycleError.handle(e);
+                if (task.cycleError != null) {
+
+                    task.cycleError.handle(e);
+
+                } else {
+
+                    System.out.println(task.name + " throws unhandled exception : " + e.getMessage());
+                }
             }
         }
     }
@@ -106,7 +113,14 @@ public class Task {
 
                 } catch (Exception e) {
 
-                    task.cycleError.handle(e);
+                    if (task.cycleError != null) {
+
+                        task.cycleError.handle(e);
+
+                    } else {
+
+                        System.out.println(task.name + " throws unhandled exception : " + e.getMessage());
+                    }
                 }
             });
         }
