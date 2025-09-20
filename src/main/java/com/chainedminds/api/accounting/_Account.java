@@ -35,7 +35,7 @@ public class _Account<Data extends _Data<?>> {
     protected static final String FIELD_REGISTRATION_TIME = "RegistrationTime";
     protected static final String FIELD_LAST_UPDATE = "LastUpdate";
 
-    protected static final Map<Integer, String> MAPPING_USER_ID = new HashMap<>();
+    protected static final Map<Integer, String> MAPPING_USER_ID = new LinkedHashMap<>();
 
     protected final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
@@ -66,7 +66,7 @@ public class _Account<Data extends _Data<?>> {
 
         _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
 
-            private final Map<Integer, String> mappingUserIDs = new HashMap<>();
+            private final Map<Integer, String> mappingUserIDs = new LinkedHashMap<>();
 
             @Override
             public void onFetchingData(ResultSet resultSet) throws Exception {
@@ -189,6 +189,15 @@ public class _Account<Data extends _Data<?>> {
     public void getUserIDMap(String tag, Utilities.GrantAccess<Map<Integer, String>> job) {
 
         Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(MAPPING_USER_ID));
+    }
+
+    public Map<Integer, String> getUserIDMap() {
+
+        Map<Integer, String> userIDMap = new LinkedHashMap<>();
+
+        Utilities.lock(TAG, LOCK.readLock(), () -> userIDMap.putAll(MAPPING_USER_ID));
+
+        return userIDMap;
     }
 
     //------------------------------------------------------------------------------------
