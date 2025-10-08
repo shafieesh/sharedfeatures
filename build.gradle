@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.chainedminds'
-version '1.0.97'
+version '1.0.98'
 
 repositories {
     mavenCentral()
@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation('com.fasterxml.jackson.core:jackson-databind:2.20.0')
     implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.0')
-    implementation('com.squareup.okhttp3:okhttp:5.1.0')
+    implementation('com.squareup.okhttp3:okhttp:5.2.0')
     implementation('org.brotli:dec:0.1.2')
     implementation('io.netty:netty-all:4.2.6.Final')
     implementation('com.mysql:mysql-connector-j:9.4.0')

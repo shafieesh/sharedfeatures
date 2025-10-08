@@ -254,7 +254,7 @@ public class _Account<Data extends _Data<?>> {
     protected final boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
 
         String statement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " +
-                fieldName + " = ?, " + FIELD_LAST_UPDATE + " = ? WHERE " + FIELD_USER_ID + " = ?";
+                fieldName + " = ?, " + FIELD_LAST_UPDATE + " = NOW() WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
