@@ -18,13 +18,8 @@ public class _Data<Account extends _AccountData> {
     public int response;
     public String message;
 
-    public _FileData file;
-    public List<_FileData> files;
-
     public _FriendData friend;
     public List<_FriendData> friends;
-
-    public _DbData database;
 
     public String engine = _Config.ENGINE_NAME;
 }
