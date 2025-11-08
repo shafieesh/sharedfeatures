@@ -273,15 +273,14 @@ public class _Account<Data extends _Data<?>> {
 
     //------------------------------------------------------------------------------------
 
-    public Data authenticateCredential(Data data) {
+    public void authenticateCredential(Data data) {
 
         data.response = _Codes.RESPONSE_NOK;
 
         if (data.account == null || data.account.credential == null || data.subRequest == null) {
 
             data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
-
-            return data;
+            return;
         }
 
         int userID = data.account.id;
@@ -295,7 +294,7 @@ public class _Account<Data extends _Data<?>> {
 
                 data.message = Messages.get("GENERAL", Messages.General.CREDENTIAL_EXPIRED, data.client.language);
                 data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
-                return data;
+                return;
             }
 
             //---------CHECK IF CREDENTIAL IS VALID-------
@@ -305,14 +304,14 @@ public class _Account<Data extends _Data<?>> {
             if (credentialIsValid == null) {
 
                 data.response = _Codes.RESPONSE_NOK;
-                return data;
+                return;
             }
 
             if (!credentialIsValid) {
 
                 data.message = Messages.get("GENERAL", Messages.General.CREDENTIAL_EXPIRED, data.client.language);
                 data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
-                return data;
+                return;
             }
         }
 
@@ -335,10 +334,10 @@ public class _Account<Data extends _Data<?>> {
 
         //------------REQUESTS------------------------
 
-        return onSubRequestReceived(data);
+        onSubRequestReceived(data);
     }
 
-    public Data onSubRequestReceived(Data data) {
+    public void onSubRequestReceived(Data data) {
 
         int userID = data.account.id;
         int subRequest = data.subRequest;
@@ -348,11 +347,9 @@ public class _Account<Data extends _Data<?>> {
             data.response = _Codes.RESPONSE_OK;
             data.message = null;
         }
-
-        return data;
     }
 
-    protected Data setPhoneNumber(Data data) {
+    protected void setPhoneNumber(Data data) {
 
         data.response = _Codes.RESPONSE_NOK;
 
@@ -360,8 +357,7 @@ public class _Account<Data extends _Data<?>> {
 
             data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
-
-            return data;
+            return;
         }
 
         int userID = data.account.id;
@@ -373,11 +369,9 @@ public class _Account<Data extends _Data<?>> {
 
             data.response = _Codes.RESPONSE_OK;
         }
-
-        return data;
     }
 
-    protected Data setEmail(Data data) {
+    protected void setEmail(Data data) {
 
         data.response = _Codes.RESPONSE_NOK;
 
@@ -385,8 +379,7 @@ public class _Account<Data extends _Data<?>> {
 
             data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
-
-            return data;
+            return;
         }
 
         int userID = data.account.id;
@@ -398,11 +391,9 @@ public class _Account<Data extends _Data<?>> {
 
             data.response = _Codes.RESPONSE_OK;
         }
-
-        return data;
     }
 
-    protected Data setName(Data data) {
+    protected void setName(Data data) {
 
         data.response = _Codes.RESPONSE_NOK;
 
@@ -410,8 +401,7 @@ public class _Account<Data extends _Data<?>> {
 
             data.message = Messages.get("GENERAL",
                     Messages.General.MISSING_DATA, data.client.language);
-
-            return data;
+            return;
         }
 
         int userID = data.account.id;
@@ -423,8 +413,6 @@ public class _Account<Data extends _Data<?>> {
 
             data.response = _Codes.RESPONSE_OK;
         }
-
-        return data;
     }
 
     //------------------------------------------------------------------------------------

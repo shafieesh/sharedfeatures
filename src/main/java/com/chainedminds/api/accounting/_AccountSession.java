@@ -2,7 +2,6 @@ package com.chainedminds.api.accounting;
 
 import com.chainedminds._Config;
 import com.chainedminds.api.IPLocationFinder;
-import com.chainedminds.models._Data;
 import com.chainedminds.utilities.Cache;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.database.DBResult;
@@ -10,7 +9,6 @@ import com.chainedminds.utilities.database.TwoStepQueryCallback;
 import com.chainedminds.utilities.database._DatabaseOld;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,7 +43,6 @@ public class _AccountSession {
                 .setInterval(0, 0, _Config.CACHED_USERS_INFO_REFRESH_RATE, 0)
                 .onEachCycle(CACHED_USERS_INFO::clear)
                 .schedule());
-
 
         Task.add(Task.Data.build()
                 .setName("Remove Stale Sessions")
@@ -155,13 +152,6 @@ public class _AccountSession {
         }
 
         return null;
-    }
-
-    public Set<Integer> getUserIDs(String appName) {
-
-        DBResult<Set<Integer>> result = getProperties(appName, FIELD_USER_ID, new HashSet<>(), Integer.class);
-
-        return result.value;
     }
 
     //------------------------
@@ -275,47 +265,6 @@ public class _AccountSession {
         return result.value;
     }
 
-    public Set<Integer> getSimilarAccountsByFirebaseID(int userID, Collection<String> firebaseIDs) {
-
-        Set<Integer> userIDs = new HashSet<>();
-
-        userIDs.add(userID);
-
-        if (firebaseIDs != null && !firebaseIDs.isEmpty()) {
-
-            Map<Integer, Object> parameters = new HashMap<>();
-
-            List<String> questionMarks = new ArrayList<>();
-
-            int counter = 1;
-
-            for (String firebaseID : firebaseIDs) {
-
-                parameters.put(counter, firebaseID);
-
-                questionMarks.add("?");
-
-                counter++;
-            }
-
-            String questionMarksArray = String.join(", ", questionMarks);
-
-            String statement = "SELECT DISTINCT " + FIELD_USER_ID +
-                    " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
-                    " WHERE " + FIELD_FIREBASE_ID + " IN (" + questionMarksArray + ")";
-
-            _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
-
-                while (resultSet.next()) {
-
-                    userIDs.add(resultSet.getInt(FIELD_USER_ID));
-                }
-            });
-        }
-
-        return userIDs;
-    }
-
     public boolean removeFirebaseID(int userID, String firebaseID) {
 
         String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
@@ -341,47 +290,6 @@ public class _AccountSession {
         DBResult<Set<String>> result = getProperties(userID, FIELD_IP_ADDRESS, new HashSet<>(), String.class);
 
         return result.value;
-    }
-
-    public Set<Integer> getSimilarAccountsByIPAddresses(int userID, Collection<String> ipAddresses) {
-
-        Set<Integer> userIDs = new HashSet<>();
-
-        userIDs.add(userID);
-
-        if (ipAddresses != null && !ipAddresses.isEmpty()) {
-
-            Map<Integer, Object> parameters = new HashMap<>();
-
-            List<String> questionMarks = new ArrayList<>();
-
-            int counter = 1;
-
-            for (String ipAddress : ipAddresses) {
-
-                parameters.put(counter, ipAddress);
-
-                questionMarks.add("?");
-
-                counter++;
-            }
-
-            String questionMarksArray = String.join(", ", questionMarks);
-
-            String statement = "SELECT DISTINCT " + FIELD_USER_ID +
-                    " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
-                    " WHERE " + FIELD_IP_ADDRESS + " IN (" + questionMarksArray + ")";
-
-            _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
-
-                while (resultSet.next()) {
-
-                    userIDs.add(resultSet.getInt(FIELD_USER_ID));
-                }
-            });
-        }
-
-        return userIDs;
     }
 
     //------------------------------------------------------------------------------------
@@ -683,49 +591,6 @@ public class _AccountSession {
         return result;
     }
 
-    public boolean setProperty(int userID, String appName, String platform, String field, Object value) {
-
-        return setProperty(null, userID, appName, platform, field, value);
-    }
-
-    public boolean setProperty(Connection connection, int userID, String appName, String platform, String field, Object value) {
-
-        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_SESSIONS + " (" +
-                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_PLATFORM + ", " + field +
-                ") VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE " + field + " = VALUES (" + field + ")" +
-                ", " + FIELD_LAST_UPDATE + " = NOW()";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, platform);
-        parameters.put(4, value);
-
-        if (connection == null) {
-
-            return _DatabaseOld.update(TAG, updateStatement, parameters);
-
-        } else {
-
-            return _DatabaseOld.update(connection, TAG, updateStatement, parameters);
-        }
-    }
-
-    public boolean setProperty(Connection connection, int userID, String appName, String field, Object value) {
-
-        String updateStatement = "INSERT INTO " + _Config.TABLE_ACCOUNTS_SESSIONS + " (" +
-                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + field +
-                ") VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE " + field +
-                " = VALUES (" + field + ")" + ", " + FIELD_LAST_UPDATE + " = NOW()";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, value);
-
-        return _DatabaseOld.update(connection, TAG, updateStatement, parameters);
-    }
-
     //------------------------------------------------------------------------------------
 
     protected void updateAccount(String credential, String version,
@@ -736,6 +601,14 @@ public class _AccountSession {
 
             country = IPLocationFinder.getCountry(ipAddress);
         }
+        if (language != null) {
+
+            language = language.toUpperCase();
+        }
+        if ("0".equals(version)) {
+
+            version = null;
+        }
 
         String statement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
                 FIELD_VERSION + " = COALESCE(?, " + FIELD_VERSION + "), " +
@@ -745,7 +618,7 @@ public class _AccountSession {
                 FIELD_LAST_UPDATE + " = NOW() WHERE " + FIELD_CREDENTIAL + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-        parameters.put(1, (version == null || version.equals("0")) ? null : version);
+        parameters.put(1, version);
         parameters.put(2, language);
         parameters.put(3, firebaseID);
         parameters.put(4, ipAddress);
@@ -759,176 +632,6 @@ public class _AccountSession {
             CACHED_USERS_INFO.add(credential);
         }
     }
-
-    public <Data extends _Data<?>> Data getFullProfile(int profileID, Data data) {
-
-        return data;
-    }
-
-    public <Data extends _Data<?>> Data getPublicProfile(int profileID, Data data) {
-
-        return data;
-    }
-
-    /*public int getScore(int userID, String appName, String platform) {
-
-        DBResult<Integer> result = getProperty(userID, appName, platform, FIELD_SCORE, Integer.class);
-
-        if (result.isSuccessful()) {
-
-            return result.value;
-        }
-
-        return BaseCodes.NOT_FOUND;
-    }
-
-    public void addScore(Integer userID, String appName, String platform, String gameName, int score, int playTime, boolean wonGame) {
-
-        synchronized (userID) {
-
-            int currentScore = getScore(userID, appName, platform);
-
-            boolean wasSuccessful = currentScore != BaseCodes.NOT_FOUND;
-
-            int newScore = score + currentScore;
-
-            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
-
-            wasSuccessful &= setScore(connection, userID, appName, platform, newScore);
-
-            if (wasSuccessful) {
-
-                //wasSuccessful = BaseResources.getInstance().leaderboardManager.addScore(userID, appName, score);
-            }
-
-            if (wasSuccessful) {
-
-                BaseConnectionManagerOld.commit(connection);
-
-            } else {
-
-                BaseConnectionManagerOld.rollback(connection);
-
-                Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
-                        addScore(userID, appName, platform, gameName, score, playTime, wonGame));
-            }
-
-            BaseConnectionManagerOld.close(connection);
-        }
-    }
-
-    public void addScore(Integer userID, String appName, String gameName, int score) {
-
-        String statement = "INSERT " + BaseConfig.TABLE_LEADERBOARD_DAILY + " (" + FIELD_USER_ID +
-                ", " + FIELD_APP_NAME + ", " + FIELD_GAME_NAME + ", " + FIELD_SCORE + ")" + " VALUES (?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE " + FIELD_SCORE + " = " + FIELD_SCORE + " + VALUES(" + FIELD_SCORE + ")";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, gameName);
-        parameters.put(4, score);
-
-        if (userID == 1) {
-
-            parameters.put(4, 0);
-        }
-
-        synchronized (userID) {
-
-            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
-
-            boolean wasSuccessful = BaseDatabaseHelperOld.insert(connection, TAG, statement, parameters);
-
-            if (wasSuccessful) {
-
-                BaseConnectionManagerOld.commit(connection);
-
-            } else {
-
-                BaseConnectionManagerOld.rollback(connection);
-
-                Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
-                        addScore(userID, appName, gameName, score));
-            }
-
-            BaseConnectionManagerOld.close(connection);
-        }
-    }
-
-    public void setRecord(Integer userID, String appName, String gameName, int score) {
-
-        String statement = "INSERT " + BaseConfig.TABLE_LEADERBOARD_DAILY + " (" + FIELD_USER_ID +
-                ", " + FIELD_APP_NAME + ", " + FIELD_GAME_NAME + ", " + FIELD_SCORE + ") VALUES (?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE " + FIELD_SCORE + " = IF(" + FIELD_SCORE + " < VALUES(" + FIELD_SCORE + ")," +
-                " VALUES(" + FIELD_SCORE + "), " + FIELD_SCORE + ")";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, gameName);
-        parameters.put(4, score);
-
-        if (userID == 1) {
-
-            parameters.put(4, 0);
-        }
-
-        synchronized (userID) {
-
-            Connection connection = BaseConnectionManagerOld.getConnection(BaseConnectionManagerOld.MANUAL_COMMIT);
-
-            boolean wasSuccessful = BaseDatabaseHelperOld.insert(connection, TAG, statement, parameters);
-
-            if (wasSuccessful) {
-
-                BaseConnectionManagerOld.commit(connection);
-
-            } else {
-
-                BaseConnectionManagerOld.rollback(connection);
-
-                Utilities.retryWithin(BaseConfig.ONE_MINUTE, () ->
-                        setRecord(userID, appName, gameName, score));
-            }
-
-            BaseConnectionManagerOld.close(connection);
-        }
-    }
-
-    public void addLeagueScore(Integer userID, String appName, String gameName,
-                               int score, int playTime, boolean wonGame, int leagueID) {
-
-        if (userID == 1) {
-
-            score = 0;
-        }
-
-        String statement = "INSERT " + BaseConfig.TABLE_LEAGUE_GAMES + " (" +
-                FIELD_USER_ID + ", " + FIELD_APP_NAME + ", " + FIELD_GAME_NAME +
-                ", " + FIELD_PLAY_TIME + ", " + FIELD_SCORE + ", " + FIELD_RESULT +
-                ", " + FIELD_LEAGUE_ID + ", " + FIELD_DATE_TIME + ")" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
-
-        Map<Integer, Object> parameters = new HashMap<>();
-
-        parameters.put(1, userID);
-        parameters.put(2, appName);
-        parameters.put(3, gameName);
-        parameters.put(4, playTime);
-        parameters.put(5, score);
-        parameters.put(6, wonGame);
-        parameters.put(7, leagueID);
-
-        BaseDatabaseHelperOld.insert(TAG, statement, parameters);
-    }
-
-    protected boolean setScore(Connection connection, int userID, String appName, String platform, int score) {
-
-        return setProperty(connection, userID, appName, platform, FIELD_SCORE, score);
-    }*/
 
     //------------------------------------------------------------------------------------
 

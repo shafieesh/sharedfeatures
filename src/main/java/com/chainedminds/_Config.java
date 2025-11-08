@@ -281,7 +281,7 @@ public class _Config {
 
     //-------------------------------------------------------------//
 
-    public static boolean DEBUG_MODE = true;
+    public static boolean DEBUG_MODE = false;
     public static String DATABASE_URL;
 
     //-------------------------------------------------------------//
