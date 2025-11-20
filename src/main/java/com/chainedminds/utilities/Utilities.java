@@ -383,6 +383,25 @@ public class Utilities {
         return false;
     }
 
+    public static boolean valueChanged(Object object1, Object object2) {
+
+        if (object1 != null) {
+
+            if (object2 == null) {
+
+                return true;
+
+            } else {
+
+                return !object1.equals(object2);
+            }
+
+        } else {
+
+            return object2 != null;
+        }
+    }
+
     public static class Pagination {
 
         public static <T> void getRange(List<T> contents, int offset, int limit, Callback<T> callback) {
