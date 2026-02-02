@@ -136,8 +136,8 @@ public class DynamicConfig {
 
         String key = section + "-" + field;
 
-        String statement = "REPLACE INTO " + _Config.TABLE_DYNAMIC_CONFIGS + " (" +
-                FIELD_KEY + ", " + FIELD_TYPE + ", " + FIELD_VALUE + ") VALUES (?, ?, ?)";
+        String statement = "REPLACE INTO " + _Config.TABLE_DYNAMIC_CONFIGS + " (`" +
+                FIELD_KEY + "`, " + FIELD_TYPE + ", " + FIELD_VALUE + ") VALUES (?, ?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, key);
