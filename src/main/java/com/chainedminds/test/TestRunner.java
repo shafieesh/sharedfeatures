@@ -1,7 +1,6 @@
 package com.chainedminds.test;
 
 import com.chainedminds._Config;
-import com.chainedminds.network.netty.NettyServer;
 
 class TestRunner {
 
