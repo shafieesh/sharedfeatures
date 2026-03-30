@@ -107,7 +107,7 @@ public class _InternalPayment {
         int userID = data.account.id;
         String appName = data.client.appName;
 
-        data.account.subscriptions = _AccountPermissions.getPermissions(userID, appName);
+        data.account.subscriptions = _AccountPermissions.get(userID);
 
         data.response = _Codes.RESPONSE_OK;
 

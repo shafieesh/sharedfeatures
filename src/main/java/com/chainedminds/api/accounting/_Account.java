@@ -163,7 +163,7 @@ public class _Account<Data extends _Data<?>> {
 
     protected int registerAccount(String name) {
 
-        AtomicInteger userID = new AtomicInteger(_Config.NOT_FOUND);
+        AtomicInteger userID = new AtomicInteger(_Codes.NOT_FOUND);
 
         String insertStatement = "INSERT " + _Config.TABLE_ACCOUNTS + " (" + FIELD_NAME + ") VALUES (?)";
 
@@ -239,7 +239,7 @@ public class _Account<Data extends _Data<?>> {
 
             if (T == Integer.class) {
 
-                value.set((T) Integer.valueOf(_Config.NOT_FOUND));
+                value.set((T) Integer.valueOf(_Codes.NOT_FOUND));
             }
         }
 
@@ -279,7 +279,7 @@ public class _Account<Data extends _Data<?>> {
 
         if (data.account == null || data.account.credential == null || data.subRequest == null) {
 
-            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
             return;
         }
 
@@ -292,7 +292,7 @@ public class _Account<Data extends _Data<?>> {
 
             if (!validateUserID(userID)) {
 
-                data.message = Messages.get("GENERAL", Messages.General.CREDENTIAL_EXPIRED, data.client.language);
+                data.message = Messages.get(Messages.CREDENTIAL_EXPIRED, data.client.language);
                 data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
                 return;
             }
@@ -309,7 +309,7 @@ public class _Account<Data extends _Data<?>> {
 
             if (!credentialIsValid) {
 
-                data.message = Messages.get("GENERAL", Messages.General.CREDENTIAL_EXPIRED, data.client.language);
+                data.message = Messages.get(Messages.CREDENTIAL_EXPIRED, data.client.language);
                 data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
                 return;
             }
@@ -326,7 +326,7 @@ public class _Account<Data extends _Data<?>> {
             String ipAddress = data.client.address;
             String country = data.client.country;
 
-            NettyServer.execute(() -> _Resources.get().accountSession.updateAccount(
+            NettyServer.execute(() -> _Resources.get().accountSession.update(
                     credential, version, language, firebaseID, ipAddress, country));
         }
 
@@ -355,8 +355,7 @@ public class _Account<Data extends _Data<?>> {
 
         if (data.account == null || (data.account.phoneNumber + "").length() == 0) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
             return;
         }
 
@@ -377,8 +376,7 @@ public class _Account<Data extends _Data<?>> {
 
         if (data.account == null || data.account.email == null || data.account.email.isEmpty()) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
             return;
         }
 
@@ -399,8 +397,7 @@ public class _Account<Data extends _Data<?>> {
 
         if (data.account == null || data.account.name == null) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
             return;
         }
 
@@ -423,8 +420,8 @@ public class _Account<Data extends _Data<?>> {
 
         if (data.account == null || data.client == null || data.client.packageName == null) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(
+                    Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -475,7 +472,7 @@ public class _Account<Data extends _Data<?>> {
 
             data.response = BaseCodes.RESPONSE_NOK_INVALID_APPLICATION_ID;
 
-            data.message = Messages.get("GENERAL", Messages
+            data.message = Messages.get(Messages
                     .General.INVALID_APPLICATION_ID, data.client.language);
         }
 

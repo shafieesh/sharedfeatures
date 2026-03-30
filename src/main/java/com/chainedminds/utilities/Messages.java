@@ -5,23 +5,18 @@ import com.chainedminds.utilities.database._DatabaseOld;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 
 public class Messages {
 
     protected static final String TAG = Messages.class.getSimpleName();
 
-    public static final String ACTIVITIES = "ACTIVITIES";
-
-    private static final String FIELD_SECTION = "Section";
-    private static final String FIELD_MESSAGE_ID = "MessageID";
+    private static final String FIELD_ID = "ID";
     private static final String FIELD_LANGUAGE = "Language";
-    private static final String FIELD_VALUE = "Value";
+    private static final String FIELD_MESSAGE = "Message";
 
     private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
@@ -52,11 +47,9 @@ public class Messages {
                 while (resultSet.next()) {
 
                     Message message = new Message();
-
-                    message.section = resultSet.getString(FIELD_SECTION);
-                    message.messageID = resultSet.getString(FIELD_MESSAGE_ID);
+                    message.id = resultSet.getString(FIELD_ID);
                     message.language = resultSet.getString(FIELD_LANGUAGE);
-                    message.value = resultSet.getString(FIELD_VALUE);
+                    message.message = resultSet.getString(FIELD_MESSAGE);
 
                     messages.add(message);
                 }
@@ -78,14 +71,51 @@ public class Messages {
         });
     }
 
-    public static String get(String section, String messageID, String language, String value) {
+    public static String get(String messageID, String language) {
 
-        return get(section, messageID, language, new String[]{value});
+        String isoLanguage = language.toUpperCase();
+
+        AtomicReference<String> messageHolder = new AtomicReference<>();
+
+        Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+            for (Message message : MESSAGES) {
+
+                if (message.id.equals(messageID) && message.language.equals(isoLanguage)) {
+
+                    messageHolder.set(message.message);
+                    break;
+                }
+            }
+        });
+
+        if (messageHolder.get() == null) {
+
+            messageHolder.set("MESSAGE " + messageID + " IS NOT DEFINED");
+        }
+
+        return messageHolder.get();
     }
 
-    public static String get(String section, String messageID, String language, String[] values) {
+    public static String get(String messageID, String language, String value) {
 
-        String message = get(section, messageID, language);
+        return get(messageID, language, Collections.singletonList(value));
+    }
+
+    public static String get(String messageID, String language, String... values) {
+
+        String message = get(messageID, language);
+
+        message = fulfill(message, Arrays.asList(values));
+
+        message = fixDirections(message, language);
+
+        return message;
+    }
+
+    public static String get(String messageID, String language, List<String> values) {
+
+        String message = get(messageID, language);
 
         message = fulfill(message, values);
 
@@ -94,45 +124,13 @@ public class Messages {
         return message;
     }
 
-    public static String get(String section, String messageID, String language) {
+    public static String fulfill(String message, List<String> values) {
 
-        String isoLanguage = language.toUpperCase();
+        for (int index = 0; index < values.size(); index++) {
 
-        AtomicReference<String> translatedMessage = new AtomicReference<>();
+            String value = values.get(index);
 
-        Utilities.lock(TAG, LOCK.readLock(), () -> {
-
-            for (Message message : MESSAGES) {
-
-                if (message.section.equals(section) &&
-                        message.messageID.equals(messageID) &&
-                        message.language.equals(isoLanguage)) {
-
-                    translatedMessage.set(message.value);
-
-                    break;
-                }
-            }
-        });
-
-        if (translatedMessage.get() == null) {
-
-            translatedMessage.set("MESSAGE " + section + "-" + messageID + " IS NOT DEFINED");
-        }
-
-        return translatedMessage.get();
-    }
-
-    public static String fulfill(String message, String value) {
-
-        return fulfill(message, new String[]{value});
-    }
-
-    public static String fulfill(String message, String[] values) {
-
-        for (int index = 0; index < values.length; index++) {
-
-            message = message.replace("$" + index, values[index]);
+            message = message.replace("$" + index, value);
         }
 
         return message;
@@ -161,73 +159,23 @@ public class Messages {
 
     private static class Message {
 
-        String section;
-        String messageID;
+        String id;
         String language;
-        String value;
+        String message;
     }
 
-    public static class General {
-
-        public static String YOU_HAVE_TOO_MANY_FRIENDS = "YOU_HAVE_TOO_MANY_FRIENDS";
-        public static String TARGET_HAS_TOO_MANY_FRIENDS = "TARGET_HAS_TOO_MANY_FRIENDS";
-
-        public static String SERVERS_ARE_NOT_AVAILABLE = "SERVERS_ARE_NOT_AVAILABLE";
-        public static String MISSING_DATA = "MISSING_DATA";
-        public static String MISSING_PERMISSION = "MISSING_PERMISSION";
-        public static String USERNAME_IS_TOO_SHORT = "USERNAME_IS_TOO_SHORT";
-        public static String PASSWORD_IS_TOO_SHORT = "PASSWORD_IS_TOO_SHORT";
-        public static String INVALID_USERNAME_OR_PASSWORD = "INVALID_USERNAME_OR_PASSWORD";
-        public static String SOMETHING_WENT_WRONG = "SOMETHING_WENT_WRONG";
-        public static String SOMETHING_WENT_WRONG_TRY_AGAIN = "SOMETHING_WENT_WRONG_TRY_AGAIN";
-        public static String TOO_MANY_ATTEMPTS = "TOO_MANY_ATTEMPTS";
-        public static String CREDENTIAL_EXPIRED = "CREDENTIAL_EXPIRED";
-        public static String ACCOUNT_DEACTIVATED = "ACCOUNT_DEACTIVATED";
-
-        public static String USERNAME_HAS_REGISTERED_BEFORE = "USERNAME_HAS_REGISTERED_BEFORE";
-
-    }
-
-    public static class Notification {
-
-        public static final String TOUCH_HERE_TO_OPEN = "TOUCH_HERE_TO_OPEN";
-
-        public static class Friendship {
-
-            public static final String NEW_FRIEND_REQUEST = "NEW_FRIEND_REQUEST";
-            public static final String FRIEND_BECAME_ONLINE = "FRIEND_BECAME_ONLINE";
-            public static final String ACCEPTED_YOUR_FRIENDSHIP = "ACCEPTED_YOUR_FRIENDSHIP";
-
-            public static final String TAG_NEW_FRIEND_REQUEST = "friendship_new_friendship_request";
-            public static final String TAG_FRIEND_BECAME_ONLINE = "friendship_friend_became_online";
-            public static final String TAG_ACCEPTED_YOUR_FRIENDSHIP = "friendship_accepted_your_friendship";
-        }
-    }
-
-    public static class Friendship {
-
-        public static final String GAMERTAG_IS_NOW_ONLINE = "GAMERTAG_IS_NOW_ONLINE";
-        public static final String GAMERTAG_IS_ONLINE = "GAMERTAG_IS_ONLINE";
-        public static final String X_PLAYERS_ARE_ONLINE = "X_PLAYERS_ARE_ONLINE";
-    }
-
-    public static class Activities {
-
-        public static final String PLAYING_DB = "PLAYING_DB";
-        public static final String PLAYING_C4 = "PLAYING_C4";
-        public static final String PLAYING_TF = "PLAYING_TF";
-        public static final String PLAYING_BB = "PLAYING_BB";
-        public static final String PLAYING_MCH = "PLAYING_MCH";
-        public static final String PLAYING_QW = "PLAYING_QW";
-        public static final String PLAYING_FF = "PLAYING_FF";
-        public static final String PLAYING_WE = "PLAYING_WE";
-
-        public static final String ONLINE = "ONLINE";
-
-        public static final String WAS_ONLINE_YEARS_AGO = "WAS_ONLINE_YEARS_AGO";
-        public static final String WAS_ONLINE_MONTHS_AGO = "WAS_ONLINE_MONTHS_AGO";
-        public static final String WAS_ONLINE_DAYS_AGO = "WAS_ONLINE_DAYS_AGO";
-        public static final String WAS_ONLINE_HOURS_AGO = "WAS_ONLINE_HOURS_AGO";
-        public static final String WAS_ONLINE_MINUTES_AGO = "WAS_ONLINE_MINUTES_AGO";
-    }
+    public static String YOU_HAVE_TOO_MANY_FRIENDS = "YOU_HAVE_TOO_MANY_FRIENDS";
+    public static String TARGET_HAS_TOO_MANY_FRIENDS = "TARGET_HAS_TOO_MANY_FRIENDS";
+    public static String SERVERS_ARE_NOT_AVAILABLE = "SERVERS_ARE_NOT_AVAILABLE";
+    public static String MISSING_DATA = "MISSING_DATA";
+    public static String MISSING_PERMISSION = "MISSING_PERMISSION";
+    public static String USERNAME_IS_TOO_SHORT = "USERNAME_IS_TOO_SHORT";
+    public static String PASSWORD_IS_TOO_SHORT = "PASSWORD_IS_TOO_SHORT";
+    public static String INVALID_USERNAME_OR_PASSWORD = "INVALID_USERNAME_OR_PASSWORD";
+    public static String SOMETHING_WENT_WRONG = "SOMETHING_WENT_WRONG";
+    public static String SOMETHING_WENT_WRONG_TRY_AGAIN = "SOMETHING_WENT_WRONG_TRY_AGAIN";
+    public static String TOO_MANY_ATTEMPTS = "TOO_MANY_ATTEMPTS";
+    public static String CREDENTIAL_EXPIRED = "CREDENTIAL_EXPIRED";
+    public static String ACCOUNT_DEACTIVATED = "ACCOUNT_DEACTIVATED";
+    public static String USERNAME_HAS_REGISTERED_BEFORE = "USERNAME_HAS_REGISTERED_BEFORE";
 }

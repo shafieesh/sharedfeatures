@@ -113,8 +113,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -142,14 +141,12 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
             case YOU_HAVE_TOO_MANY_FRIENDS:
 
-                data.message = Messages.get("GENERAL", Messages.General.
-                        YOU_HAVE_TOO_MANY_FRIENDS, language);
+                data.message = Messages.get(Messages.YOU_HAVE_TOO_MANY_FRIENDS, language);
                 return data;
 
             case TARGET_HAS_TOO_MANY_FRIENDS:
 
-                data.message = Messages.get("GENERAL", Messages.General.
-                        TARGET_HAS_TOO_MANY_FRIENDS, language);
+                data.message = Messages.get(Messages.TARGET_HAS_TOO_MANY_FRIENDS, language);
                 return data;
         }
 
@@ -210,13 +207,12 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 String receiverLanguage = _Resources.get()
                         .accountSession.getLanguage(receiverID, appName);
 
-                String tag = Messages.Notification.Friendship.TAG_NEW_FRIEND_REQUEST;
+                String tag = "friendship_new_friendship_request";
 
-                String title = Messages.get("NOTIFICATION", Messages.Notification.
-                        Friendship.NEW_FRIEND_REQUEST, receiverLanguage, requestingName);
+                String title = Messages.get("NEW_FRIEND_REQUEST",
+                        receiverLanguage, requestingName);
 
-                String message = Messages.get("NOTIFICATION", Messages.Notification.
-                        TOUCH_HERE_TO_OPEN, receiverLanguage);
+                String message = Messages.get("TOUCH_HERE_TO_OPEN", receiverLanguage);
 
                 _NotificationManager.sendNotification(receiverID, appName, tag, title, message);
             }
@@ -236,8 +232,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -295,13 +290,12 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 String receiverLanguage = _Resources.get()
                         .accountSession.getLanguage(receiverID, appName);
 
-                String tag = Messages.Notification.Friendship.TAG_ACCEPTED_YOUR_FRIENDSHIP;
+                String tag = "friendship_accepted_your_friendship";
 
-                String title = Messages.get("NOTIFICATION", Messages.Notification.
-                        Friendship.ACCEPTED_YOUR_FRIENDSHIP, receiverLanguage, requestingName);
+                String title = Messages.get("ACCEPTED_YOUR_FRIENDSHIP",
+                        receiverLanguage, requestingName);
 
-                String message = Messages.get("NOTIFICATION", Messages.Notification.
-                        TOUCH_HERE_TO_OPEN, receiverLanguage);
+                String message = Messages.get("TOUCH_HERE_TO_OPEN", receiverLanguage);
 
                 _NotificationManager.sendNotification(receiverID, appName, tag, title, message);
             }
@@ -316,8 +310,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -372,8 +365,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
         if (data.friend == null || data.friend.id == 0) {
 
-            data.message = Messages.get("GENERAL",
-                    Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -727,8 +719,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
 
                 String playersCount = Utilities.localizeNumbers(onlineFriendIDs.size() + "", receiverLanguage);
 
-                String message = Messages.get("FRIENDSHIP", Messages.Friendship.
-                        X_PLAYERS_ARE_ONLINE, receiverLanguage, playersCount);
+                String message = Messages.get("X_PLAYERS_ARE_ONLINE", receiverLanguage, playersCount);
 
                 _NotificationManager.sendMessage(userID, appName, message);
 
@@ -737,8 +728,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
                 String name = _Resources.get()
                         .account.getName(onlineFriendIDs.get(0));
 
-                String message = Messages.get("FRIENDSHIP", Messages.Friendship.
-                        GAMERTAG_IS_ONLINE, receiverLanguage, name);
+                String message = Messages.get("GAMERTAG_IS_ONLINE", receiverLanguage, name);
 
                 _NotificationManager.sendMessage(userID, appName, message);
             }
@@ -751,8 +741,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
             String receiverLanguage = _Resources.get()
                     .accountSession.getLanguage(friendID, appName);
 
-            String message = Messages.get("FRIENDSHIP", Messages.Friendship.
-                    GAMERTAG_IS_NOW_ONLINE, receiverLanguage, name);
+            String message = Messages.get("GAMERTAG_IS_NOW_ONLINE", receiverLanguage, name);
 
             _NotificationManager.sendMessage(friendID, appName, message);
         }

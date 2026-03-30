@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class BackgroundGradient {
 
-    public int id = _Codes.UNDEFINED;
+    public int id = _Codes.NOT_FOUND;
     public String type;
     public String[] colors;
     public String orientation;

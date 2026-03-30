@@ -255,7 +255,7 @@ public class _IABPayment<
                 data.iabTransaction.sku == null ||
                 data.iabTransaction.token == null) {
 
-            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -338,7 +338,7 @@ public class _IABPayment<
 
             if (verified == null) {
 
-                data.message = Messages.get("GENERAL", Messages.General.SERVERS_ARE_NOT_AVAILABLE, language);
+                data.message = Messages.get(Messages.SERVERS_ARE_NOT_AVAILABLE, language);
 
                 return data;
             }
@@ -366,7 +366,7 @@ public class _IABPayment<
 
             data.response = BaseCodes.RESPONSE_NOK;
 
-            data.message = Messages.get("GENERAL", Messages.General.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
+            data.message = Messages.get(Messages.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
         }
 
         if (iabTransaction.state == PURCHASE_STATE_APPLIED) {
@@ -801,8 +801,8 @@ public class _IABPayment<
 
                     String notificationLanguage = "FA";
 
-                    String notificationMessage = Messages.get("GENERAL",
-                            Messages.General.SUBSCRIPTION_CANCELED, notificationLanguage);
+                    String notificationMessage = Messages.get(
+                            Messages.SUBSCRIPTION_CANCELED, notificationLanguage);
 
                     BaseNotificationManager.sendNotification(userID, appName, BaseConfig.APP_NAME_CAFE_GAME, notificationMessage);
 
@@ -815,7 +815,7 @@ public class _IABPayment<
                 } else {
 
                     data.response = BaseCodes.RESPONSE_NOK;
-                    data.message = Messages.get("GENERAL", Messages.General.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
+                    data.message = Messages.get(Messages.PAYMENT_INFO_IS_NOT_VALID, data.client.language);
                 }
             }
         }

@@ -63,7 +63,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         if (data.ipgTransaction == null || data.ipgTransaction.sku == null) {
 
-            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -181,7 +181,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         if (data.ipgTransaction == null) {
 
-            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -283,7 +283,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         if (data.ipgTransaction == null) {
 
-            data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+            data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
 
             return data;
         }
@@ -659,7 +659,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         int transactionID = addArbitraryData(gateway, transaction.arbitraryData);
 
-        if (transactionID == _Codes.UNDEFINED) {
+        if (transactionID == _Codes.NOT_FOUND) {
 
             return false;
         }
@@ -685,7 +685,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
     public int addArbitraryData(String gateway, Map<String, String> arbitraryData) {
 
-        AtomicInteger arbitraryID = new AtomicInteger(_Codes.NOT_DEFINED);
+        AtomicInteger arbitraryID = new AtomicInteger(_Codes.NOT_FOUND);
 
         String table = "";
         String fields = "";

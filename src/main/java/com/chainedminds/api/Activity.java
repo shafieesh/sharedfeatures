@@ -35,39 +35,39 @@ public class Activity {
 
             case PLAYING_DB:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_DB, language);
+                return Messages.get("PLAYING_DB", language);
 
             case PLAYING_C4:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_C4, language);
+                return Messages.get("PLAYING_C4", language);
 
             case PLAYING_TF:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_TF, language);
+                return Messages.get("PLAYING_TF", language);
 
             case PLAYING_BB:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_BB, language);
+                return Messages.get("PLAYING_BB", language);
 
             case PLAYING_MCH:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_MCH, language);
+                return Messages.get("PLAYING_MCH", language);
 
             case PLAYING_QW:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_QW, language);
+                return Messages.get("PLAYING_QW", language);
 
             case PLAYING_FF:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_FF, language);
+                return Messages.get("PLAYING_FF", language);
 
             case PLAYING_WE:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.PLAYING_WE, language);
+                return Messages.get("PLAYING_WE", language);
 
             case PLAYING_CR:
 
-                return Messages.get(Messages.ACTIVITIES, Messages.Activities.ONLINE, language);
+                return Messages.get("ONLINE", language);
 
             default:
 
@@ -79,27 +79,27 @@ public class Activity {
 
                 if (diff > _Config.ONE_YEAR) {
 
-                    return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_YEARS_AGO,
+                    return Messages.get("WAS_ONLINE_YEARS_AGO",
                             language, "" + Math.round(diff / _Config.ONE_YEAR));
                 }
                 if (diff > _Config.ONE_MONTH) {
 
-                    return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_MONTHS_AGO,
+                    return Messages.get("WAS_ONLINE_MONTHS_AGO",
                             language, "" + Math.round(diff / _Config.ONE_MONTH));
                 }
                 if (diff > _Config.ONE_DAY) {
 
-                    return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_DAYS_AGO,
+                    return Messages.get("WAS_ONLINE_DAYS_AGO",
                             language, "" + Math.round(diff / _Config.ONE_DAY));
                 }
                 if (diff > _Config.ONE_HOUR) {
 
-                    return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_HOURS_AGO,
+                    return Messages.get("WAS_ONLINE_HOURS_AGO",
                             language, "" + Math.round(diff / _Config.ONE_HOUR));
                 }
                 if (diff > _Config.ONE_MINUTE) {
 
-                    return Messages.get(Messages.ACTIVITIES, Messages.Activities.WAS_ONLINE_MINUTES_AGO,
+                    return Messages.get("WAS_ONLINE_MINUTES_AGO",
                             language, "" + Math.round(diff / _Config.ONE_MINUTE));
                 }
 

@@ -1,5 +1,6 @@
 package com.chainedminds.api.accounting;
 
+import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.utilities.Cache;
@@ -409,7 +410,7 @@ public class _AccountSession {
 
             if (T == Integer.class) {
 
-                value.set((T) Integer.valueOf(_Config.NOT_FOUND));
+                value.set((T) Integer.valueOf(_Codes.NOT_FOUND));
             }
         }
 
@@ -500,7 +501,7 @@ public class _AccountSession {
 
             if (T == Integer.class) {
 
-                result.value = (T) (Integer) _Config.NOT_FOUND;
+                result.value = (T) (Integer) _Codes.NOT_FOUND;
             }
         }
 
@@ -593,9 +594,9 @@ public class _AccountSession {
 
     //------------------------------------------------------------------------------------
 
-    protected void updateAccount(String credential, String version,
-                                 String language, String firebaseID,
-                                 String ipAddress, String country) {
+    protected void update(String credential, String version,
+                          String language, String firebaseID,
+                          String ipAddress, String country) {
 
         if (country == null) {
 

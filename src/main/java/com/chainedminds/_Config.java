@@ -5,12 +5,7 @@ import okhttp3.Interceptor;
 
 public class _Config {
 
-    public static final int NOT_FOUND = -1;
-
     //-------------------------------------------------------------//
-
-    public static final boolean USING_FEATURE_SUBSCRIPTION = false;
-    public static final boolean USING_FEATURE_COIN = false;
 
     public static String FIREBASE_KEY;
     public static String FIREBASE_PROJECT_ID;

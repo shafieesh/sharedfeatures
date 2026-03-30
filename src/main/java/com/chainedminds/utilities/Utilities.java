@@ -1,6 +1,7 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds._Config;
+import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -575,6 +576,69 @@ public class Utilities {
             error.printStackTrace(new PrintWriter(stringWriter));
 
             return stringWriter.toString();
+        }
+    }
+
+    public static class Cleanup {
+
+        private static final String TAG = Cleanup.class.getSimpleName();
+
+        public static void cleanTable(String table, String primaryKey) {
+
+            long startTime = System.currentTimeMillis();
+
+            String statement = "SET @count = 0;" +
+                    "UPDATE " + table + " SET `" + primaryKey + "` = @count:= @count + 1;" +
+                    "ALTER TABLE " + table + " AUTO_INCREMENT = 1";
+
+            _DatabaseOld.update(TAG, statement, (wasSuccessful, error) -> {
+
+                long finishTime = System.currentTimeMillis();
+
+                System.out.println("Task finished in : " + (finishTime - startTime) + " ms");
+            });
+
+            System.out.println("TASK DONE");
+        }
+
+        public static void cleanTableDescending(String table, String primaryKey, int times) {
+
+            long startTime = System.currentTimeMillis();
+
+            for (int counter = 0; counter < times; counter++) {
+
+                String statement = "UPDATE  " + table + " " +
+                        "SET  " + primaryKey + " = ( " +
+                        "    SELECT gap FROM ( " +
+                        "        SELECT MIN(t1. " + primaryKey + " + 1) AS gap " +
+                        "        FROM  " + table + " t1 " +
+                        "        LEFT JOIN  " + table + " t2 " +
+                        "          ON t2. " + primaryKey + " = t1. " + primaryKey + " + 1 " +
+                        "        WHERE t2. " + primaryKey + " IS NULL " +
+                        "    ) AS g " +
+                        ") " +
+                        "WHERE  " + primaryKey + " = ( " +
+                        "    SELECT max_id FROM ( " +
+                        "        SELECT MAX( " + primaryKey + ") AS max_id " +
+                        "        FROM  " + table + " " +
+                        "    ) AS m" +
+                        ")";
+
+                _DatabaseOld.update(TAG, statement, (wasSuccessful, error) -> {
+
+                    if (!wasSuccessful) {
+
+                        System.err.println(error.getMessage());
+                    }
+                });
+
+            }
+
+            long finishTime = System.currentTimeMillis();
+
+            System.out.println("Task finished in : " + (finishTime - startTime) + " ms");
+
+            System.out.println("TASK DONE");
         }
     }
 }

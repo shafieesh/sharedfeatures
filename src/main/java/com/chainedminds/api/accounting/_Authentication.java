@@ -112,7 +112,7 @@ public class _Authentication {
             if (data.account == null || data.account.username == null || data.account.password == null ||
                     data.client.appName == null || data.client.platform == null || data.client.version == null) {
 
-                data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+                data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
                 return;
             }
 
@@ -126,7 +126,7 @@ public class _Authentication {
 
             if (isBruteForcing(address)) {
 
-                data.message = Messages.get("GENERAL", Messages.General.TOO_MANY_ATTEMPTS, language);
+                data.message = Messages.get(Messages.TOO_MANY_ATTEMPTS, language);
                 return;
             }
 
@@ -135,7 +135,7 @@ public class _Authentication {
 
             int userID = getUserID(username);
 
-            if (userID != _Config.NOT_FOUND) {
+            if (userID != _Codes.NOT_FOUND) {
 
                 Boolean passwordValidated = validatePassword(userID, password);
 
@@ -147,7 +147,7 @@ public class _Authentication {
 
                         if (isActive != null && !isActive) {
 
-                            data.message = Messages.get("GENERAL", Messages.General.ACCOUNT_DEACTIVATED, language);
+                            data.message = Messages.get(Messages.ACCOUNT_DEACTIVATED, language);
                             return;
                         }
 
@@ -167,16 +167,14 @@ public class _Authentication {
                     } else {
 
                         data.response = _Codes.RESPONSE_INVALID_LOGIN;
-                        data.message = Messages.get("GENERAL",
-                                Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
+                        data.message = Messages.get(Messages.INVALID_USERNAME_OR_PASSWORD, language);
                     }
                 }
 
             } else {
 
                 data.response = _Codes.RESPONSE_INVALID_LOGIN;
-                data.message = Messages.get("GENERAL",
-                        Messages.General.INVALID_USERNAME_OR_PASSWORD, language);
+                data.message = Messages.get(Messages.INVALID_USERNAME_OR_PASSWORD, language);
             }
         }
 
@@ -186,7 +184,7 @@ public class _Authentication {
 
             if (data.account == null || data.account.username == null || data.account.password == null) {
 
-                data.message = Messages.get("GENERAL", Messages.General.MISSING_DATA, data.client.language);
+                data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
                 return;
             }
 
@@ -195,15 +193,13 @@ public class _Authentication {
 
             if (username.length() < 4) {
 
-                data.message = Messages.get("GENERAL",
-                        Messages.General.USERNAME_IS_TOO_SHORT, data.client.language);
+                data.message = Messages.get(Messages.USERNAME_IS_TOO_SHORT, data.client.language);
                 return;
             }
 
             if (password.length() < 6) {
 
-                data.message = Messages.get("GENERAL",
-                        Messages.General.PASSWORD_IS_TOO_SHORT, data.client.language);
+                data.message = Messages.get(Messages.PASSWORD_IS_TOO_SHORT, data.client.language);
                 return;
             }
 
@@ -244,8 +240,7 @@ public class _Authentication {
 
             } else {
 
-                data.message = Messages.get("GENERAL",
-                        Messages.General.USERNAME_HAS_REGISTERED_BEFORE, data.client.language);
+                data.message = Messages.get(Messages.USERNAME_HAS_REGISTERED_BEFORE, data.client.language);
             }
         }
 
@@ -255,15 +250,13 @@ public class _Authentication {
 
             if (data.account == null || data.account.password == null) {
 
-                data.message = Messages.get("GENERAL",
-                        Messages.General.MISSING_DATA, data.client.language);
+                data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
                 return;
             }
 
             if (data.account.password.length() < 6) {
 
-                data.message = Messages.get("GENERAL",
-                        Messages.General.PASSWORD_IS_TOO_SHORT, data.client.language);
+                data.message = Messages.get(Messages.PASSWORD_IS_TOO_SHORT, data.client.language);
                 return;
             }
 
@@ -297,7 +290,7 @@ public class _Authentication {
 
         public static int getUserID(String username) {
 
-            AtomicInteger userID = new AtomicInteger(_Config.NOT_FOUND);
+            AtomicInteger userID = new AtomicInteger(_Codes.NOT_FOUND);
 
             if (username == null) {
 
@@ -439,7 +432,7 @@ public class _Authentication {
 
                 if (T == Integer.class) {
 
-                    value.set((T) Integer.valueOf(_Config.NOT_FOUND));
+                    value.set((T) Integer.valueOf(_Codes.NOT_FOUND));
                 }
             }
 
