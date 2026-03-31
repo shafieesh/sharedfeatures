@@ -7,7 +7,7 @@ class TestRunner {
     public static void main(String[] args) {
 
         _Config.config();
-        TestResources.getInstance().config();
+        TestResources.config();
 
         _Config.ENGINE_NAME = "SharedFeatures";
     }

@@ -33,41 +33,9 @@ public class Activity {
 
         switch (activity.get()) {
 
-            case PLAYING_DB:
+            case PLAYING_X:
 
-                return Messages.get("PLAYING_DB", language);
-
-            case PLAYING_C4:
-
-                return Messages.get("PLAYING_C4", language);
-
-            case PLAYING_TF:
-
-                return Messages.get("PLAYING_TF", language);
-
-            case PLAYING_BB:
-
-                return Messages.get("PLAYING_BB", language);
-
-            case PLAYING_MCH:
-
-                return Messages.get("PLAYING_MCH", language);
-
-            case PLAYING_QW:
-
-                return Messages.get("PLAYING_QW", language);
-
-            case PLAYING_FF:
-
-                return Messages.get("PLAYING_FF", language);
-
-            case PLAYING_WE:
-
-                return Messages.get("PLAYING_WE", language);
-
-            case PLAYING_CR:
-
-                return Messages.get("ONLINE", language);
+                return Messages.get("PLAYING_X", language);
 
             default:
 
@@ -137,14 +105,6 @@ public class Activity {
     public enum Type {
 
         NOTHING,
-        PLAYING_DB,
-        PLAYING_C4,
-        PLAYING_TF,
-        PLAYING_BB,
-        PLAYING_MCH,
-        PLAYING_QW,
-        PLAYING_FF,
-        PLAYING_WE,
-        PLAYING_CR
+        PLAYING_X,
     }
 }

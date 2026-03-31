@@ -60,7 +60,7 @@ public class _Account<Data extends _Data<?>> {
         //OVERRIDES IN UPPER CLASSES
     }
 
-    protected void fetch() {
+    public void fetch() {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS;
 
@@ -97,7 +97,7 @@ public class _Account<Data extends _Data<?>> {
 
     //------------------------------------------------------------------------------------
 
-    protected boolean validateUserID(int userID) {
+    public boolean validateUserID(int userID) {
 
         AtomicBoolean userIDExists = new AtomicBoolean(false);
 
@@ -108,7 +108,7 @@ public class _Account<Data extends _Data<?>> {
 
     //------------------------
 
-    protected Boolean getIsActive(int userID) {
+    public Boolean getIsActive(int userID) {
 
         return getProperty(userID, FIELD_IS_ACTIVE, Boolean.class);
     }
@@ -118,7 +118,7 @@ public class _Account<Data extends _Data<?>> {
         AtomicReference<String> name = new AtomicReference<>();
 
         Utilities.lock(TAG, LOCK.readLock(), () -> name.set(MAPPING_USER_ID.get(userID)));
-        
+
         return name.get();
     }
 
@@ -161,7 +161,7 @@ public class _Account<Data extends _Data<?>> {
         }
     }
 
-    protected int registerAccount(String name) {
+    public int registerAccount(String name) {
 
         AtomicInteger userID = new AtomicInteger(_Codes.NOT_FOUND);
 
@@ -277,7 +277,8 @@ public class _Account<Data extends _Data<?>> {
 
         data.response = _Codes.RESPONSE_NOK;
 
-        if (data.account == null || data.account.credential == null || data.subRequest == null) {
+        if (data.account == null || data.account.id == null ||
+                data.account.credential == null || data.subRequest == null) {
 
             data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
             return;
@@ -288,31 +289,28 @@ public class _Account<Data extends _Data<?>> {
 
         //---------CHECK IF USER ID IS VALID-------
 
-        if (!_Config.DEBUG_MODE) {
+        if (!validateUserID(userID)) {
 
-            if (!validateUserID(userID)) {
+            data.message = Messages.get(Messages.CREDENTIAL_EXPIRED, data.client.language);
+            data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
+            return;
+        }
 
-                data.message = Messages.get(Messages.CREDENTIAL_EXPIRED, data.client.language);
-                data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
-                return;
-            }
+        //---------CHECK IF CREDENTIAL IS VALID-------
 
-            //---------CHECK IF CREDENTIAL IS VALID-------
+        Boolean credentialIsValid = _Resources.get().accountSession.validateCredential(userID, credential);
 
-            Boolean credentialIsValid = _Resources.get().accountSession.validateCredential(userID, credential);
+        if (credentialIsValid == null) {
 
-            if (credentialIsValid == null) {
+            data.response = _Codes.RESPONSE_NOK;
+            return;
+        }
 
-                data.response = _Codes.RESPONSE_NOK;
-                return;
-            }
+        if (!credentialIsValid) {
 
-            if (!credentialIsValid) {
-
-                data.message = Messages.get(Messages.CREDENTIAL_EXPIRED, data.client.language);
-                data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
-                return;
-            }
+            data.message = Messages.get(Messages.CREDENTIAL_EXPIRED, data.client.language);
+            data.response = _Codes.RESPONSE_CREDENTIAL_EXPIRED;
+            return;
         }
 
         //------------------------------------------------

@@ -13,9 +13,9 @@ public class _Data<Account extends _AccountData> {
     public Account account;
     public List<Account> accounts;
 
-    public int request;
+    public Integer request;
     public Integer subRequest;
-    public int response;
+    public Integer response;
     public String message;
 
     public _FriendData friend;

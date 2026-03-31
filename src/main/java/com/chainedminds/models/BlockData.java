@@ -2,12 +2,12 @@ package com.chainedminds.models;
 
 public class BlockData {
 
-    public int id;
+    public Integer id;
     public String property;
     public String type;
     public String reason;
     public String payload;
-    public int reporterID;
-    public int blockedTimes;
-    public long lastBlockTime;
+    public Integer reporterID;
+    public Integer blockedTimes;
+    public Long lastBlockTime;
 }

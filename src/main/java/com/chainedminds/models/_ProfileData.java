@@ -8,6 +8,6 @@ public class _ProfileData {
     //public int score;
     //public Map<String, Integer> scores;
 
-    public int sex;
-    public int age;
+    public Integer sex;
+    public Integer age;
 }

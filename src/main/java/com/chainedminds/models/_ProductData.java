@@ -2,23 +2,23 @@ package com.chainedminds.models;
 
 public class _ProductData {
 
-    public int id;
+    public Integer id;
     public String name;
 
-    public int tier;
+    public Integer tier;
 
-    public int coins;
-    public float price;
+    public Integer coins;
+    public Float price;
 
     public String sku;
 
-    public int discount;
+    public Integer discount;
 
     public String market;
     public String category;
     public String type;
 
-    public boolean available;
-    public boolean consumable;
+    public Boolean available;
+    public Boolean consumable;
     public String appName;
 }

@@ -9,6 +9,8 @@ import java.net.Socket;
 
 public class TestRequestHandler extends _RequestHandler<TestData> {
 
+    public String test2;
+
     private static final String TAG = TestRequestHandler.class.getSimpleName();
 
     public TestRequestHandler(Class<TestData> mappedClass) {

@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class _AccountData {
 
-    public int id;
+    public Integer id;
     public String name;
     public String username;
     public String password;

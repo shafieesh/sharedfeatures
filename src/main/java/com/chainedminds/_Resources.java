@@ -50,35 +50,6 @@ public class _Resources<
             ? extends _Log
             > INSTANCE = new _Resources<>();
 
-    public _Resources() {
-
-    }
-
-    @Deprecated
-    public static <
-            RequestHandler extends _RequestHandler<?>,
-            Profile extends _Profile,
-            Account extends _Account<? extends _Data<?>>,
-            AccountSession extends _AccountSession,
-            Friendship extends _Friendship<? extends _Data<?>, ? extends _FriendData>,
-            File extends _File,
-            IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
-            IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
-            IABProductPurchase extends _IABProductPurchase<? extends _IABTransactionData>,
-            IPGProductPurchase extends _IPGProductPurchase<? extends _IPGTransactionData>,
-            IABSubscriptionPurchase extends _IABSubscriptionPurchase<? extends _IABTransactionData>,
-            IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
-            Product extends _Product<? extends _ProductData>,
-            BlackList extends _BlackList,
-            Log extends _Log> _Resources<
-            RequestHandler, Profile, Account, AccountSession,
-            Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
-            IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
-            > getInstance() {
-
-        return get();
-    }
-
     public static <
             RequestHandler extends _RequestHandler<?>,
             Profile extends _Profile,

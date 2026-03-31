@@ -8,7 +8,9 @@ import com.chainedminds.api.accounting._BlackList;
 import com.chainedminds.api.accounting._Profile;
 import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.api.store.*;
-import com.chainedminds.models.*;
+import com.chainedminds.models._FileData;
+import com.chainedminds.models._ProductData;
+import com.chainedminds.models._ProfileData;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.models.account._FriendData;
 import com.chainedminds.models.notification._MessageData;
@@ -35,57 +37,54 @@ public class TestResources extends _Resources<
         _BlackList,
         _Log> {
 
-    private static final TestResources INSTANCE = new TestResources();
+    public static _Resources<
+            TestRequestHandler,
+            _Profile,
+            _Account<TestData>,
+            _AccountSession,
+            _Friendship<TestData, _FriendData>,
+            _File,
+            _IABPayment<_IABTransactionData, _ProductData>,
+            _IPGPayment<_IPGTransactionData, _ProductData>,
+            _IABProductPurchase<_IABTransactionData>,
+            _IPGProductPurchase<_IPGTransactionData>,
+            _IABSubscriptionPurchase<_IABTransactionData>,
+            _IPGSubscriptionPurchase<_IPGTransactionData>,
+            _Product<_ProductData>,
+            _BlackList,
+            _Log> get() {
 
-    public static TestResources getInstance() {
-
-        return INSTANCE;
+        return _Resources.get();
     }
 
-    public void config() {
-
-        super.requestHandler = new TestRequestHandler(TestData.class);
-        super.profile = new _Profile();
-        super.account = new _Account<>();
-        super.accountSession = new _AccountSession();
-        super.friendship = new _Friendship<>();
-        super.file = new _File();
-        super.iabPayment = new _IABPayment<>();
-        super.ipgPayment = new _IPGPayment<>();
-        super.iabProductPurchase = new _IABProductPurchase<>();
-        super.ipgProductPurchase = new _IPGProductPurchase<>();
-        super.iabSubscriptionPurchase = new _IABSubscriptionPurchase<>();
-        super.ipgSubscriptionPurchase = new _IPGSubscriptionPurchase<>();
-        super.product = new _Product<>();
-        super.blackList = new _BlackList();
-        super.log = new _Log();
+    public static void config() {
 
         _Resources<TestRequestHandler, _Profile, _Account<TestData>, _AccountSession,
-                        _Friendship<TestData, _FriendData>,
+                _Friendship<TestData, _FriendData>,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
-                        _IPGPayment<_IPGTransactionData, _ProductData>,
-                        _IABProductPurchase<_IABTransactionData>,
-                        _IPGProductPurchase<_IPGTransactionData>,
-                        _IABSubscriptionPurchase<_IABTransactionData>,
-                        _IPGSubscriptionPurchase<_IPGTransactionData>,
-                        _Product<_ProductData>,
-                        _BlackList, _Log> resources = _Resources.get();
+                _IPGPayment<_IPGTransactionData, _ProductData>,
+                _IABProductPurchase<_IABTransactionData>,
+                _IPGProductPurchase<_IPGTransactionData>,
+                _IABSubscriptionPurchase<_IABTransactionData>,
+                _IPGSubscriptionPurchase<_IPGTransactionData>,
+                _Product<_ProductData>,
+                _BlackList, _Log> resources = _Resources.get();
 
-        resources.requestHandler = super.requestHandler;
-        resources.profile = super.profile;
-        resources.account = super.account;
-        resources.accountSession = super.accountSession;
-        resources.friendship = super.friendship;
-        resources.file = super.file;
-        resources.iabPayment = super.iabPayment;
-        resources.ipgPayment = super.ipgPayment;
-        resources.iabProductPurchase = super.iabProductPurchase;
-        resources.ipgProductPurchase = super.ipgProductPurchase;
-        resources.iabSubscriptionPurchase = super.iabSubscriptionPurchase;
-        resources.ipgSubscriptionPurchase = super.ipgSubscriptionPurchase;
-        resources.product = super.product;
-        resources.blackList = super.blackList;
-        resources.log = super.log;
+        resources.requestHandler = new TestRequestHandler(TestData.class);
+        resources.profile = new _Profile();
+        resources.account = new _Account<>();
+        resources.accountSession = new _AccountSession();
+        resources.friendship = new _Friendship<>();
+        resources.file = new _File();
+        resources.iabPayment = new _IABPayment<>();
+        resources.ipgPayment = new _IPGPayment<>();
+        resources.iabProductPurchase = new _IABProductPurchase<>();
+        resources.ipgProductPurchase = new _IPGProductPurchase<>();
+        resources.iabSubscriptionPurchase = new _IABSubscriptionPurchase<>();
+        resources.ipgSubscriptionPurchase = new _IPGSubscriptionPurchase<>();
+        resources.product = new _Product<>();
+        resources.blackList = new _BlackList();
+        resources.log = new _Log();
 
         _Classes classes = _Classes.getInstance();
 
