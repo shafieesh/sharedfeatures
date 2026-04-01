@@ -1,15 +1,13 @@
 package com.chainedminds;
 
 import com.chainedminds.api._RequestHandler;
-import com.chainedminds.api.accounting._Account;
-import com.chainedminds.api.accounting._AccountSession;
-import com.chainedminds.api.accounting._BlackList;
-import com.chainedminds.api.accounting._Profile;
+import com.chainedminds.api.account._Accounts;
+import com.chainedminds.api.account._AccountSessions;
+import com.chainedminds.api.account._BlackList;
+import com.chainedminds.api.account._Profile;
 import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.api.store.*;
-import com.chainedminds.models._Data;
 import com.chainedminds.models._ProductData;
-import com.chainedminds.models.account._FriendData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
@@ -18,9 +16,9 @@ import com.chainedminds.utilities._Log;
 public class _Resources<
         RequestHandler extends _RequestHandler<?>,
         Profile extends _Profile,
-        Account extends _Account<? extends _Data<?>>,
-        AccountSession extends _AccountSession,
-        Friendship extends _Friendship<? extends _Data<?>, ? extends _FriendData>,
+        Account extends _Accounts,
+        AccountSession extends _AccountSessions,
+        Friendship extends _Friendship,
         File extends _File,
         IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
         IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
@@ -35,9 +33,9 @@ public class _Resources<
     private static final _Resources<
             ? extends _RequestHandler<?>,
             ? extends _Profile,
-            ? extends _Account<?>,
-            ? extends _AccountSession,
-            ? extends _Friendship<?, ?>,
+            ? extends _Accounts,
+            ? extends _AccountSessions,
+            ? extends _Friendship,
             ? extends _File,
             ? extends _IABPayment<?, ?>,
             ? extends _IPGPayment<?, ?>,
@@ -53,9 +51,9 @@ public class _Resources<
     public static <
             RequestHandler extends _RequestHandler<?>,
             Profile extends _Profile,
-            Account extends _Account<? extends _Data<?>>,
-            AccountSession extends _AccountSession,
-            Friendship extends _Friendship<? extends _Data<?>, ? extends _FriendData>,
+            Account extends _Accounts,
+            AccountSession extends _AccountSessions,
+            Friendship extends _Friendship,
             File extends _File,
             IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
             IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,

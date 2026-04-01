@@ -27,7 +27,7 @@ public class MainPipeServer {
                     //.handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) {
+                        public void initChannel(SocketChannel socketChannel) {
 
                             final  IdleStateHandler autoCloser = new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT);
                             final MainChannelDecoder decoder = new MainChannelDecoder();

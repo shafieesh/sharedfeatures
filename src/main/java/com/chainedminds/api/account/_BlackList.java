@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds.models.BlockData;
@@ -34,19 +34,19 @@ public class _BlackList {
 
     private static final String TAG = _BlackList.class.getSimpleName();
 
-    protected static final String FIELD_PROPERTY = "Property";
-    protected static final String FIELD_TYPE = "Type";
-    protected static final String FIELD_REASON = "Reason";
-    protected static final String FIELD_PAYLOAD = "Payload";
-    protected static final String FIELD_REPORTER_ID = "ReporterID";
-    protected static final String FIELD_BLOCKED_TIMES = "BlockedTimes";
-    protected static final String FIELD_LAST_BLOCK_TIME = "LastBlockTime";
+    public static final String FIELD_PROPERTY = "Property";
+    public static final String FIELD_TYPE = "Type";
+    public static final String FIELD_REASON = "Reason";
+    public static final String FIELD_PAYLOAD = "Payload";
+    public static final String FIELD_REPORTER_ID = "ReporterID";
+    public static final String FIELD_BLOCKED_TIMES = "BlockedTimes";
+    public static final String FIELD_LAST_BLOCK_TIME = "LastBlockTime";
 
-    protected static final List<BlockData> BLOCKS = new ArrayList<>();
-    protected static final Set<String> PROPERTY_IDX = new HashSet<>();
-    protected static final Map<Object, Integer> REPORTED_PLAYERS = new HashMap<>();
+    public static final List<BlockData> BLOCKS = new ArrayList<>();
+    public static final Set<String> PROPERTY_IDX = new HashSet<>();
+    public static final Map<Object, Integer> REPORTED_PLAYERS = new HashMap<>();
 
-    protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public static void start() {
 
@@ -300,12 +300,12 @@ public class _BlackList {
         });
     }
 
-    protected boolean onVelocityCheck(Object property, String type, String reason) {
+    public boolean onVelocityCheck(Object property, String type, String reason) {
 
         return false;
     }
 
-    protected void onVelocityAlert(Object property, String type, String reason, String payload) {
+    public void onVelocityAlert(Object property, String type, String reason, String payload) {
 
     }
 

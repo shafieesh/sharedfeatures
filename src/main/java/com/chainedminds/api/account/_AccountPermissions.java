@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds.models.account._AccountPermissionData;
@@ -17,16 +17,16 @@ public class _AccountPermissions {
 
     private static final String TAG = _AccountPermissions.class.getSimpleName();
 
-    protected static final String FIELD_USER_ID = "UserID";
-    protected static final String FIELD_PERMISSION = "Permission";
-    protected static final String FIELD_START_TIME = "StartTime";
-    protected static final String FIELD_FINISH_TIME = "FinishTime";
+    public static final String FIELD_USER_ID = "UserID";
+    public static final String FIELD_PERMISSION = "Permission";
+    public static final String FIELD_START_TIME = "StartTime";
+    public static final String FIELD_FINISH_TIME = "FinishTime";
 
-    protected static final Map<Integer, Map<String, _AccountPermissionData>> PERMISSIONS = new LinkedHashMap<>();
+    public static final Map<Integer, Map<String, _AccountPermissionData>> PERMISSIONS = new LinkedHashMap<>();
 
-    protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
-    protected static void fetch() {
+    public static void fetch() {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS_PERMISSIONS +
                 " WHERE " + FIELD_START_TIME + " <= NOW() AND NOW() <= " + FIELD_FINISH_TIME;

@@ -15,12 +15,12 @@ public abstract class _Database {
     private int updatesCount = 0;
     private int insertsCount = 0;
 
-    protected Connection connect() {
+    public Connection connect() {
 
         return null;
     }
 
-    protected void close(Connection connection) {
+    public void close(Connection connection) {
 
     }
 

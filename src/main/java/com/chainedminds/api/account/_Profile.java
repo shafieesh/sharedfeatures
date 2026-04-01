@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds.utilities.database._DatabaseOld;

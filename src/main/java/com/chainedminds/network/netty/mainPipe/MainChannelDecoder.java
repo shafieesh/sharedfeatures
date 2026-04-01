@@ -12,7 +12,7 @@ public class MainChannelDecoder extends ByteToMessageDecoder {
     private int availableBytes = 10;
 
     @Override
-    protected void decode(ChannelHandlerContext context, ByteBuf buffer, List<Object> objects) {
+    public void decode(ChannelHandlerContext context, ByteBuf buffer, List<Object> objects) {
 
         while (buffer.readableBytes() >= availableBytes) {
 

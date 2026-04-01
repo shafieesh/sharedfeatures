@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Messages {
 
-    protected static final String TAG = Messages.class.getSimpleName();
+    public static final String TAG = Messages.class.getSimpleName();
 
     private static final String FIELD_ID = "ID";
     private static final String FIELD_LANGUAGE = "Language";

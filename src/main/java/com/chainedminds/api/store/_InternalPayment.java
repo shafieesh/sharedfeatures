@@ -1,17 +1,11 @@
 package com.chainedminds.api.store;
 
-import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds.api.accounting._AccountPermissions;
-import com.chainedminds.models._Data;
-import com.chainedminds.models.payment._TransactionData;
 import com.chainedminds.utilities.BackendHelper;
 import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class _InternalPayment {
@@ -62,7 +56,7 @@ public class _InternalPayment {
         return days;
     }
 
-    public static _Data getMyTransactions(_Data data) {
+    /*public static _Data getMyTransactions(_Data data) {
 
         data.response = _Codes.RESPONSE_NOK;
 
@@ -112,7 +106,7 @@ public class _InternalPayment {
         data.response = _Codes.RESPONSE_OK;
 
         return data;
-    }
+    }*/
 }
 
 

@@ -15,17 +15,17 @@ public abstract class _DBConnection {
     private ConnectionPool automaticConnections = null;
     private ConnectionPool manualConnections = null;
 
-    protected String getAddress() {
+    public String getAddress() {
 
         return null;
     }
 
-    protected String getUsername() {
+    public String getUsername() {
 
         return null;
     }
 
-    protected String getPassword() {
+    public String getPassword() {
 
         return null;
     }

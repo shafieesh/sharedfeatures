@@ -2,10 +2,10 @@ package com.chainedminds.test;
 
 import com.chainedminds._Classes;
 import com.chainedminds._Resources;
-import com.chainedminds.api.accounting._Account;
-import com.chainedminds.api.accounting._AccountSession;
-import com.chainedminds.api.accounting._BlackList;
-import com.chainedminds.api.accounting._Profile;
+import com.chainedminds.api.account._Accounts;
+import com.chainedminds.api.account._AccountSessions;
+import com.chainedminds.api.account._BlackList;
+import com.chainedminds.api.account._Profile;
 import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.api.store.*;
 import com.chainedminds.models._FileData;
@@ -23,9 +23,9 @@ import com.chainedminds.utilities._Log;
 public class TestResources extends _Resources<
         TestRequestHandler,
         _Profile,
-        _Account<TestData>,
-        _AccountSession,
-        _Friendship<TestData, _FriendData>,
+        _Accounts,
+        _AccountSessions,
+        _Friendship,
         _File,
         _IABPayment<_IABTransactionData, _ProductData>,
         _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -40,9 +40,9 @@ public class TestResources extends _Resources<
     public static _Resources<
             TestRequestHandler,
             _Profile,
-            _Account<TestData>,
-            _AccountSession,
-            _Friendship<TestData, _FriendData>,
+            _Accounts,
+            _AccountSessions,
+            _Friendship,
             _File,
             _IABPayment<_IABTransactionData, _ProductData>,
             _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -59,8 +59,8 @@ public class TestResources extends _Resources<
 
     public static void config() {
 
-        _Resources<TestRequestHandler, _Profile, _Account<TestData>, _AccountSession,
-                _Friendship<TestData, _FriendData>,
+        _Resources<TestRequestHandler, _Profile, _Accounts, _AccountSessions,
+                _Friendship,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
                 _IABProductPurchase<_IABTransactionData>,
@@ -72,9 +72,9 @@ public class TestResources extends _Resources<
 
         resources.requestHandler = new TestRequestHandler(TestData.class);
         resources.profile = new _Profile();
-        resources.account = new _Account<>();
-        resources.accountSession = new _AccountSession();
-        resources.friendship = new _Friendship<>();
+        resources.account = new _Accounts();
+        resources.accountSession = new _AccountSessions();
+        resources.friendship = new _Friendship();
         resources.file = new _File();
         resources.iabPayment = new _IABPayment<>();
         resources.ipgPayment = new _IPGPayment<>();

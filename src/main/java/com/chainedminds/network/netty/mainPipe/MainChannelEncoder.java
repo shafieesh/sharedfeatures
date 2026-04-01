@@ -9,7 +9,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class MainChannelEncoder extends MessageToByteEncoder<byte[]> {
 
     @Override
-    protected void encode(ChannelHandlerContext context, byte[] message, ByteBuf buffer) {
+    public void encode(ChannelHandlerContext context, byte[] message, ByteBuf buffer) {
 
         byte[] dataLengthBytes = new byte[10];
 

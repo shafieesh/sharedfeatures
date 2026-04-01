@@ -45,7 +45,7 @@ public class TelnetPipeServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) {
+                        public void initChannel(SocketChannel socketChannel) {
 
                             socketChannel.pipeline().addLast("AUTO_CLOSER", new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT));
                             socketChannel.pipeline().addLast("DELIMITER", new DelimiterBasedFrameDecoder(

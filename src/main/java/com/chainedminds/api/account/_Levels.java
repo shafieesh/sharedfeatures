@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds.utilities.Task;
@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _Level {
+public class _Levels {
 
-    private static final String TAG = _Level.class.getSimpleName();
+    private static final String TAG = _Levels.class.getSimpleName();
 
     private final static String FIELD_APP_NAME = "AppName";
     private final static String FIELD_LEVEL = "Level";
@@ -33,7 +33,7 @@ public class _Level {
                 .setName("LevelManager")
                 .setTime(0, 0, 0)
                 .setInterval(0, 1, 0, 0)
-                .onEachCycle(_Level::fetch)
+                .onEachCycle(_Levels::fetch)
                 .runNow()
                 .schedule());
     }

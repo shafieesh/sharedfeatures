@@ -20,6 +20,7 @@ public class _AccountData {
     public Integer onlineStatus;
     public String activity;
     public String title;
+    public String code;
 
     public String credential;
     public Long registrationTime;

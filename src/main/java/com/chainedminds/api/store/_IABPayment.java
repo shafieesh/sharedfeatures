@@ -687,7 +687,7 @@ public class _IABPayment<
         return null;
     }
 
-    protected void consumeIABTransaction(_IABTransactionData transaction) {
+    public void consumeIABTransaction(_IABTransactionData transaction) {
 
         new Thread(() -> {
 

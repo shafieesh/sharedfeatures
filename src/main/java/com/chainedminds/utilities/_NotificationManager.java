@@ -468,7 +468,7 @@ public class _NotificationManager {
 //        });
 //    }
 
-    /*protected static boolean sendToFirebase(int userID, FirebaseMessageData content) {
+    /*public static boolean sendToFirebase(int userID, FirebaseMessageData content) {
 
         boolean wasSuccessful = false;
 
@@ -540,7 +540,7 @@ public class _NotificationManager {
         return wasSuccessful;
     }*/
 
-    protected static void sendToFirebase(int userID, FirebaseMessageData content) {
+    public static void sendToFirebase(int userID, FirebaseMessageData content) {
 
         String url = "https://fcm.googleapis.com/fcm/send";
 

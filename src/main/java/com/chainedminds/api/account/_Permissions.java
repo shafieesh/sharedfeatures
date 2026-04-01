@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds.models._PermissionData;
@@ -16,17 +16,17 @@ public class _Permissions {
 
     private static final String TAG = _Permissions.class.getSimpleName();
 
-    protected static final String FIELD_PERMISSION = "Permission";
-    protected static final String FIELD_POSITION = "Position";
-    protected static final String FIELD_CATEGORY = "Category";
-    protected static final String FIELD_TITLE = "Title";
-    protected static final String FIELD_DESCRIPTION = "Description";
+    public static final String FIELD_PERMISSION = "Permission";
+    public static final String FIELD_POSITION = "Position";
+    public static final String FIELD_CATEGORY = "Category";
+    public static final String FIELD_TITLE = "Title";
+    public static final String FIELD_DESCRIPTION = "Description";
 
-    protected static final List<_PermissionData> PERMISSIONS = new ArrayList<>();
+    public static final List<_PermissionData> PERMISSIONS = new ArrayList<>();
 
-    protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
-    protected static void fetch() {
+    public static void fetch() {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_PERMISSIONS + " ORDER BY " + FIELD_POSITION;
 

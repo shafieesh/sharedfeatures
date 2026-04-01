@@ -1,6 +1,5 @@
 package com.chainedminds;
 
-import com.chainedminds.models._Data;
 import com.chainedminds.network.netty.NettyServer;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database._DatabaseOld;
@@ -30,32 +29,6 @@ public class _Monitor extends Thread {
         status.put("database", database);
 
         return status;
-    }
-
-    public static _Data<?> forceCloseServer(_Data<?> data) {
-
-        String password = data.account.password;
-        int userID = data.account.id;
-
-        data = new _Data<>();
-        data.response = _Config.RESPONSE_NOK;
-
-        if ("B7R538QT387XRBO2R78XR2837".equals(password) && 1241234 == userID) {
-
-            isAppRunning = false;
-
-            System.out.println("\n#################################");
-            System.out.println("#################################\n");
-
-            System.out.println("  SELF DESTRUCTING GAME SERVER");
-
-            System.out.println("\n#################################");
-            System.out.println("#################################\n");
-
-            data.response = _Config.RESPONSE_OK;
-        }
-
-        return data;
     }
 
     public static boolean isAppRunning() {

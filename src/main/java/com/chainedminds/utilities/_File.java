@@ -51,7 +51,7 @@ public class _File {
         //init();
     }
 
-    protected void init() {
+    public void init() {
 
         String sep = File.separator;
 

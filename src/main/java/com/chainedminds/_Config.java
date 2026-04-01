@@ -211,6 +211,9 @@ public class _Config {
     public static String TABLE_NAME_AUTH_USERNAME = "auth_username";
     public static String TABLE_AUTH_USERNAME;
     //----------------------------------------------------------------------------------------------------------------//
+    public static String TABLE_NAME_AUTH_OTP = "auth_otp";
+    public static String TABLE_AUTH_OTP;
+    //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_ACCOUNTS_SESSIONS = "accounts_sessions";
     public static String TABLE_ACCOUNTS_SESSIONS;
     //----------------------------------------------------------------------------------------------------------------//
@@ -334,6 +337,7 @@ public class _Config {
         TABLE_ACCOUNTS_PROFILES = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_PROFILE;
         TABLE_ACCOUNTS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS;
         TABLE_AUTH_USERNAME = DATABASE_NAME + "." + TABLE_NAME_AUTH_USERNAME;
+        TABLE_AUTH_OTP = DATABASE_NAME + "." + TABLE_NAME_AUTH_OTP;
         TABLE_ACCOUNTS_SESSIONS = DATABASE_NAME + "." + TABLE_NAME_ACCOUNTS_SESSIONS;
         TABLE_TRANSACTIONS_INTERNAL = DATABASE_NAME + "." + TABLE_NAME_TRANSACTIONS_INTERNAL;
         TABLE_MAPPING = DATABASE_NAME + "." + TABLE_NAME_MAPPING;

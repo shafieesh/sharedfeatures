@@ -40,9 +40,9 @@ public class _Product<ProductData extends _ProductData> {
     private static final String FIELD_SKU = "SKU";
     private static final String FIELD_APP_NAME = "AppName";
 
-    protected final List<ProductData> PRODUCTS = new ArrayList<>();
+    public final List<ProductData> PRODUCTS = new ArrayList<>();
 
-    protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public void start() {
 

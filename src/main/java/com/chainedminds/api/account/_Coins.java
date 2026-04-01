@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
@@ -11,9 +11,9 @@ public class _Coins {
 
     private static final String TAG = _Coins.class.getSimpleName();
 
-    protected static final String FIELD_COINS = "Coins";
-    protected static final String FIELD_LAST_COIN_CHARGE_AMOUNT = "LastCoinChargeAmount";
-    protected static final String FIELD_PREMIUM_PASS = "PremiumPass";
+    public static final String FIELD_COINS = "Coins";
+    public static final String FIELD_LAST_COIN_CHARGE_AMOUNT = "LastCoinChargeAmount";
+    public static final String FIELD_PREMIUM_PASS = "PremiumPass";
 
     public void start() {
 
@@ -32,7 +32,7 @@ public class _Coins {
                 .schedule());
     }
 
-    protected void chargeCoins() {
+    public void chargeCoins() {
 
         String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
@@ -41,7 +41,7 @@ public class _Coins {
         _DatabaseOld.update(TAG, updateStatement);
     }
 
-    protected void chargePremiumCoins() {
+    public void chargePremiumCoins() {
 
         String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
@@ -60,7 +60,7 @@ public class _Coins {
         return _Resources.get().account.getProperty(connection, userID, FIELD_COINS, Integer.class);
     }
 
-    protected boolean setCoins(Connection connection, int userID, int coins) {
+    public boolean setCoins(Connection connection, int userID, int coins) {
 
         return _Resources.get().account.setProperty(connection, userID, FIELD_COINS, coins);
     }

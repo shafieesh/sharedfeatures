@@ -12,11 +12,11 @@ public class _Log {
 
     private static final String TAG = _Log.class.getSimpleName();
 
-    protected static final String FIELD_USER_ID = "UserID";
-    protected static final String FIELD_SECTION = "Section";
-    protected static final String FIELD_ACTION = "Action";
-    protected static final String FIELD_CRASH_LOG = "CrashLog";
-    protected static final String FIELD_PAYLOAD = "Payload";
+    public static final String FIELD_USER_ID = "UserID";
+    public static final String FIELD_SECTION = "Section";
+    public static final String FIELD_ACTION = "Action";
+    public static final String FIELD_CRASH_LOG = "CrashLog";
+    public static final String FIELD_PAYLOAD = "Payload";
 
     public static void error(String tag, String cause) {
 
@@ -81,7 +81,7 @@ public class _Log {
         report(tag, null, payload);
     }
 
-    protected static void report(String section, String log, String payload) {
+    public static void report(String section, String log, String payload) {
 
         System.out.println(log + "\n\nPAYLOAD :\n" + payload + "\n");
 

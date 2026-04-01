@@ -6,6 +6,7 @@ import com.chainedminds.models.account._FriendData;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class _Data<Account extends _AccountData> {
 
     public ClientData client;

@@ -1,31 +1,35 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
-import com.chainedminds.models._Data;
-import com.chainedminds.utilities.*;
+import com.chainedminds.utilities.Cache;
+import com.chainedminds.utilities.Utilities;
+import com.chainedminds.utilities._DBConnectionOld;
+import com.chainedminds.utilities._Log;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _Authentication {
+public class _Authentications {
 
     private static final Cache<String, Integer> LOGIN_ATTEMPTS_CACHE =
             new Cache<>(_Config.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
 
     public static void fetch() {
 
-        Username.fetch();
-        Email.fetch();
+        _Username.fetch();
+        _OTP.fetch();
     }
 
     public static boolean isBruteForcing(String address) {
@@ -41,27 +45,20 @@ public class _Authentication {
         return attemptsTimes > _Config.BRUTE_FORCE_ALLOWED_ATTEMPTS;
     }
 
-    public static class Email {
+    public static class _Username {
 
-        protected static void fetch() {
+        private static final String TAG = _Username.class.getSimpleName();
 
-        }
-    }
+        public static final String FIELD_USER_ID = "UserID";
+        public static final String FIELD_USERNAME = "Username";
+        public static final String FIELD_PASSWORD = "Password";
 
-    public static class Username {
+        public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
-        private static final String TAG = Username.class.getSimpleName();
+        public static final Map<Integer, AuthData> MAPPING_USER_ID = new HashMap<>();
+        public static final Map<String, AuthData> MAPPING_USERNAME = new HashMap<>();
 
-        protected static final String FIELD_USER_ID = "UserID";
-        protected static final String FIELD_USERNAME = "Username";
-        protected static final String FIELD_PASSWORD = "Password";
-
-        protected static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
-
-        protected static final Map<Integer, AuthData> MAPPING_USER_ID = new HashMap<>();
-        protected static final Map<String, AuthData> MAPPING_USERNAME = new HashMap<>();
-
-        protected static void fetch() {
+        public static void fetch() {
 
             String selectStatement = "SELECT * FROM " + _Config.TABLE_AUTH_USERNAME;
 
@@ -105,7 +102,7 @@ public class _Authentication {
 
         //------------------------
 
-        public static void authenticate(_Data data) {
+        /*public static void authenticate(_Data data) {
 
             data.response = _Codes.RESPONSE_NOK;
 
@@ -143,7 +140,7 @@ public class _Authentication {
 
                     if (passwordValidated) {
 
-                        Boolean isActive = _Resources.get().account.getIsActive(userID);
+                        Boolean isActive = _Resources.get().account.isActive(userID);
 
                         if (isActive != null && !isActive) {
 
@@ -269,7 +266,7 @@ public class _Authentication {
 
                 data.response = _Codes.RESPONSE_OK;
             }
-        }
+        }*/
 
         //------------------------
 
@@ -381,7 +378,7 @@ public class _Authentication {
             return wasSuccessful;
         }
 
-        protected static Boolean validatePassword(int userID, String password) {
+        public static Boolean validatePassword(int userID, String password) {
 
             String storedPassword = getPassword(userID);
 
@@ -395,12 +392,12 @@ public class _Authentication {
 
         //------------------------
 
-        protected static <T> T getProperty(int userID, String field, Class<T> T) {
+        public static <T> T getProperty(int userID, String field, Class<T> T) {
 
             return getProperty(null, userID, field, T);
         }
 
-        protected static <T> T getProperty(Connection connection, int userID, String field, Class<T> T) {
+        public static <T> T getProperty(Connection connection, int userID, String field, Class<T> T) {
 
             AtomicReference<T> value = new AtomicReference<>();
 
@@ -439,12 +436,12 @@ public class _Authentication {
             return value.get();
         }
 
-        protected static boolean setProperty(int userID, String fieldName, Object value) {
+        public static boolean setProperty(int userID, String fieldName, Object value) {
 
             return setProperty(null, userID, fieldName, value);
         }
 
-        protected static boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
+        public static boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
 
             String statement = "UPDATE " + _Config.TABLE_AUTH_USERNAME + " SET " +
                     fieldName + " = ? WHERE " + FIELD_USER_ID + " = ?";
@@ -471,6 +468,215 @@ public class _Authentication {
             public int userID;
             public String username;
             public String password;
+        }
+    }
+
+    public static class _OTP {
+
+        private static final String TAG = _OTP.class.getSimpleName();
+
+        public static final String FIELD_USER_ID = "UserID";
+        public static final String FIELD_CODE = "Code";
+        public static final String FIELD_EXPIRATION_TIME = "ExpirationTime";
+
+        public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+
+        public static final Map<Integer, AuthData> MAPPING_USER_ID = new HashMap<>();
+        public static final Map<String, AuthData> MAPPING_CODE = new HashMap<>();
+
+        public static void fetch() {
+
+            String statement = "DELETE FROM " + _Config.TABLE_AUTH_OTP +
+                    " WHERE " + FIELD_EXPIRATION_TIME + " < DATE_ADD(NOW(), INTERVAL 5 MINUTE)";
+
+            _DatabaseOld.update(TAG, statement);
+
+            statement = "SELECT * FROM " + _Config.TABLE_AUTH_OTP;
+
+            _DatabaseOld.query(TAG, statement, new TwoStepQueryCallback() {
+
+                private final Map<Integer, AuthData> mappingUserIDs = new HashMap<>();
+                private final Map<String, AuthData> mappingCodes = new HashMap<>();
+
+                @Override
+                public void onFetchingData(ResultSet resultSet) throws Exception {
+
+                    while (resultSet.next()) {
+
+                        AuthData authData = new AuthData();
+                        authData.userID = resultSet.getInt(FIELD_USER_ID);
+                        authData.code = resultSet.getString(FIELD_CODE);
+                        authData.expirationTime = resultSet.getTimestamp(FIELD_EXPIRATION_TIME).getTime();
+
+                        mappingUserIDs.put(authData.userID, authData);
+                        mappingCodes.put(authData.code.toLowerCase(), authData);
+                    }
+                }
+
+                @Override
+                public void onFinishedTask(boolean wasSuccessful, Exception error) {
+
+                    if (wasSuccessful) {
+
+                        Utilities.lock(TAG, LOCK.writeLock(), () -> {
+
+                            MAPPING_USER_ID.clear();
+                            MAPPING_USER_ID.putAll(mappingUserIDs);
+
+                            MAPPING_CODE.clear();
+                            MAPPING_CODE.putAll(mappingCodes);
+                        });
+                    }
+                }
+            });
+        }
+
+        //------------------------
+
+        /*public static void authenticate(_Data data) {
+
+            data.response = _Codes.RESPONSE_NOK;
+
+            if (data.account == null || data.account.code == null ||
+                    data.client.appName == null ||
+                    data.client.platform == null ||
+                    data.client.version == null) {
+
+                data.message = Messages.get(Messages.MISSING_DATA, data.client.language);
+                return;
+            }
+
+            String code = data.account.code;
+            String appName = data.client.appName;
+            String platform = data.client.platform;
+            String language = data.client.language;
+            String address = data.client.address;
+            String version = data.client.version;
+
+            if (isBruteForcing(address)) {
+
+                data.message = Messages.get(Messages.TOO_MANY_ATTEMPTS, language);
+                return;
+            }
+
+            int userID = getUserID(code);
+
+            if (userID != _Codes.NOT_FOUND) {
+
+                Boolean isActive = _Resources.get().account.isActive(userID);
+
+                if (isActive != null && !isActive) {
+
+                    data.message = Messages.get(Messages.ACCOUNT_DEACTIVATED, language);
+                    return;
+                }
+
+                String credential = BackendHelper.generateCredential();
+
+                boolean wasSuccessful = _Resources.get().accountSession
+                        .addCredential(userID, credential, appName, platform, version, language);
+
+                if (wasSuccessful) {
+
+                    data.account.id = userID;
+                    data.account.credential = credential;
+
+                    data.response = _Codes.RESPONSE_OK;
+                }
+
+            } else {
+
+                data.response = _Codes.RESPONSE_INVALID_LOGIN;
+                data.message = Messages.get("INVALID_OTP", language);
+            }
+        }*/
+
+        public static AuthData get(int userID) {
+
+            AtomicReference<AuthData> data = new AtomicReference<>();
+
+            Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+                if (MAPPING_USER_ID.containsKey(userID)) {
+
+                    data.set(MAPPING_USER_ID.get(userID));
+                }
+            });
+
+            return data.get();
+        }
+
+        public static int getUserID(String code) {
+
+            AtomicInteger userID = new AtomicInteger(_Codes.NOT_FOUND);
+
+            if (code == null) {
+
+                return userID.get();
+            }
+
+            Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+                if (MAPPING_CODE.containsKey(code)) {
+
+                    userID.set(MAPPING_CODE.get(code).userID);
+                }
+            });
+
+            return userID.get();
+        }
+
+        public static String generateCode(int userID) {
+
+            Random random = new Random();
+
+            String code = "" + random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10) +
+                    random.nextInt(10);
+
+            String insertStatement = "INSERT " + _Config.TABLE_AUTH_OTP + " (" +
+                    FIELD_USER_ID + ", " + FIELD_CODE + ", " + FIELD_EXPIRATION_TIME +
+                    ") VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
+
+            Map<Integer, Object> parameters = new HashMap<>();
+            parameters.put(1, userID);
+            parameters.put(2, code);
+
+            boolean wasSuccessful = _DatabaseOld.insert(TAG, insertStatement, parameters);
+
+            if (wasSuccessful) {
+
+                Utilities.lock(TAG, LOCK.writeLock(), () -> {
+
+                    AuthData authData = new AuthData();
+                    authData.userID = userID;
+                    authData.code = code;
+                    authData.expirationTime = System.currentTimeMillis();
+
+                    MAPPING_USER_ID.put(userID, authData);
+                    MAPPING_CODE.put(code, authData);
+                });
+
+                return code;
+            }
+
+            return null;
+        }
+
+        //------------------------
+
+        public static class AuthData {
+
+            public int userID;
+            public String code;
+            public long expirationTime;
         }
     }
 }

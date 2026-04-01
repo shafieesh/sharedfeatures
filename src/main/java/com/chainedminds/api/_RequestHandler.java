@@ -2,14 +2,13 @@ package com.chainedminds.api;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds.api.accounting._AccountSession;
+import com.chainedminds.api.account._AccountSessions;
 import com.chainedminds.api.friendship._Friendship;
-import com.chainedminds.models._Data;
-import com.chainedminds.models.account._AccountData;
+import com.chainedminds.models.SmallData;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities._Log;
-import com.chainedminds.utilities.json.JsonException;
 import com.chainedminds.utilities.json.Json;
+import com.chainedminds.utilities.json.JsonException;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -59,7 +58,7 @@ public class _RequestHandler<Data> {
 
         if (System.currentTimeMillis() - lastAccessTime >= _Config.FIVE_MINUTES) {
 
-            _AccountSession.USER_ACTIVITY.getOrDefault(appName, new HashMap<>()).put(userID, currentTime);
+            _AccountSessions.USER_ACTIVITY.getOrDefault(appName, new HashMap<>()).put(userID, currentTime);
 
             _Friendship.notifyPlayerIsOnline(userID, appName);
         }
@@ -83,11 +82,11 @@ public class _RequestHandler<Data> {
 
     public Object handleRequest(Data data, Socket socket) {
 
-        _Data<_AccountData> responseData = new _Data<>();
-        responseData.response = _Codes.RESPONSE_NOK;
-        responseData.message = "Default response from BaseRequestManager";
+        SmallData response = new SmallData();
+        response.response = _Codes.RESPONSE_NOK;
+        response.message = "RequestManager has not implemented";
 
-        return responseData;
+        return response;
     }
 
     public Object processRequest(ChannelHandlerContext channelContext, InetSocketAddress remoteAddress, Object request) {
@@ -104,12 +103,11 @@ public class _RequestHandler<Data> {
 
             } else {
 
-                _Data pendingObject = new _Data<>();
+                SmallData response = new SmallData();
+                response.response = _Codes.RESPONSE_NOK;
+                response.message = "Could not decode request.";
 
-                pendingObject.response = _Codes.RESPONSE_NOK;
-                pendingObject.message = "The request was not handled. Could not parse request.";
-
-                return prepareResponse(request, pendingObject);
+                return prepareResponse(request, response);
             }
 
         } catch (Exception e) {
@@ -117,22 +115,20 @@ public class _RequestHandler<Data> {
             _Log.error(TAG, e);
         }
 
-        _Data pendingObject = new _Data<>();
+        SmallData response = new SmallData();
+        response.response = _Codes.RESPONSE_NOK;
+        response.message = "The request was not handled.";
 
-        pendingObject.response = _Codes.RESPONSE_NOK;
-        pendingObject.message = "The request was not handled.";
-
-        return prepareResponse(request, pendingObject);
+        return prepareResponse(request, response);
     }
 
     public Object sendServerBusyResponse(Object request) {
 
-        _Data pendingObject = new _Data<>();
+        SmallData response = new SmallData();
+        response.response = _Codes.RESPONSE_NOK;
+        response.message = "Server is busy. Try again later.";
 
-        pendingObject.response = _Codes.RESPONSE_NOK;
-        pendingObject.message = "Server is too busy. Try again later";
-
-        return prepareResponse(request, pendingObject);
+        return prepareResponse(request, response);
     }
 
     private Wrapper prepareRequest(ChannelHandlerContext channelContext, InetSocketAddress remoteAddress, Object data) {

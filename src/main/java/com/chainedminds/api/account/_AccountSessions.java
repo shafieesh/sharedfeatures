@@ -1,4 +1,4 @@
-package com.chainedminds.api.accounting;
+package com.chainedminds.api.account;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
@@ -14,25 +14,25 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class _AccountSession {
+public class _AccountSessions {
 
-    private static final String TAG = _AccountSession.class.getSimpleName();
+    private static final String TAG = _AccountSessions.class.getSimpleName();
 
-    protected static final String FIELD_USER_ID = "UserID";
-    protected static final String FIELD_CREDENTIAL = "Credential";
-    protected static final String FIELD_APP_NAME = "AppName";
-    protected static final String FIELD_PLATFORM = "Platform";
-    protected static final String FIELD_VERSION = "Version";
-    protected static final String FIELD_LANGUAGE = "Language";
-    protected static final String FIELD_FIREBASE_ID = "FirebaseID";
-    protected static final String FIELD_IP_ADDRESS = "IPAddress";
-    protected static final String FIELD_COUNTRY = "Country";
-    protected static final String FIELD_LAST_UPDATE = "LastUpdate";
+    public static final String FIELD_USER_ID = "UserID";
+    public static final String FIELD_CREDENTIAL = "Credential";
+    public static final String FIELD_APP_NAME = "AppName";
+    public static final String FIELD_PLATFORM = "Platform";
+    public static final String FIELD_VERSION = "Version";
+    public static final String FIELD_LANGUAGE = "Language";
+    public static final String FIELD_FIREBASE_ID = "FirebaseID";
+    public static final String FIELD_IP_ADDRESS = "IPAddress";
+    public static final String FIELD_COUNTRY = "Country";
+    public static final String FIELD_LAST_UPDATE = "LastUpdate";
 
-    protected static final Cache<String, Integer> CREDENTIALS_CACHE = new Cache<>();
-    protected static final Cache<Integer, Map<String, String>> LANGUAGE_CACHE = new Cache<>();
+    public static final Cache<String, Integer> CREDENTIALS_CACHE = new Cache<>();
+    public static final Cache<Integer, Map<String, String>> LANGUAGE_CACHE = new Cache<>();
 
-    protected final Set<String> CACHED_USERS_INFO = new HashSet<>();
+    public final Set<String> CACHED_USERS_INFO = new HashSet<>();
     public static final Map<String, Map<Integer, Long>> USER_ACTIVITY = new HashMap<>();
     public static final Map<String, String> APP_VERSIONS = new HashMap<>();
 
@@ -206,7 +206,7 @@ public class _AccountSession {
         return wasSuccessful;
     }
 
-    protected Boolean validateCredential(int userID, @NotNull String credential) {
+    public Boolean validateCredential(int userID, @NotNull String credential) {
 
         AtomicReference<Integer> storedUserID = new AtomicReference<>();
 
@@ -295,7 +295,7 @@ public class _AccountSession {
 
     //------------------------------------------------------------------------------------
 
-    protected List<SessionData> getActiveSessions(int userID) {
+    public List<SessionData> getActiveSessions(int userID) {
 
         List<SessionData> activeSessions = new ArrayList<>();
 
@@ -343,7 +343,7 @@ public class _AccountSession {
         return activeSessions;
     }
 
-    protected boolean terminateSession(int userID, String credential) {
+    public boolean terminateSession(int userID, String credential) {
 
         Boolean credentialIsValid = validateCredential(userID, credential);
 
@@ -374,7 +374,7 @@ public class _AccountSession {
         return false;
     }
 
-    protected void removeStaleSessions() {
+    public void removeStaleSessions() {
 
         String statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
                 " WHERE " + FIELD_LAST_UPDATE + " < DATE_SUB(NOW(), INTERVAL 7 DAY)";
@@ -594,7 +594,7 @@ public class _AccountSession {
 
     //------------------------------------------------------------------------------------
 
-    protected void update(String credential, String version,
+    public void update(String credential, String version,
                           String language, String firebaseID,
                           String ipAddress, String country) {
 

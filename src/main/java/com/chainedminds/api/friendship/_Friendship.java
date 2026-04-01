@@ -1,28 +1,24 @@
 package com.chainedminds.api.friendship;
 
 import com.chainedminds._Classes;
-import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds._Resources;
 import com.chainedminds.api.Activity;
-import com.chainedminds.models._Data;
 import com.chainedminds.models.account._FriendData;
-import com.chainedminds.utilities._NotificationManager;
 import com.chainedminds.utilities.Messages;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities._NotificationManager;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.ResultSet;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> {
+public class _Friendship {
 
     private static final String TAG = _Friendship.class.getSimpleName();
 
@@ -107,7 +103,7 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
         });
     }
 
-    public Data addFriend(Data data) {
+    /*public Data addFriend(Data data) {
 
         data.response = _Codes.RESPONSE_NOK;
 
@@ -219,11 +215,6 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
         }
 
         return data;
-    }
-
-    private static void addFriendship(Friendship friendship) {
-
-        Utilities.lock(TAG, LOCK.writeLock(), () -> RELATIONS.add(friendship));
     }
 
     public Data acceptFriend(Data data) {
@@ -451,6 +442,11 @@ public class _Friendship<Data extends _Data<?>, FriendData extends _FriendData> 
         data.response = _Codes.RESPONSE_OK;
 
         return data;
+    }*/
+
+    private static void addFriendship(Friendship friendship) {
+
+        Utilities.lock(TAG, LOCK.writeLock(), () -> RELATIONS.add(friendship));
     }
 
     private static <FriendData extends _FriendData> List<FriendData> getActivitySortedFriendsList(int userID, String appName, String language) {
