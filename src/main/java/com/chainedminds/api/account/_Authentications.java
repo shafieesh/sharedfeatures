@@ -23,13 +23,13 @@ public class _Authentications {
 
     public static void start() {
 
-        _OTP.start();
+        OTP.start();
     }
 
     public static void fetch() {
 
-        _Username.fetch();
-        _OTP.fetch();
+        Username.fetch();
+        OTP.fetch();
     }
 
     public static boolean isBruteForcing(String address) {
@@ -45,9 +45,9 @@ public class _Authentications {
         return attemptsTimes > _Config.BRUTE_FORCE_ALLOWED_ATTEMPTS;
     }
 
-    public static class _Username {
+    public static class Username {
 
-        private static final String TAG = _Username.class.getSimpleName();
+        private static final String TAG = Username.class.getSimpleName();
 
         public static final String FIELD_USER_ID = "UserID";
         public static final String FIELD_USERNAME = "Username";
@@ -471,9 +471,9 @@ public class _Authentications {
         }
     }
 
-    public static class _OTP {
+    public static class OTP {
 
-        private static final String TAG = _OTP.class.getSimpleName();
+        private static final String TAG = OTP.class.getSimpleName();
 
         public static final String FIELD_USER_ID = "UserID";
         public static final String FIELD_CODE = "Code";
