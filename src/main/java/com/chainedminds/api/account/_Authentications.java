@@ -2,20 +2,15 @@ package com.chainedminds.api.account;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds.utilities.Cache;
-import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities._DBConnectionOld;
-import com.chainedminds.utilities._Log;
+import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.database.TwoStepQueryCallback;
 import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -25,6 +20,11 @@ public class _Authentications {
 
     private static final Cache<String, Integer> LOGIN_ATTEMPTS_CACHE =
             new Cache<>(_Config.BRUTE_FORCE_REMOVE_BLOCKAGE_AFTER);
+
+    public static void start() {
+
+        _OTP.start();
+    }
 
     public static void fetch() {
 
@@ -484,14 +484,29 @@ public class _Authentications {
         public static final Map<Integer, AuthData> MAPPING_USER_ID = new HashMap<>();
         public static final Map<String, AuthData> MAPPING_CODE = new HashMap<>();
 
+        public static void start() {
+
+            Task.add(Task.Data.build()
+                    .setName("FetchAuth")
+                    .setTime(0, 0, 0)
+                    .setInterval(0, 0, 1, 0)
+                    .onEachCycle(() -> {
+
+                        for (AuthData auth : getAll()) {
+
+                            if (auth.expirationTime <= System.currentTimeMillis()) {
+
+                                remove(auth.code);
+                            }
+                        }
+                    })
+                    .runNow()
+                    .schedule());
+        }
+
         public static void fetch() {
 
-            String statement = "DELETE FROM " + _Config.TABLE_AUTH_OTP +
-                    " WHERE " + FIELD_EXPIRATION_TIME + " < DATE_ADD(NOW(), INTERVAL 5 MINUTE)";
-
-            _DatabaseOld.update(TAG, statement);
-
-            statement = "SELECT * FROM " + _Config.TABLE_AUTH_OTP;
+            String statement = "SELECT * FROM " + _Config.TABLE_AUTH_OTP;
 
             _DatabaseOld.query(TAG, statement, new TwoStepQueryCallback() {
 
@@ -606,6 +621,15 @@ public class _Authentications {
             return data.get();
         }
 
+        public static List<AuthData> getAll() {
+
+            List<AuthData> auths = new ArrayList<>();
+
+            Utilities.lock(TAG, LOCK.readLock(), () -> auths.addAll(MAPPING_USER_ID.values()));
+
+            return auths;
+        }
+
         public static int getUserID(String code) {
 
             AtomicInteger userID = new AtomicInteger(_Codes.NOT_FOUND);
@@ -626,7 +650,22 @@ public class _Authentications {
             return userID.get();
         }
 
-        public static String generateCode(int userID) {
+        public static String getCode(int userID) {
+
+            AtomicReference<String> code = new AtomicReference<>();
+
+            Utilities.lock(TAG, LOCK.readLock(), () -> {
+
+                if (MAPPING_USER_ID.containsKey(userID)) {
+
+                    code.set(MAPPING_USER_ID.get(userID).code);
+                }
+            });
+
+            return code.get();
+        }
+
+        public static String generateCode(int userID, int minutes) {
 
             Random random = new Random();
 
@@ -641,15 +680,18 @@ public class _Authentications {
                     random.nextInt(10) +
                     random.nextInt(10);
 
-            String insertStatement = "INSERT " + _Config.TABLE_AUTH_OTP + " (" +
+            long expirationTime = System.currentTimeMillis() + ((long) minutes * _Config.ONE_MINUTE);
+
+            String statement = "INSERT " + _Config.TABLE_AUTH_OTP + " (" +
                     FIELD_USER_ID + ", " + FIELD_CODE + ", " + FIELD_EXPIRATION_TIME +
-                    ") VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
+                    ") VALUES (?, ?, ?)";
 
             Map<Integer, Object> parameters = new HashMap<>();
             parameters.put(1, userID);
             parameters.put(2, code);
+            parameters.put(3, new Timestamp(expirationTime));
 
-            boolean wasSuccessful = _DatabaseOld.insert(TAG, insertStatement, parameters);
+            boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
 
             if (wasSuccessful) {
 
@@ -658,7 +700,7 @@ public class _Authentications {
                     AuthData authData = new AuthData();
                     authData.userID = userID;
                     authData.code = code;
-                    authData.expirationTime = System.currentTimeMillis();
+                    authData.expirationTime = expirationTime;
 
                     MAPPING_USER_ID.put(userID, authData);
                     MAPPING_CODE.put(code, authData);
@@ -668,6 +710,29 @@ public class _Authentications {
             }
 
             return null;
+        }
+
+        public static boolean remove(String code) {
+
+            int oldUserID = getUserID(code);
+
+            String statement = "DELETE FROM " + _Config.TABLE_AUTH_OTP +
+                    " WHERE " + FIELD_CODE + " = ?";
+
+            Map<Integer, Object> parameters = new HashMap<>();
+            parameters.put(1, code);
+
+            return _DatabaseOld.update(TAG, statement, parameters, (wasSuccessful, error) -> {
+
+                if (wasSuccessful) {
+
+                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
+
+                        MAPPING_USER_ID.remove(oldUserID);
+                        MAPPING_CODE.remove(code);
+                    });
+                }
+            });
         }
 
         //------------------------
