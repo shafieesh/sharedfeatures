@@ -17,11 +17,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _Accounts {
+public class _Account {
 
-    private static final String TAG = _Accounts.class.getSimpleName();
+    private static final String TAG = _Account.class.getSimpleName();
 
-    public static final String FIELD_ID = "UserID";
+    public static final String FIELD_USER_ID = "UserID";
     public static final String FIELD_NAME = "Name";
     public static final String FIELD_IS_ACTIVE = "IsActive";
     public static final String FIELD_LAST_UPDATE = "LastUpdate";
@@ -43,7 +43,7 @@ public class _Accounts {
 
                 while (resultSet.next()) {
 
-                    int userID = resultSet.getInt(FIELD_ID);
+                    int userID = resultSet.getInt(FIELD_USER_ID);
                     String username = resultSet.getString(FIELD_NAME);
 
                     mappingUserIDs.put(userID, username);
@@ -105,7 +105,7 @@ public class _Accounts {
 
         String query = name.toLowerCase();
 
-        getUserIDMap(TAG, entries -> entries.forEach((loopingUserID, loopingName) -> {
+        getAll(TAG, entries -> entries.forEach((loopingUserID, loopingName) -> {
 
             if (loopingName.toLowerCase().contains(query)) {
 
@@ -156,9 +156,18 @@ public class _Accounts {
         return userID.get();
     }
 
-    public void getUserIDMap(String tag, Utilities.GrantAccess<Map<Integer, String>> job) {
+    public void getAll(String tag, Utilities.GrantAccess<Map<Integer, String>> job) {
 
         Utilities.lock(tag, LOCK.readLock(), () -> job.giveAccess(USERS));
+    }
+
+    public Map<Integer, String> getAll() {
+
+        Map<Integer, String> userIDMap = new LinkedHashMap<>();
+
+        Utilities.lock(TAG, LOCK.readLock(), () -> userIDMap.putAll(USERS));
+
+        return userIDMap;
     }
 
     public Map<Integer, String> getUsers() {
@@ -182,7 +191,7 @@ public class _Accounts {
         AtomicReference<T> value = new AtomicReference<>();
 
         String statement = "SELECT " + field + " FROM " + _Config.TABLE_ACCOUNTS +
-                " WHERE " + FIELD_ID + " = ?";
+                " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
 
@@ -224,7 +233,7 @@ public class _Accounts {
     public final boolean setProperty(Connection connection, int id, String fieldName, Object value) {
 
         String statement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " +
-                fieldName + " = ?, " + FIELD_LAST_UPDATE + " = NOW() WHERE " + FIELD_ID + " = ?";
+                fieldName + " = ?, " + FIELD_LAST_UPDATE + " = NOW() WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
 

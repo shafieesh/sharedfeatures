@@ -1,7 +1,7 @@
 package com.chainedminds.api;
 
 import com.chainedminds._Config;
-import com.chainedminds.api.account._AccountSessions;
+import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.utilities.Messages;
 import com.chainedminds.utilities.Utilities;
 
@@ -39,7 +39,7 @@ public class Activity {
 
             default:
 
-                long lastActivity = _AccountSessions.USER_ACTIVITY
+                long lastActivity = _AccountSession.USER_ACTIVITY
                         .getOrDefault(appName, new HashMap<>())
                         .getOrDefault(userID, 0L);
 

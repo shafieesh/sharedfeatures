@@ -522,7 +522,7 @@ public class _Friendship {
             }
         });
 
-        _Resources.get().account.getUserIDMap(TAG, mappingUserID -> {
+        _Resources.get().account.getAll(TAG, mappingUserID -> {
 
             for (FriendData friend : pendingRelations) {
 

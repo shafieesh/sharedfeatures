@@ -14,9 +14,9 @@ import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class _AccountSessions {
+public class _AccountSession {
 
-    private static final String TAG = _AccountSessions.class.getSimpleName();
+    private static final String TAG = _AccountSession.class.getSimpleName();
 
     public static final String FIELD_USER_ID = "UserID";
     public static final String FIELD_CREDENTIAL = "Credential";

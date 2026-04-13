@@ -2,7 +2,7 @@ package com.chainedminds.api;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds.api.account._AccountSessions;
+import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.models.SmallData;
 import com.chainedminds.utilities.Utilities;
@@ -58,7 +58,7 @@ public class _RequestHandler<Data> {
 
         if (System.currentTimeMillis() - lastAccessTime >= _Config.FIVE_MINUTES) {
 
-            _AccountSessions.USER_ACTIVITY.getOrDefault(appName, new HashMap<>()).put(userID, currentTime);
+            _AccountSession.USER_ACTIVITY.getOrDefault(appName, new HashMap<>()).put(userID, currentTime);
 
             _Friendship.notifyPlayerIsOnline(userID, appName);
         }

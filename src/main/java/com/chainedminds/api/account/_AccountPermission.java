@@ -13,9 +13,9 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _AccountPermissions {
+public class _AccountPermission {
 
-    private static final String TAG = _AccountPermissions.class.getSimpleName();
+    private static final String TAG = _AccountPermission.class.getSimpleName();
 
     public static final String FIELD_USER_ID = "UserID";
     public static final String FIELD_PERMISSION = "Permission";

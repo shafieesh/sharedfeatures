@@ -2,8 +2,8 @@ package com.chainedminds.test;
 
 import com.chainedminds._Classes;
 import com.chainedminds._Resources;
-import com.chainedminds.api.account._Accounts;
-import com.chainedminds.api.account._AccountSessions;
+import com.chainedminds.api.account._Account;
+import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.api.account._BlackList;
 import com.chainedminds.api.account._Profile;
 import com.chainedminds.api.friendship._Friendship;
@@ -23,8 +23,8 @@ import com.chainedminds.utilities._Log;
 public class TestResources extends _Resources<
         TestRequestHandler,
         _Profile,
-        _Accounts,
-        _AccountSessions,
+        _Account,
+        _AccountSession,
         _Friendship,
         _File,
         _IABPayment<_IABTransactionData, _ProductData>,
@@ -40,8 +40,8 @@ public class TestResources extends _Resources<
     public static _Resources<
             TestRequestHandler,
             _Profile,
-            _Accounts,
-            _AccountSessions,
+            _Account,
+            _AccountSession,
             _Friendship,
             _File,
             _IABPayment<_IABTransactionData, _ProductData>,
@@ -59,7 +59,7 @@ public class TestResources extends _Resources<
 
     public static void config() {
 
-        _Resources<TestRequestHandler, _Profile, _Accounts, _AccountSessions,
+        _Resources<TestRequestHandler, _Profile, _Account, _AccountSession,
                 _Friendship,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -72,8 +72,8 @@ public class TestResources extends _Resources<
 
         resources.requestHandler = new TestRequestHandler(TestData.class);
         resources.profile = new _Profile();
-        resources.account = new _Accounts();
-        resources.accountSession = new _AccountSessions();
+        resources.account = new _Account();
+        resources.accountSession = new _AccountSession();
         resources.friendship = new _Friendship();
         resources.file = new _File();
         resources.iabPayment = new _IABPayment<>();

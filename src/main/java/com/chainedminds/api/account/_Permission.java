@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class _Permissions {
+public class _Permission {
 
-    private static final String TAG = _Permissions.class.getSimpleName();
+    private static final String TAG = _Permission.class.getSimpleName();
 
     public static final String FIELD_PERMISSION = "Permission";
     public static final String FIELD_POSITION = "Position";
