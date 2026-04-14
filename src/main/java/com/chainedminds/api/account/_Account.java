@@ -170,15 +170,6 @@ public class _Account {
         return userIDMap;
     }
 
-    public Map<Integer, String> getUsers() {
-
-        Map<Integer, String> users = new LinkedHashMap<>();
-
-        Utilities.lock(TAG, LOCK.readLock(), () -> users.putAll(USERS));
-
-        return users;
-    }
-
     //------------------------------------------------------------------------------------
 
     public final <T> T getProperty(int id, String field, Class<T> T) {
