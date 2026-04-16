@@ -518,6 +518,18 @@ public class _Authentication {
 
             long expirationTime = System.currentTimeMillis() + ((long) minutes * _Config.ONE_MINUTE);
 
+            boolean wasSuccessful = put(userID, code, expirationTime);
+
+            if (wasSuccessful) {
+
+                return code;
+            }
+
+            return null;
+        }
+
+        public static boolean put(int userID, String code, long expirationTime) {
+
             String statement = "INSERT " + _Config.TABLE_AUTH_OTP + " (" +
                     FIELD_USER_ID + ", " + FIELD_CODE + ", " + FIELD_EXPIRATION_TIME +
                     ") VALUES (?, ?, ?)";
@@ -527,25 +539,22 @@ public class _Authentication {
             parameters.put(2, code);
             parameters.put(3, new Timestamp(expirationTime));
 
-            boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
+            return  _DatabaseOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
 
-            if (wasSuccessful) {
+                if (wasSuccessful) {
 
-                Utilities.lock(TAG, LOCK.writeLock(), () -> {
+                    Utilities.lock(TAG, LOCK.writeLock(), () -> {
 
-                    AuthData authData = new AuthData();
-                    authData.userID = userID;
-                    authData.code = code;
-                    authData.expirationTime = expirationTime;
+                        AuthData authData = new AuthData();
+                        authData.userID = userID;
+                        authData.code = code;
+                        authData.expirationTime = expirationTime;
 
-                    MAPPING_USER_ID.put(userID, authData);
-                    MAPPING_CODE.put(code, authData);
-                });
-
-                return code;
-            }
-
-            return null;
+                        MAPPING_USER_ID.put(userID, authData);
+                        MAPPING_CODE.put(code, authData);
+                    });
+                }
+            });
         }
 
         public static boolean remove(String code) {
