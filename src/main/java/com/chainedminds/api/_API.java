@@ -94,19 +94,136 @@ public class _API {
             throw new RuntimeException("OkHTTP is not initialized.");
         }
 
-        try {
+        Request request = builder.build();
 
-            Request request = builder.build();
+        try (Response response = okHttp.newCall(request).execute()) {
 
-            try (Response response = okHttp.newCall(request).execute()) {
+            int code = response.code();
+
+            okhttp3.Headers baseHeaders = response.headers();
+
+            ResponseBody responseBody = response.body();
+
+            String responseString = null;
+
+            if ("br".equals(baseHeaders.get("content-encoding"))) {
+
+                InputStreamReader inputStream = new InputStreamReader(
+                        new BrotliInputStream(responseBody.byteStream()));
+
+                Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+
+                responseString = scanner.hasNext() ? scanner.next() : "";
+            }
+
+            if (responseString == null) {
+
+                responseString = responseBody.string();
+            }
+
+            responseBody.close();
+
+            if (apiCallback != null) {
+
+                Headers headers = new Headers();
+
+                baseHeaders.forEach(pair -> headers.add(pair.component1().toLowerCase(), pair.component2()));
+
+                List<String> cookies = new ArrayList<>();
+
+                List<String> cookieKeys = new ArrayList<>();
+                List<String> cookieValues = new ArrayList<>();
+                List<List<String>> cookieAttributes = new ArrayList<>();
+
+                for (HeaderItem header : headers.getAll()) {
+
+                    if (header.key.equals("set-cookie")) {
+
+                        apiCallback.onSetCookie(header.value);
+
+                        cookies.add(header.value);
+
+                        String value = header.value;
+
+                        String cookieValue = value;
+
+                        if (value.contains(";")) {
+
+                            int semicolonIndex = value.indexOf(";");
+
+                            cookieValue = value.substring(0, semicolonIndex);
+                            value = value.substring(semicolonIndex + 2);
+                        }
+
+                        String[] cookieValueParts = cookieValue.split("=", 2);
+                        String cookieValueKey = cookieValueParts[0];
+                        String cookieValueValue = cookieValueParts[1];
+                        List<String> cookieValueAttributes = new ArrayList<>();
+
+                        for (String cookieValueAttribute : value.split(";")) {
+
+                            cookieValueAttributes.add(cookieValueAttribute.trim());
+                        }
+
+                        apiCallback.onSetCookie(cookieValueKey, cookieValueValue, cookieValueAttributes);
+
+                        cookieKeys.add(cookieValueKey);
+                        cookieValues.add(cookieValueValue);
+                        cookieAttributes.add(cookieValueAttributes);
+                    }
+                }
+
+                if (!cookies.isEmpty()) {
+
+                    apiCallback.onSetCookies(cookies);
+                    apiCallback.onSetCookies(cookieKeys, cookieValues, cookieAttributes);
+                }
+
+                apiCallback.onResponse(code, responseString);
+                apiCallback.onResponse(code, baseHeaders.toMultimap(), responseString);
+                apiCallback.onResponse(code, headers, responseString);
+            }
+
+        } catch (Exception e) {
+
+            if (apiCallback != null) {
+
+                apiCallback.onError(e);
+                apiCallback.onError(e.getClass().getSimpleName(), e.getMessage());
+                apiCallback.onError(e.getMessage(), e);
+            }
+        }
+    }
+
+    public void callAsync(Request.Builder builder, ApiCallback apiCallback) {
+
+        if (okHttp == null) {
+
+            throw new RuntimeException("OkHTTP is not initialized.");
+        }
+
+        Request request = builder.build();
+
+        okHttp.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                if (apiCallback != null) {
+
+                    apiCallback.onError(e);
+                    apiCallback.onError(e.getClass().getSimpleName(), e.getMessage());
+                    apiCallback.onError(e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) {
 
                 int code = response.code();
 
                 okhttp3.Headers baseHeaders = response.headers();
 
-                ResponseBody responseBody = response.body();
-
-                if (responseBody != null) {
+                try (ResponseBody responseBody = response.body()) {
 
                     String responseString = null;
 
@@ -125,8 +242,6 @@ public class _API {
                         responseString = responseBody.string();
                     }
 
-                    responseBody.close();
-
                     if (apiCallback != null) {
 
                         Headers headers = new Headers();
@@ -139,7 +254,7 @@ public class _API {
                         List<String> cookieValues = new ArrayList<>();
                         List<List<String>> cookieAttributes = new ArrayList<>();
 
-                        for (_API.HeaderItem header : headers.getAll()) {
+                        for (HeaderItem header : headers.getAll()) {
 
                             if (header.key.equals("set-cookie")) {
 
@@ -187,143 +302,14 @@ public class _API {
                         apiCallback.onResponse(code, baseHeaders.toMultimap(), responseString);
                         apiCallback.onResponse(code, headers, responseString);
                     }
-                }
-            }
 
-        } catch (Exception e) {
+                } catch (Exception e) {
 
-            /*HttpUrl url = builder.getUrl$okhttp();
+                    if (apiCallback != null) {
 
-            if (url != null) {
-
-                System.out.println("OKHTTP ERROR : " + url);
-            }*/
-
-            if (apiCallback != null) {
-
-                apiCallback.onError(e);
-                apiCallback.onError(e.getClass().getSimpleName(), e.getMessage());
-                apiCallback.onError(e.getMessage(), e);
-            }
-        }
-    }
-
-    public void callAsync(Request.Builder builder, ApiCallback apiCallback) {
-
-        if (okHttp == null) {
-
-            throw new RuntimeException("OkHTTP is not initialized.");
-        }
-
-        Request request = builder.build();
-
-        okHttp.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-
-                /*HttpUrl url = builder.getUrl$okhttp();
-
-                if (url != null) {
-
-                    System.out.println("OKHTTP ERROR : " + url);
-                }*/
-
-                if (apiCallback != null) {
-
-                    apiCallback.onError(e);
-                    apiCallback.onError(e.getClass().getSimpleName(), e.getMessage());
-                    apiCallback.onError(e.getMessage(), e);
-                }
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
-                int code = response.code();
-
-                okhttp3.Headers baseHeaders = response.headers();
-
-                try (ResponseBody responseBody = response.body()) {
-
-                    if (responseBody != null) {
-
-                        String responseString = null;
-
-                        if ("br".equals(baseHeaders.get("content-encoding"))) {
-
-                            InputStreamReader inputStream = new InputStreamReader(
-                                    new BrotliInputStream(responseBody.byteStream()));
-
-                            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-
-                            responseString = scanner.hasNext() ? scanner.next() : "";
-                        }
-
-                        if (responseString == null) {
-
-                            responseString = responseBody.string();
-                        }
-
-                        if (apiCallback != null) {
-
-                            Headers headers = new Headers();
-
-                            baseHeaders.forEach(pair -> headers.add(pair.component1().toLowerCase(), pair.component2()));
-
-                            List<String> cookies = new ArrayList<>();
-
-                            List<String> cookieKeys = new ArrayList<>();
-                            List<String> cookieValues = new ArrayList<>();
-                            List<List<String>> cookieAttributes = new ArrayList<>();
-
-                            for (_API.HeaderItem header : headers.getAll()) {
-
-                                if (header.key.equals("set-cookie")) {
-
-                                    apiCallback.onSetCookie(header.value);
-
-                                    cookies.add(header.value);
-
-                                    String value = header.value;
-
-                                    String cookieValue = value;
-
-                                    if (value.contains(";")) {
-
-                                        int semicolonIndex = value.indexOf(";");
-
-                                        cookieValue = value.substring(0, semicolonIndex);
-                                        value = value.substring(semicolonIndex + 2);
-                                    }
-
-                                    String[] cookieValueParts = cookieValue.split("=", 2);
-                                    String cookieValueKey = cookieValueParts[0];
-                                    String cookieValueValue = cookieValueParts[1];
-                                    List<String> cookieValueAttributes = new ArrayList<>();
-
-                                    for (String cookieValueAttribute : value.split(";")) {
-
-                                        cookieValueAttributes.add(cookieValueAttribute.trim());
-                                    }
-
-                                    apiCallback.onSetCookie(cookieValueKey, cookieValueValue, cookieValueAttributes);
-
-                                    cookieKeys.add(cookieValueKey);
-                                    cookieValues.add(cookieValueValue);
-                                    cookieAttributes.add(cookieValueAttributes);
-                                }
-                            }
-
-                            if (!cookies.isEmpty()) {
-
-                                apiCallback.onSetCookies(cookies);
-                                apiCallback.onSetCookies(cookieKeys, cookieValues, cookieAttributes);
-                            }
-
-                            apiCallback.onResponse(code, responseString);
-                            apiCallback.onResponse(code, baseHeaders.toMultimap(), responseString);
-                            apiCallback.onResponse(code, headers, responseString);
-                        }
+                        apiCallback.onError(e);
+                        apiCallback.onError(e.getClass().getSimpleName(), e.getMessage());
+                        apiCallback.onError(e.getMessage(), e);
                     }
                 }
             }
