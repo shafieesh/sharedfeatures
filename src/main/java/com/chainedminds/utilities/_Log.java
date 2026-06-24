@@ -5,6 +5,7 @@ import com.chainedminds._Resources;
 import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,11 @@ public class _Log {
     public static final String FIELD_ACTION = "Action";
     public static final String FIELD_CRASH_LOG = "CrashLog";
     public static final String FIELD_PAYLOAD = "Payload";
+
+    public static void print(String tag, String log) {
+
+        System.out.println(tag + " - " + new Timestamp(System.currentTimeMillis()) + "\n" + log + "\n");
+    }
 
     public static void error(String tag, String cause) {
 
