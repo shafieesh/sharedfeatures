@@ -1,5 +1,6 @@
 package com.chainedminds;
 
+import com.chainedminds.api._FileHandler;
 import com.chainedminds.api._RequestHandler;
 import com.chainedminds.api.account._Account;
 import com.chainedminds.api.account._AccountSession;
@@ -15,6 +16,7 @@ import com.chainedminds.utilities._Log;
 
 public class _Resources<
         RequestHandler extends _RequestHandler<?>,
+        FileHandler extends _FileHandler<?>,
         Profile extends _Profile,
         Account extends _Account,
         AccountSession extends _AccountSession,
@@ -32,6 +34,7 @@ public class _Resources<
 
     private static final _Resources<
             ? extends _RequestHandler<?>,
+            ? extends _FileHandler<?>,
             ? extends _Profile,
             ? extends _Account,
             ? extends _AccountSession,
@@ -50,6 +53,7 @@ public class _Resources<
 
     public static <
             RequestHandler extends _RequestHandler<?>,
+            FileHandler extends _FileHandler<?>,
             Profile extends _Profile,
             Account extends _Account,
             AccountSession extends _AccountSession,
@@ -64,19 +68,20 @@ public class _Resources<
             Product extends _Product<? extends _ProductData>,
             BlackList extends _BlackList,
             Log extends _Log> _Resources<
-            RequestHandler, Profile, Account, AccountSession,
+            RequestHandler, FileHandler, Profile, Account, AccountSession,
             Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
             IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
             > get() {
 
         return (_Resources<
-                RequestHandler, Profile, Account, AccountSession,
+                RequestHandler, FileHandler, Profile, Account, AccountSession,
                 Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
                 IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
                 >) INSTANCE;
     }
 
     public RequestHandler requestHandler;
+    public FileHandler fileHandler;
     public Profile profile;
     public Account account;
     public AccountSession accountSession;

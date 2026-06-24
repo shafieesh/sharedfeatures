@@ -1,0 +1,70 @@
+package com.chainedminds.network.netty.mainPipe;
+
+import com.chainedminds._Config;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+
+public class MainMessageTransport {
+
+    public static void start(EventLoopGroup connectionExecutor, EventLoopGroup ioExecutor, boolean keepAlive) {
+
+        try {
+
+            final MainMessageProcessor processor = new MainMessageProcessor();
+            final MainChannelEncoder encoder = new MainChannelEncoder();
+
+            MainMessageProcessor.KEEP_ALIVE = keepAlive;
+
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(connectionExecutor, ioExecutor)
+                    .channel(NioServerSocketChannel.class)
+                    //.handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel socketChannel) {
+
+                            final IdleStateHandler autoCloser = new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT);
+                            final MainChannelDecoder decoder = new MainChannelDecoder();
+
+                            socketChannel.pipeline().addLast("AUTO_CLOSER", autoCloser);
+                            socketChannel.pipeline().addLast("DECODER", decoder);
+                            socketChannel.pipeline().addLast("PROCESSOR", processor);
+                            socketChannel.pipeline().addLast("ENCODER", encoder);
+                        }
+                    });
+
+            //serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
+            //serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
+            //serverBootstrap.childOption(ChannelOption.SO_LINGER, 20);
+
+            ChannelFuture channelFuture = serverBootstrap.bind(_Config.PORT_MAIN_MESSAGE_TRANSPORT).syncUninterruptibly();
+
+            System.out.println("Starting main message transport @ " + _Config.PORT_MAIN_MESSAGE_TRANSPORT);
+
+            //channelFuture.channel().closeFuture().sync();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        } finally {
+
+            //workerGroup.shutdownGracefully();
+
+            //bossGroup.shutdownGracefully();
+        }
+    }
+
+    /*public static void writeMessage(String id, byte[] message) {
+
+        CHANNEL_GROUP.writeAndFlush(message, channel -> channel.id().asLongText().equals(id));
+
+        //CHANNEL_GROUP.writeAndFlush(message);
+    }*/
+}

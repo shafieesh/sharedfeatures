@@ -10,16 +10,15 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
-public class MainPipeServer {
+public class MainFileTransport {
 
     public static void start(EventLoopGroup connectionExecutor, EventLoopGroup ioExecutor, boolean keepAlive) {
 
         try {
 
-            final MainChannelProcessor processor = new MainChannelProcessor();
             final MainChannelEncoder encoder = new MainChannelEncoder();
 
-            MainChannelProcessor.KEEP_ALIVE = keepAlive;
+            MainFileProcessor.KEEP_ALIVE = keepAlive;
 
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(connectionExecutor, ioExecutor)
@@ -29,8 +28,9 @@ public class MainPipeServer {
                         @Override
                         public void initChannel(SocketChannel socketChannel) {
 
-                            final  IdleStateHandler autoCloser = new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT);
+                            final IdleStateHandler autoCloser = new ReadTimeoutHandler(_Config.DEFAULT_TIMEOUT);
                             final MainChannelDecoder decoder = new MainChannelDecoder();
+                            final MainFileProcessor processor = new MainFileProcessor();
 
                             socketChannel.pipeline().addLast("AUTO_CLOSER", autoCloser);
                             socketChannel.pipeline().addLast("DECODER", decoder);
@@ -43,9 +43,9 @@ public class MainPipeServer {
             //serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             //serverBootstrap.childOption(ChannelOption.SO_LINGER, 20);
 
-            ChannelFuture channelFuture = serverBootstrap.bind(_Config.SERVER_PORT_MAIN).syncUninterruptibly();
+            ChannelFuture channelFuture = serverBootstrap.bind(_Config.PORT_MAIN_FILE_TRANSPORT).syncUninterruptibly();
 
-            System.out.println("Starting main pipe server...");
+            System.out.println("Starting main file transport @ " + _Config.PORT_MAIN_FILE_TRANSPORT);
 
             //channelFuture.channel().closeFuture().sync();
 

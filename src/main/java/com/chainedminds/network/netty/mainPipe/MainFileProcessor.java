@@ -7,28 +7,20 @@ import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
 
 import java.net.InetSocketAddress;
+import java.sql.Timestamp;
+import java.util.Arrays;
 
-@ChannelHandler.Sharable
-public class MainChannelProcessor extends ChannelInboundHandlerAdapter {
+public class MainFileProcessor extends ChannelInboundHandlerAdapter {
 
     public static boolean KEEP_ALIVE = false;
-    private static int NEW_CONNECTIONS = 0;
 
-    public static int getNewConnections() {
-
-        int copiedNewConnectionsCount = NEW_CONNECTIONS;
-
-        NEW_CONNECTIONS = 0;
-
-        return copiedNewConnectionsCount;
-    }
+    private byte[] message;
+    private byte[] data;
 
     @Override
     public void channelActive(ChannelHandlerContext context) throws Exception {
 
         super.channelActive(context);
-
-        NEW_CONNECTIONS++;
 
         ChannelFuture channelCloseFuture = context.channel().closeFuture();
 
@@ -39,24 +31,33 @@ public class MainChannelProcessor extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext context, Object message) {
+    public void channelRead(ChannelHandlerContext context, Object data) {
 
-        byte[] requestData = (byte[]) message;
+        if (this.message == null && data instanceof byte[]) {
 
-        String channelID = context.channel().id().asLongText();
+            this.message = (byte[]) data;
+
+            return;
+        }
+        if (this.data == null && data instanceof byte[]) {
+
+            this.data = (byte[]) data;
+        }
 
         InetSocketAddress remoteAddress = ((InetSocketAddress) context.channel().remoteAddress());
 
-        if (ChannelListeners.REGISTERED_CLIENTS.containsKey(channelID)) {
+        if (message != null && this.data != null) {
 
-            ChannelListeners.REGISTERED_CLIENTS.get(channelID).onRequestReceived(channelID, requestData);
+            byte[] newMessageHolder = this.message;
+            byte[] newDataHolder = this.data;
 
-        } else {
+            this.message = null;
+            this.data = null;
 
             Runnable task = () -> {
 
-                Object responseData = _Resources.get().requestHandler
-                        .processRequest(context, remoteAddress, requestData);
+                Object responseData = _Resources.get().fileHandler
+                        .processRequest(context, remoteAddress, newMessageHolder, newDataHolder);
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);
 
@@ -73,8 +74,8 @@ public class MainChannelProcessor extends ChannelInboundHandlerAdapter {
 
             if (!NettyServer.execute(task)) {
 
-                Object responseData = _Resources.get().requestHandler
-                        .sendServerBusyResponse(requestData);
+                Object responseData = _Resources.get().fileHandler
+                        .sendServerBusyResponse(newMessageHolder, newDataHolder);
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);
 

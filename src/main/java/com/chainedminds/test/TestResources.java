@@ -22,6 +22,7 @@ import com.chainedminds.utilities._Log;
 
 public class TestResources extends _Resources<
         TestRequestHandler,
+        TestFileHandler,
         _Profile,
         _Account,
         _AccountSession,
@@ -39,6 +40,7 @@ public class TestResources extends _Resources<
 
     public static _Resources<
             TestRequestHandler,
+            TestFileHandler,
             _Profile,
             _Account,
             _AccountSession,
@@ -59,7 +61,7 @@ public class TestResources extends _Resources<
 
     public static void config() {
 
-        _Resources<TestRequestHandler, _Profile, _Account, _AccountSession,
+        _Resources<TestRequestHandler, TestFileHandler, _Profile, _Account, _AccountSession,
                 _Friendship,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -71,6 +73,7 @@ public class TestResources extends _Resources<
                 _BlackList, _Log> resources = _Resources.get();
 
         resources.requestHandler = new TestRequestHandler(TestData.class);
+        resources.fileHandler = new TestFileHandler(TestData.class);
         resources.profile = new _Profile();
         resources.account = new _Account();
         resources.accountSession = new _AccountSession();

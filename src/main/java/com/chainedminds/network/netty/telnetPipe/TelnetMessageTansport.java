@@ -28,7 +28,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
-public class TelnetPipeServer {
+public class TelnetMessageTansport {
 
     public static void start(EventLoopGroup connectionExecutor, EventLoopGroup ioExecutor, boolean keepAlive) {
 
@@ -60,7 +60,7 @@ public class TelnetPipeServer {
             //serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             //serverBootstrap.childOption(ChannelOption.SO_LINGER, 20);
 
-            ChannelFuture channelFuture = serverBootstrap.bind(_Config.SERVER_PORT_TELNET).syncUninterruptibly();
+            ChannelFuture channelFuture = serverBootstrap.bind(_Config.PORT_TELNET_MESSAGE_TRANSPORT).syncUninterruptibly();
 
             System.out.println("Starting telnet pipe server...");
 

@@ -1,9 +1,10 @@
 package com.chainedminds.network.netty;
 
-import com.chainedminds.network.netty.mainPipe.MainChannelProcessor;
-import com.chainedminds.network.netty.mainPipe.MainPipeServer;
+import com.chainedminds.network.netty.mainPipe.MainFileTransport;
+import com.chainedminds.network.netty.mainPipe.MainMessageProcessor;
+import com.chainedminds.network.netty.mainPipe.MainMessageTransport;
 import com.chainedminds.network.netty.telnetPipe.TelnetChannelProcessor;
-import com.chainedminds.network.netty.telnetPipe.TelnetPipeServer;
+import com.chainedminds.network.netty.telnetPipe.TelnetMessageTansport;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
@@ -25,18 +26,31 @@ public class NettyServer {
         REQUESTS_EXECUTOR.allowCoreThreadTimeOut(true);
     }
 
-    public static void start() {
+    public static void startMessageTransport() {
 
-        start(false);
+        startMessageTransport(false);
     }
 
-    public static void start(boolean keepAlive) {
+    public static void startMessageTransport(boolean keepAlive) {
 
         EventLoopGroup connectionExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         EventLoopGroup ioExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 
-        MainPipeServer.start(connectionExecutor, ioExecutor, keepAlive);
-        TelnetPipeServer.start(connectionExecutor, ioExecutor, keepAlive);
+        MainMessageTransport.start(connectionExecutor, ioExecutor, keepAlive);
+        TelnetMessageTansport.start(connectionExecutor, ioExecutor, keepAlive);
+    }
+
+    public static void startFileTransport() {
+
+        startFileTransport(false);
+    }
+
+    public static void startFileTransport(boolean keepAlive) {
+
+        EventLoopGroup connectionExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+        EventLoopGroup ioExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+
+        MainFileTransport.start(connectionExecutor, ioExecutor, keepAlive);
     }
 
     public static boolean execute(Runnable runnable) {
@@ -127,7 +141,7 @@ public class NettyServer {
 
     public static Map<String, Integer> getConnectionsCount() {
 
-        int mainNewConnectionsCount = MainChannelProcessor.getNewConnections();
+        int mainNewConnectionsCount = MainMessageProcessor.getNewConnections();
         int telnetNewConnectionsCount = TelnetChannelProcessor.getNewConnections();
         //int webNewConnectionsCount = HttpStaticFileServerHandler.getNewConnectionsCount();
         int totalConnectionsCount = mainNewConnectionsCount + telnetNewConnectionsCount;// + webNewConnectionsCount;

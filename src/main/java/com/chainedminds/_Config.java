@@ -272,10 +272,12 @@ public class _Config {
 
     public static String ENGINE_NAME;
 
-    public static int SERVER_PORT_MAIN;
-    public static int SERVER_PORT_TELNET;
+    public static int PORT_MAIN_MESSAGE_TRANSPORT;
+    public static int PORT_MAIN_FILE_TRANSPORT;
+    public static int PORT_TELNET_MESSAGE_TRANSPORT;
 
     public static int DEFAULT_TIMEOUT = 30;
+    public static int MAIN_FILE_TRANSPORT_TIMEOUT = 30;
 
     //-------------------------------------------------------------//
 
