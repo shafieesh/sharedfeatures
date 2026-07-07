@@ -3,8 +3,8 @@ package com.chainedminds.network.netty;
 import com.chainedminds.network.netty.mainPipe.MainFileTransport;
 import com.chainedminds.network.netty.mainPipe.MainMessageProcessor;
 import com.chainedminds.network.netty.mainPipe.MainMessageTransport;
-import com.chainedminds.network.netty.telnetPipe.TelnetChannelProcessor;
-import com.chainedminds.network.netty.telnetPipe.TelnetMessageTansport;
+import com.chainedminds.network.netty.telnetPipe.TelnetMessageProcessor;
+import com.chainedminds.network.netty.telnetPipe.TelnetMessageTransport;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
@@ -37,7 +37,7 @@ public class NettyServer {
         EventLoopGroup ioExecutor = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 
         MainMessageTransport.start(connectionExecutor, ioExecutor, keepAlive);
-        TelnetMessageTansport.start(connectionExecutor, ioExecutor, keepAlive);
+        TelnetMessageTransport.start(connectionExecutor, ioExecutor, keepAlive);
     }
 
     public static void startFileTransport() {
@@ -142,7 +142,7 @@ public class NettyServer {
     public static Map<String, Integer> getConnectionsCount() {
 
         int mainNewConnectionsCount = MainMessageProcessor.getNewConnections();
-        int telnetNewConnectionsCount = TelnetChannelProcessor.getNewConnections();
+        int telnetNewConnectionsCount = TelnetMessageProcessor.getNewConnections();
         //int webNewConnectionsCount = HttpStaticFileServerHandler.getNewConnectionsCount();
         int totalConnectionsCount = mainNewConnectionsCount + telnetNewConnectionsCount;// + webNewConnectionsCount;
         int activeConnectionsCount = REQUESTS_EXECUTOR.getActiveCount();

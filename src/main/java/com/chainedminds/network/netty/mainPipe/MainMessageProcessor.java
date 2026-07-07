@@ -2,7 +2,7 @@ package com.chainedminds.network.netty.mainPipe;
 
 import com.chainedminds._Resources;
 import com.chainedminds.api._RequestHandler;
-import com.chainedminds.network.netty.ChannelListeners;
+import com.chainedminds.network.netty.ChannelPool;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
 
@@ -34,7 +34,7 @@ public class MainMessageProcessor extends ChannelInboundHandlerAdapter {
 
         channelCloseFuture.addListener((ChannelFutureListener) future -> {
 
-            ChannelListeners.removeListener(future.channel().id().asLongText());
+            ChannelPool.removeListener(future.channel().id().asLongText());
         });
     }
 
@@ -47,9 +47,9 @@ public class MainMessageProcessor extends ChannelInboundHandlerAdapter {
 
         InetSocketAddress remoteAddress = ((InetSocketAddress) context.channel().remoteAddress());
 
-        if (ChannelListeners.REGISTERED_CLIENTS.containsKey(channelID)) {
+        if (ChannelPool.REQUEST_HANDLERS.containsKey(channelID)) {
 
-            ChannelListeners.REGISTERED_CLIENTS.get(channelID).onRequestReceived(channelID, requestData);
+            ChannelPool.REQUEST_HANDLERS.get(channelID).handleRequest(channelID, requestData);
 
         } else {
 

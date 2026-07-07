@@ -2,13 +2,11 @@ package com.chainedminds.network.netty.mainPipe;
 
 import com.chainedminds._Resources;
 import com.chainedminds.api._RequestHandler;
-import com.chainedminds.network.netty.ChannelListeners;
+import com.chainedminds.network.netty.ChannelPool;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
 
 import java.net.InetSocketAddress;
-import java.sql.Timestamp;
-import java.util.Arrays;
 
 public class MainFileProcessor extends ChannelInboundHandlerAdapter {
 
@@ -26,7 +24,7 @@ public class MainFileProcessor extends ChannelInboundHandlerAdapter {
 
         channelCloseFuture.addListener((ChannelFutureListener) future -> {
 
-            ChannelListeners.removeListener(future.channel().id().asLongText());
+            ChannelPool.removeListener(future.channel().id().asLongText());
         });
     }
 

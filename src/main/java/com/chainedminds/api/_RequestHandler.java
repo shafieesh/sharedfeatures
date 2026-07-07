@@ -14,7 +14,6 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +79,12 @@ public class _RequestHandler<Data> {
         return LAST_ACCESS_CACHE.size();
     }
 
-    public Object handleRequest(Data data, Socket socket) {
+    public Object handleRequest(Wrapper data) {
+
+        return handleRequest(data.data, data.channelID, data.channel);
+    }
+
+    public Object handleRequest(Data data, String channelID, ChannelHandlerContext channel) {
 
         SmallData response = new SmallData();
         response.response = _Codes.RESPONSE_NOK;
@@ -97,7 +101,7 @@ public class _RequestHandler<Data> {
 
             if (bakedRequest != null) {
 
-                Object pendingObject = handleRequest(bakedRequest.data, null);
+                Object pendingObject = handleRequest(bakedRequest);
 
                 return prepareResponse(request, pendingObject);
 
@@ -157,7 +161,7 @@ public class _RequestHandler<Data> {
         if (request != null) {
 
             Wrapper wrapper = new Wrapper();
-            wrapper.channelContext = channelContext;
+            wrapper.channel = channelContext;
             wrapper.channelID = channelContext.channel().id().asLongText();
             wrapper.address = remoteAddress.getAddress().getHostAddress();
             wrapper.data = request;
@@ -232,7 +236,7 @@ public class _RequestHandler<Data> {
 
     public class Wrapper {
 
-        public ChannelHandlerContext channelContext;
+        public ChannelHandlerContext channel;
         public String channelID;
         public String address;
         public Data data;

@@ -28,15 +28,15 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
-public class TelnetMessageTansport {
+public class TelnetMessageTransport {
 
     public static void start(EventLoopGroup connectionExecutor, EventLoopGroup ioExecutor, boolean keepAlive) {
 
         final StringDecoder decoder = new StringDecoder();
         final StringEncoder encoder = new StringEncoder();
-        final TelnetChannelProcessor processor = new TelnetChannelProcessor();
+        final TelnetMessageProcessor processor = new TelnetMessageProcessor();
 
-        TelnetChannelProcessor.KEEP_ALIVE = keepAlive;
+        TelnetMessageProcessor.KEEP_ALIVE = keepAlive;
 
         try {
 

@@ -4,8 +4,7 @@ import com.chainedminds._Codes;
 import com.chainedminds.api._RequestHandler;
 import com.chainedminds.models._Data;
 import com.chainedminds.utilities.json.Json;
-
-import java.net.Socket;
+import io.netty.channel.ChannelHandlerContext;
 
 public class TestRequestHandler extends _RequestHandler<TestData> {
 
@@ -17,7 +16,7 @@ public class TestRequestHandler extends _RequestHandler<TestData> {
     }
 
     @Override
-    public Object handleRequest(TestData data, Socket socket) {
+    public Object handleRequest(TestData data, String channelID, ChannelHandlerContext channel) {
 
         System.out.println(Json.getString(data));
 

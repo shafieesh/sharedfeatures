@@ -2,14 +2,14 @@ package com.chainedminds.network.netty.telnetPipe;
 
 import com.chainedminds._Resources;
 import com.chainedminds.api._RequestHandler;
-import com.chainedminds.network.netty.ChannelListeners;
+import com.chainedminds.network.netty.ChannelPool;
 import com.chainedminds.network.netty.NettyServer;
 import io.netty.channel.*;
 
 import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
-public class TelnetChannelProcessor extends SimpleChannelInboundHandler<String> {
+public class TelnetMessageProcessor extends SimpleChannelInboundHandler<String> {
 
     public static boolean KEEP_ALIVE = false;
     private static int NEW_CONNECTIONS = 0;
@@ -34,7 +34,7 @@ public class TelnetChannelProcessor extends SimpleChannelInboundHandler<String> 
 
         channelCloseFuture.addListener((ChannelFutureListener) future -> {
 
-            ChannelListeners.removeListener(future.channel().id().asLongText());
+            ChannelPool.removeListener(future.channel().id().asLongText());
         });
     }
 
