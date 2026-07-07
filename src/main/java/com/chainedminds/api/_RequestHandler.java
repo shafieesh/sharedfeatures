@@ -79,11 +79,6 @@ public class _RequestHandler<Data> {
         return LAST_ACCESS_CACHE.size();
     }
 
-    public Object handleRequest(Wrapper data) {
-
-        return handleRequest(data.data, data.channelID, data.channel);
-    }
-
     public Object handleRequest(Data data, String channelID, ChannelHandlerContext channel) {
 
         SmallData response = new SmallData();
@@ -97,11 +92,11 @@ public class _RequestHandler<Data> {
 
         try {
 
-            Wrapper bakedRequest = prepareRequest(channelContext, remoteAddress, request);
+            Wrapper wrapper = prepareRequest(channelContext, remoteAddress, request);
 
-            if (bakedRequest != null) {
+            if (wrapper != null) {
 
-                Object pendingObject = handleRequest(bakedRequest);
+                Object pendingObject = handleRequest(wrapper.data, wrapper.channelID, wrapper.channel);
 
                 return prepareResponse(request, pendingObject);
 
