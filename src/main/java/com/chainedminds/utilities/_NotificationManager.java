@@ -2,7 +2,7 @@ package com.chainedminds.utilities;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.api._API;
 import com.chainedminds.models.notification._MessageData;
 import com.chainedminds.models.firebase.FirebaseMessageData;
@@ -322,7 +322,7 @@ public class _NotificationManager {
 
     public static void notifyUser(int userID, String appName, String title, String content) {
 
-        String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
+        String firebaseID = _R.get().accountSession.getFirebaseID(userID, appName);
 
         if (firebaseID != null) {
 
@@ -351,7 +351,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
+            String firebaseID = _R.get().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -374,7 +374,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
+            String firebaseID = _R.get().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -414,7 +414,7 @@ public class _NotificationManager {
 
         NettyServer.execute(() -> {
 
-            String firebaseID = _Resources.get().accountSession.getFirebaseID(userID, appName);
+            String firebaseID = _R.get().accountSession.getFirebaseID(userID, appName);
 
             if (firebaseID != null) {
 
@@ -582,7 +582,7 @@ public class _NotificationManager {
 
                         if ("NotRegistered".equals(error) || "InvalidRegistration".equals(error)) {
 
-                            _Resources.get().accountSession.removeFirebaseID(userID, content.to);
+                            _R.get().accountSession.removeFirebaseID(userID, content.to);
                         }
                     }
                 }

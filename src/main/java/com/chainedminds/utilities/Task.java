@@ -2,7 +2,7 @@ package com.chainedminds.utilities;
 
 import com.chainedminds._Config;
 import com.chainedminds._Monitor;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds._R;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -135,7 +135,7 @@ public class Task {
         parameters.put(1, task.name);
         parameters.put(2, new Timestamp(System.currentTimeMillis()));
 
-        _DatabaseOld.insert(TAG, insertStatement, parameters);
+        _R.get().database.insert(TAG, insertStatement, parameters, null);
     }
 
     private static void run() {

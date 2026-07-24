@@ -1,7 +1,7 @@
 package com.chainedminds.test;
 
 import com.chainedminds._Classes;
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.api.account._Account;
 import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.api.account._BlackList;
@@ -19,8 +19,12 @@ import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
 import com.chainedminds.utilities._Log;
+import com.chainedminds.utilities.database._Database;
 
-public class TestResources extends _Resources<
+import java.sql.Connection;
+
+public class TestResources extends _R<
+        _Database,
         TestRequestHandler,
         TestFileHandler,
         _Profile,
@@ -38,7 +42,8 @@ public class TestResources extends _Resources<
         _BlackList,
         _Log> {
 
-    public static _Resources<
+    public static _R<
+            _Database,
             TestRequestHandler,
             TestFileHandler,
             _Profile,
@@ -56,12 +61,12 @@ public class TestResources extends _Resources<
             _BlackList,
             _Log> get() {
 
-        return _Resources.get();
+        return _R.get();
     }
 
     public static void config() {
 
-        _Resources<TestRequestHandler, TestFileHandler, _Profile, _Account, _AccountSession,
+        _R<_Database, TestRequestHandler, TestFileHandler, _Profile, _Account, _AccountSession,
                 _Friendship,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -70,8 +75,19 @@ public class TestResources extends _Resources<
                 _IABSubscriptionPurchase<_IABTransactionData>,
                 _IPGSubscriptionPurchase<_IPGTransactionData>,
                 _Product<_ProductData>,
-                _BlackList, _Log> resources = _Resources.get();
+                _BlackList, _Log> resources = _R.get();
 
+        resources.database = new _Database() {
+            @Override
+            public Connection connect() {
+                return super.connect();
+            }
+
+            @Override
+            public void close(Connection connection) {
+                super.close(connection);
+            }
+        };
         resources.requestHandler = new TestRequestHandler(TestData.class);
         resources.fileHandler = new TestFileHandler(TestData.class);
         resources.profile = new _Profile();
@@ -90,7 +106,6 @@ public class TestResources extends _Resources<
         resources.log = new _Log();
 
         _Classes classes = _Classes.getInstance();
-
         classes.dataClass = TestData.class;
         classes.accountClass = _AccountData.class;
         classes.friendClass = _FriendData.class;

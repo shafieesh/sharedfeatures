@@ -3,8 +3,9 @@ package com.chainedminds.api.store;
 import com.chainedminds._Classes;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.models.payment._IABTransactionData;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -52,7 +53,7 @@ public class _IABProductPurchase<IABTransactionData extends _IABTransactionData>
         parameters.put(4, sku);
         parameters.put(5, token);
 
-        _DatabaseOld.insert(TAG, statement, parameters,
+        _R.get().database.insert(TAG, statement, parameters,
                 (wasSuccessful, generatedID, error) -> transactionID.set(generatedID));
 
         return transactionID.get();
@@ -66,16 +67,18 @@ public class _IABProductPurchase<IABTransactionData extends _IABTransactionData>
                 " WHERE " + FIELD_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, transactionID);
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                iabTransactionHolder.set(iabTransaction);
+                    iabTransactionHolder.set(iabTransaction);
+                }
             }
         });
 
@@ -90,16 +93,18 @@ public class _IABProductPurchase<IABTransactionData extends _IABTransactionData>
                 " WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, userID);
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                transactionsList.add(iabTransaction);
+                    transactionsList.add(iabTransaction);
+                }
             }
         });
 
@@ -114,17 +119,19 @@ public class _IABProductPurchase<IABTransactionData extends _IABTransactionData>
                 " WHERE " + FIELD_MARKET + " = ? AND " + FIELD_TOKEN + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, market);
         parameters.put(2, token);
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                iabTransactionHolder.set(iabTransaction);
+                    iabTransactionHolder.set(iabTransaction);
+                }
             }
         });
 
@@ -139,13 +146,16 @@ public class _IABProductPurchase<IABTransactionData extends _IABTransactionData>
                 " WHERE " + FIELD_STATE + " = " + _IABPayment.PURCHASE_STATE_PENDING +
                 " OR " + FIELD_STATE + " = " + _IABPayment.PURCHASE_STATE_VERIFIED;
 
-        _DatabaseOld.query(TAG, selectStatement, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                transactionsList.add(iabTransaction);
+                    transactionsList.add(iabTransaction);
+                }
             }
         });
 
@@ -164,11 +174,11 @@ public class _IABProductPurchase<IABTransactionData extends _IABTransactionData>
 
         if (connection != null) {
 
-            return _DatabaseOld.update(connection, TAG, updateStatement, parameters);
+            return _R.get().database.update(connection, TAG, updateStatement, parameters, null);
 
         } else {
 
-            return _DatabaseOld.update(TAG, updateStatement, parameters);
+            return _R.get().database.update(TAG, updateStatement, parameters, null);
         }
     }
 

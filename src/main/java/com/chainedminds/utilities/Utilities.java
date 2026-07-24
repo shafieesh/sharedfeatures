@@ -1,7 +1,7 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds._Config;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds._R;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -83,16 +83,16 @@ public class Utilities {
 
     public static String replaceLocalizedNumbers(String input) {
 
-        return input.replaceAll("۰", "0")
-                .replaceAll("۱", "1")
-                .replaceAll("۲", "2")
-                .replaceAll("۳", "3")
-                .replaceAll("۴", "4")
-                .replaceAll("۵", "5")
-                .replaceAll("۶", "6")
-                .replaceAll("۷", "7")
-                .replaceAll("۸", "8")
-                .replaceAll("۹", "9");
+        return input.replace("۰", "0")
+                .replace("۱", "1")
+                .replace("۲", "2")
+                .replace("۳", "3")
+                .replace("۴", "4")
+                .replace("۵", "5")
+                .replace("۶", "6")
+                .replace("۷", "7")
+                .replace("۸", "8")
+                .replace("۹", "9");
     }
 
     public static boolean hasLocalizedNumbers(String input) {
@@ -123,16 +123,16 @@ public class Utilities {
             return input;
         }
 
-        return input.replaceAll("0", "۰")
-                .replaceAll("1", "۱")
-                .replaceAll("2", "۲")
-                .replaceAll("3", "۳")
-                .replaceAll("4", "۴")
-                .replaceAll("5", "۵")
-                .replaceAll("6", "۶")
-                .replaceAll("7", "۷")
-                .replaceAll("8", "۸")
-                .replaceAll("9", "۹");
+        return input.replace("0", "۰")
+                .replace("1", "۱")
+                .replace("2", "۲")
+                .replace("3", "۳")
+                .replace("4", "۴")
+                .replace("5", "۵")
+                .replace("6", "۶")
+                .replace("7", "۷")
+                .replace("8", "۸")
+                .replace("9", "۹");
     }
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> unsortMap) {
@@ -591,7 +591,7 @@ public class Utilities {
                     "UPDATE " + table + " SET `" + primaryKey + "` = @count:= @count + 1;" +
                     "ALTER TABLE " + table + " AUTO_INCREMENT = 1";
 
-            _DatabaseOld.update(TAG, statement, (wasSuccessful, error) -> {
+            _R.get().database.update(TAG, statement, (wasSuccessful, error) -> {
 
                 long finishTime = System.currentTimeMillis();
 
@@ -624,7 +624,7 @@ public class Utilities {
                         "    ) AS m" +
                         ")";
 
-                _DatabaseOld.update(TAG, statement, (wasSuccessful, error) -> {
+                _R.get().database.update(TAG, statement, (wasSuccessful, error) -> {
 
                     if (!wasSuccessful) {
 
@@ -640,5 +640,10 @@ public class Utilities {
 
             System.out.println("TASK DONE");
         }
+    }
+
+    public interface HttpResponseCallback {
+
+        void onHttpResponse(int responseCode, String receivedMessage);
     }
 }

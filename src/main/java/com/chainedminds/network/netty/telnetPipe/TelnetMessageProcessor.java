@@ -1,6 +1,6 @@
 package com.chainedminds.network.netty.telnetPipe;
 
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.api._RequestHandler;
 import com.chainedminds.network.netty.ChannelPool;
 import com.chainedminds.network.netty.NettyServer;
@@ -45,7 +45,7 @@ public class TelnetMessageProcessor extends SimpleChannelInboundHandler<String> 
 
         Runnable task = () -> {
 
-            Object responseData = _Resources.get().requestHandler
+            Object responseData = _R.get().requestHandler
                     .processRequest(context, remoteAddress, requestData);
 
             if (responseData != null) {
@@ -63,7 +63,7 @@ public class TelnetMessageProcessor extends SimpleChannelInboundHandler<String> 
 
         if (!NettyServer.execute(task)) {
 
-            Object responseData = _Resources.get().requestHandler
+            Object responseData = _R.get().requestHandler
                     .sendServerBusyResponse(requestData);
 
             _RequestHandler.optimizeReadTimeout(context, responseData);

@@ -2,15 +2,14 @@ package com.chainedminds.api.friendship;
 
 import com.chainedminds._Classes;
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.api.Activity;
 import com.chainedminds.models.account._FriendData;
 import com.chainedminds.utilities.Messages;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities._NotificationManager;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.ResultSet;
 import java.util.*;
@@ -64,12 +63,12 @@ public class _Friendship {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_FRIENDS_LIST;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final Set<Friendship> relations = new HashSet<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -88,7 +87,7 @@ public class _Friendship {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -159,7 +158,7 @@ public class _Friendship {
         parameters.put(2, newerID);
         parameters.put(3, relationshipState);
 
-        boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
+        boolean wasSuccessful = _R.get().database.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -199,8 +198,8 @@ public class _Friendship {
                 int receiverID = friendID;
                 int senderID = userID;
 
-                String requestingName = _Resources.get().account.getName(senderID);
-                String receiverLanguage = _Resources.get()
+                String requestingName = _R.get().account.getName(senderID);
+                String receiverLanguage = _R.get()
                         .accountSession.getLanguage(receiverID, appName);
 
                 String tag = "friendship_new_friendship_request";
@@ -253,7 +252,7 @@ public class _Friendship {
         parameters.put(2, newerID);
         parameters.put(3, relationshipState);
 
-        boolean wasSuccessful = _DatabaseOld.update(TAG, statement, parameters);
+        boolean wasSuccessful = _R.get().database.update(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -277,8 +276,8 @@ public class _Friendship {
                 int receiverID = friendID;
                 int acceptingUserID = userID;
 
-                String requestingName = _Resources.get().account.getName(acceptingUserID);
-                String receiverLanguage = _Resources.get()
+                String requestingName = _R.get().account.getName(acceptingUserID);
+                String receiverLanguage = _R.get()
                         .accountSession.getLanguage(receiverID, appName);
 
                 String tag = "friendship_accepted_your_friendship";
@@ -325,7 +324,7 @@ public class _Friendship {
         parameters.put(1, olderID);
         parameters.put(2, newerID);
 
-        boolean wasSuccessful = _DatabaseOld.update(TAG, statement, parameters);
+        boolean wasSuccessful = _R.get().database.update(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -386,7 +385,7 @@ public class _Friendship {
         parameters.put(2, newerID);
         parameters.put(3, relationshipState);
 
-        boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
+        boolean wasSuccessful = _R.get().database.insert(TAG, statement, parameters);
 
         if (wasSuccessful) {
 
@@ -522,7 +521,7 @@ public class _Friendship {
             }
         });
 
-        _Resources.get().account.getAll(TAG, mappingUserID -> {
+        _R.get().account.getAll(TAG, mappingUserID -> {
 
             for (FriendData friend : pendingRelations) {
 
@@ -573,7 +572,7 @@ public class _Friendship {
 
     public static int getOnlineStatus(int userID) {
 
-        long lastAccessTime = _Resources.get().requestHandler.getLastAccessTime(userID);
+        long lastAccessTime = _R.get().requestHandler.getLastAccessTime(userID);
 
         long currentTime = System.currentTimeMillis();
 
@@ -708,7 +707,7 @@ public class _Friendship {
 
         if (onlineFriendIDs.size() > 0) {
 
-            String receiverLanguage = _Resources.get()
+            String receiverLanguage = _R.get()
                     .accountSession.getLanguage(userID, appName);
 
             if (onlineFriendIDs.size() > 1) {
@@ -721,7 +720,7 @@ public class _Friendship {
 
             } else {
 
-                String name = _Resources.get()
+                String name = _R.get()
                         .account.getName(onlineFriendIDs.get(0));
 
                 String message = Messages.get("GAMERTAG_IS_ONLINE", receiverLanguage, name);
@@ -730,11 +729,11 @@ public class _Friendship {
             }
         }
 
-        String name = _Resources.get().account.getName(userID);
+        String name = _R.get().account.getName(userID);
 
         for (int friendID : onlineFriendIDs) {
 
-            String receiverLanguage = _Resources.get()
+            String receiverLanguage = _R.get()
                     .accountSession.getLanguage(friendID, appName);
 
             String message = Messages.get("GAMERTAG_IS_NOW_ONLINE", receiverLanguage, name);

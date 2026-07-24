@@ -1,19 +1,24 @@
 package com.chainedminds.utilities.database;
 
-import com.chainedminds.utilities._Log;
 import com.chainedminds.utilities.Utilities;
+import com.chainedminds.utilities._Log;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class _Database {
 
-    private int queriesCount = 0;
-    private int updatesCount = 0;
-    private int insertsCount = 0;
+    private int queries = 0;
+    private int updates = 0;
+    private int inserts = 0;
 
     public Connection connect() {
 
@@ -26,14 +31,14 @@ public abstract class _Database {
 
     public final Map<String, Integer> getConnectionsCount() {
 
-        int copiedQueriesCount = queriesCount;
-        int copiedUpdatesCount = updatesCount;
-        int copiedInsertsCount = insertsCount;
+        int copiedQueriesCount = queries;
+        int copiedUpdatesCount = updates;
+        int copiedInsertsCount = inserts;
         int totalCount = copiedQueriesCount + copiedUpdatesCount + copiedInsertsCount;
 
-        queriesCount = 0;
-        updatesCount = 0;
-        insertsCount = 0;
+        queries = 0;
+        updates = 0;
+        inserts = 0;
 
         Map<String, Integer> connectionsCount = new HashMap<>();
         connectionsCount.put("queries", copiedQueriesCount);
@@ -44,88 +49,60 @@ public abstract class _Database {
         return connectionsCount;
     }
 
-    public final boolean query(String tag, String statement) {
+    //----------
 
-        return query(tag, statement, null, (QueryCallback) null);
+    public final boolean query(String tag, String statement, QueryCallback callback) {
+
+        return query(tag, statement, (Map<Integer, Object>) null, callback);
     }
 
-    public final boolean query(Connection connection, String tag, String statement) {
+    public final boolean query(String tag, String statement,
+                               List<Object> parameters, QueryCallback callback) {
 
-        return query(connection, tag, statement, null, (QueryCallback) null);
+        Map<Integer, Object> indexedParameters = new LinkedHashMap<>();
+
+        for (int index = 0; index < parameters.size(); index++) {
+
+            indexedParameters.put(index, parameters.get(index));
+        }
+
+        return query(tag, statement, indexedParameters, callback);
     }
 
-    public final boolean query(String tag, String statement, Map<Integer, Object> parameters) {
+    public final boolean query(Connection connection, String tag, String statement, QueryCallback callback) {
+
+        return query(connection, tag, statement, (Map<Integer, Object>) null, callback);
+    }
+
+    public final boolean query(Connection connection, String tag, String statement,
+                               List<Object> parameters, QueryCallback callback) {
+
+        Map<Integer, Object> indexedParameters = new LinkedHashMap<>();
+
+        for (int index = 0; index < parameters.size(); index++) {
+
+            indexedParameters.put(index, parameters.get(index));
+        }
+
+        return query(connection, tag, statement, indexedParameters, callback);
+    }
+
+    public final boolean query(String tag, String statement,
+                               Map<Integer, Object> parameters, QueryCallback callback) {
 
         Connection connection = connect();
 
-        boolean wasSuccessful = query(connection, tag, statement, parameters);
+        boolean wasSuccessful = query(connection, tag, statement, parameters, callback);
 
         close(connection);
 
         return wasSuccessful;
     }
 
-    //----------
+    public final boolean query(Connection connection, String tag, String statement,
+                               Map<Integer, Object> parameters, QueryCallback callback) {
 
-    public final boolean query(String tag, String statement, QueryCallback queryCallback) {
-
-        return query(tag, statement, null, queryCallback);
-    }
-
-    public final boolean query(String tag, String statement, TwoStepQueryCallback queryCallback) {
-
-        return query(tag, statement, null, queryCallback);
-    }
-
-    //----------
-
-    public final boolean query(String tag, String statement, Map<Integer, Object> parameters, QueryCallback queryCallback) {
-
-        Connection connection = connect();
-
-        boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
-
-        close(connection);
-
-        return wasSuccessful;
-    }
-
-    public final boolean query(String tag, String statement, Map<Integer, Object> parameters, TwoStepQueryCallback queryCallback) {
-
-        Connection connection = connect();
-
-        boolean wasSuccessful = query(connection, tag, statement, parameters, queryCallback);
-
-        close(connection);
-
-        return wasSuccessful;
-    }
-
-    //----------
-
-    public final boolean query(Connection connection, String tag, String statement, QueryCallback queryCallback) {
-
-        return query(connection, tag, statement, null, queryCallback);
-    }
-
-    public final boolean query(Connection connection, String tag, String statement, TwoStepQueryCallback queryCallback) {
-
-        return query(connection, tag, statement, null, queryCallback);
-    }
-
-    //----------
-
-    public final boolean query(Connection connection, String tag, String statement, Map<Integer, Object> parameters) {
-
-        return query(connection, tag, statement, parameters, (QueryCallback) null);
-    }
-
-    public final boolean query(Connection connection,
-                               String tag, String statement,
-                               Map<Integer, Object> parameters,
-                               TwoStepQueryCallback queryCallback) {
-
-        queriesCount++;
+        queries++;
 
         AtomicReference<Exception> error = new AtomicReference<>();
 
@@ -154,9 +131,9 @@ public abstract class _Database {
 
             results = preparedStatement.executeQuery();
 
-            if (queryCallback != null) {
+            if (callback != null) {
 
-                queryCallback.onFetchingData(results);
+                callback.fetch(results);
             }
 
             wasSuccessful = true;
@@ -176,11 +153,6 @@ public abstract class _Database {
 
         } finally {
 
-            if (parameters != null) {
-
-                parameters.clear();
-            }
-
             if (preparedStatement != null) {
 
                 Utilities.tryAndIgnore(preparedStatement::close);
@@ -191,102 +163,16 @@ public abstract class _Database {
                 Utilities.tryAndIgnore(results::close);
             }
 
-            if (queryCallback != null) {
+            if (callback != null) {
 
                 if (wasSuccessful) {
 
-                    Utilities.tryAndIgnore(() -> queryCallback.onFinishedTask(true, null));
+                    Utilities.tryAndLog(tag, () -> callback.finalize(true, null));
 
                 } else {
 
-                    Utilities.tryAndIgnore(() -> queryCallback.onFinishedTask(false, error.get()));
+                    Utilities.tryAndLog(tag, () -> callback.finalize(false, error.get()));
                 }
-            }
-        }
-
-        return wasSuccessful;
-    }
-
-    public final boolean query(Connection connection,
-                               String tag, String statement,
-                               Map<Integer, Object> parameters,
-                               QueryCallback queryCallback) {
-
-        queriesCount++;
-
-        boolean wasSuccessful = false;
-        PreparedStatement preparedStatement = null;
-        ResultSet results = null;
-
-        try {
-
-            if (connection == null) {
-
-                throw new Exception("Cannot establish a connection to database.");
-            }
-
-            preparedStatement = connection.prepareStatement(statement);
-
-            if (parameters != null) {
-
-                for (int key : parameters.keySet()) {
-
-                    Object value = parameters.get(key);
-
-                    preparedStatement.setObject(key, value);
-                }
-            }
-
-            results = preparedStatement.executeQuery();
-
-            if (queryCallback != null) {
-
-                queryCallback.onFetchingData(results);
-            }
-
-            wasSuccessful = true;
-
-        /*} catch (SQLException error) {
-
-            error.getErrorCode();
-            error.getSQLState()
-            error.getMessage()
-
-            String payload = null;
-
-            if (preparedStatement != null) {
-
-                payload = preparedStatement.toString();
-            }
-
-            BaseLogs.error(tag, error, payload);
-        }*/
-        } catch (Exception error) {
-
-            String payload = null;
-
-            if (preparedStatement != null) {
-
-                payload = preparedStatement.toString();
-            }
-
-            _Log.error(tag, error, payload);
-
-        } finally {
-
-            if (parameters != null) {
-
-                parameters.clear();
-            }
-
-            if (preparedStatement != null) {
-
-                Utilities.tryAndIgnore(preparedStatement::close);
-            }
-
-            if (results != null) {
-
-                Utilities.tryAndIgnore(results::close);
             }
         }
 
@@ -295,41 +181,45 @@ public abstract class _Database {
 
     //---------------------------------------------------------------------------------
 
-    public final boolean update(String tag, String statement) {
+    public final boolean update(String tag, String statement, UpdateCallback callback) {
 
-        return update(tag, statement, null, null);
+        return update(tag, statement, (Map<Integer, Object>) null, callback);
     }
 
-    public final boolean update(Connection connection, String tag, String statement) {
+    public final boolean update(String tag, String statement, List<Object> parameters, UpdateCallback callback) {
 
-        return update(connection, tag, statement, null, null);
+        Map<Integer, Object> indexedParameters = new LinkedHashMap<>();
+
+        for (int index = 0; index < parameters.size(); index++) {
+
+            indexedParameters.put(index, parameters.get(index));
+        }
+
+        return update(tag, statement, indexedParameters, callback);
     }
 
-    public final boolean update(String tag, String statement, UpdateCallback updateCallback) {
+    public final boolean update(Connection connection, String tag, String statement, UpdateCallback callback) {
 
-        return update(tag, statement, null, updateCallback);
+        return update(connection, tag, statement, (Map<Integer, Object>) null, callback);
     }
 
-    public final boolean update(Connection connection, String tag, String statement, UpdateCallback updateCallback) {
+    public final boolean update(Connection connection, String tag, String statement, List<Object> parameters, UpdateCallback callback) {
 
-        return update(connection, tag, statement, null, updateCallback);
+        Map<Integer, Object> indexedParameters = new LinkedHashMap<>();
+
+        for (int index = 0; index < parameters.size(); index++) {
+
+            indexedParameters.put(index, parameters.get(index));
+        }
+
+        return update(connection, tag, statement, indexedParameters, callback);
     }
 
-    public final boolean update(String tag, String statement, Map<Integer, Object> parameters) {
-
-        return update(tag, statement, parameters, null);
-    }
-
-    public final boolean update(Connection connection, String tag, String statement, Map<Integer, Object> parameters) {
-
-        return update(connection, tag, statement, parameters, null);
-    }
-
-    public final boolean update(String tag, String statement, Map<Integer, Object> parameters, UpdateCallback updateCallback) {
+    public final boolean update(String tag, String statement, Map<Integer, Object> parameters, UpdateCallback callback) {
 
         Connection connection = connect();
 
-        boolean wasSuccessful = update(connection, tag, statement, parameters, updateCallback);
+        boolean wasSuccessful = update(connection, tag, statement, parameters, callback);
 
         close(connection);
 
@@ -337,10 +227,9 @@ public abstract class _Database {
     }
 
     public final boolean update(Connection connection, String tag, String statement,
-                                Map<Integer, Object> parameters,
-                                UpdateCallback updateCallback) {
+                                Map<Integer, Object> parameters, UpdateCallback callback) {
 
-        updatesCount++;
+        updates++;
 
         AtomicReference<Exception> error = new AtomicReference<>();
 
@@ -383,25 +272,20 @@ public abstract class _Database {
 
         } finally {
 
-            if (parameters != null) {
-
-                parameters.clear();
-            }
-
             if (preparedStatement != null) {
 
                 Utilities.tryAndIgnore(preparedStatement::close);
             }
 
-            if (updateCallback != null) {
+            if (callback != null) {
 
                 if (wasSuccessful) {
 
-                    Utilities.tryAndIgnore(() -> updateCallback.run(true, null));
+                    Utilities.tryAndLog(tag, () -> callback.finalize(true, null));
 
                 } else {
 
-                    Utilities.tryAndIgnore(() -> updateCallback.run(false, error.get()));
+                    Utilities.tryAndLog(tag, () -> callback.finalize(false, error.get()));
                 }
             }
         }
@@ -409,41 +293,47 @@ public abstract class _Database {
         return wasSuccessful;
     }
 
-    public final boolean insert(String tag, String statement) {
+    //---------------------------------------------------------------------------------
 
-        return insert(tag, statement, null, null);
+    public final boolean insert(String tag, String statement, InsertCallback callback) {
+
+        return insert(tag, statement, (Map<Integer, Object>) null, callback);
     }
 
-    public final boolean insert(Connection connection, String tag, String statement) {
+    public final boolean insert(String tag, String statement, List<Object> parameters, InsertCallback callback) {
 
-        return insert(connection, tag, statement, null, null);
+        Map<Integer, Object> indexedParameters = new LinkedHashMap<>();
+
+        for (int index = 0; index < parameters.size(); index++) {
+
+            indexedParameters.put(index, parameters.get(index));
+        }
+
+        return insert(tag, statement, indexedParameters, callback);
     }
 
-    public final boolean insert(String tag, String statement, InsertCallback insertCallback) {
+    public final boolean insert(Connection connection, String tag, String statement, InsertCallback callback) {
 
-        return insert(tag, statement, null, insertCallback);
+        return insert(connection, tag, statement, (Map<Integer, Object>) null, callback);
     }
 
-    public final boolean insert(Connection connection, String tag, String statement, InsertCallback insertCallback) {
+    public final boolean insert(Connection connection, String tag, String statement, List<Object> parameters, InsertCallback callback) {
 
-        return insert(connection, tag, statement, null, insertCallback);
+        Map<Integer, Object> indexedParameters = new LinkedHashMap<>();
+
+        for (int index = 0; index < parameters.size(); index++) {
+
+            indexedParameters.put(index, parameters.get(index));
+        }
+
+        return insert(connection, tag, statement, indexedParameters, callback);
     }
 
-    public final boolean insert(String tag, String statement, Map<Integer, Object> parameters) {
-
-        return insert(tag, statement, parameters, null);
-    }
-
-    public final boolean insert(Connection connection, String tag, String statement, Map<Integer, Object> parameters) {
-
-        return insert(connection, tag, statement, parameters, null);
-    }
-
-    public final boolean insert(String tag, String statement, Map<Integer, Object> parameters, InsertCallback insertCallback) {
+    public final boolean insert(String tag, String statement, Map<Integer, Object> parameters, InsertCallback callback) {
 
         Connection connection = connect();
 
-        boolean wasSuccessful = insert(connection, tag, statement, parameters, insertCallback);
+        boolean wasSuccessful = insert(connection, tag, statement, parameters, callback);
 
         close(connection);
 
@@ -451,10 +341,9 @@ public abstract class _Database {
     }
 
     public final boolean insert(Connection connection, String tag, String statement,
-                                Map<Integer, Object> parameters,
-                                InsertCallback insertCallback) {
+                                Map<Integer, Object> parameters, InsertCallback callback) {
 
-        insertsCount++;
+        inserts++;
 
         AtomicInteger generatedID = new AtomicInteger();
         AtomicReference<Exception> error = new AtomicReference<>();
@@ -484,7 +373,7 @@ public abstract class _Database {
 
             preparedStatement.execute();
 
-            if (insertCallback != null) {
+            if (callback != null) {
 
                 results = preparedStatement.getGeneratedKeys();
 
@@ -508,11 +397,6 @@ public abstract class _Database {
 
         } finally {
 
-            if (parameters != null) {
-
-                parameters.clear();
-            }
-
             if (preparedStatement != null) {
 
                 Utilities.tryAndIgnore(preparedStatement::close);
@@ -523,15 +407,15 @@ public abstract class _Database {
                 Utilities.tryAndIgnore(results::close);
             }
 
-            if (insertCallback != null) {
+            if (callback != null) {
 
                 if (wasSuccessful) {
 
-                    Utilities.tryAndIgnore(() -> insertCallback.onFinishedTask(true, generatedID.get(), null));
+                    Utilities.tryAndLog(tag, () -> callback.finalize(true, generatedID.get(), null));
 
                 } else {
 
-                    Utilities.tryAndIgnore(() -> insertCallback.onFinishedTask(false, 0, error.get()));
+                    Utilities.tryAndLog(tag, () -> callback.finalize(false, 0, error.get()));
                 }
             }
         }

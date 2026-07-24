@@ -2,11 +2,11 @@ package com.chainedminds.api.store;
 
 import com.chainedminds._Classes;
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.models._ProductData;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -67,12 +67,12 @@ public class _Product<ProductData extends _ProductData> {
         parameters.put(2, "video_ad");
         parameters.put(3, "subscription");
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
 
             private final List<ProductData> products = new ArrayList<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -96,7 +96,7 @@ public class _Product<ProductData extends _ProductData> {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -342,7 +342,7 @@ public class _Product<ProductData extends _ProductData> {
                     " = Values(" + FIELD_AVAILABILITY + ")";
         }
 
-        return _DatabaseOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
+        return _R.get().database.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
 
             if (wasSuccessful) {
 
@@ -394,7 +394,7 @@ public class _Product<ProductData extends _ProductData> {
         String statement = "DELETE FROM " + _Config.TABLE_PRODUCTS + " WHERE " + FIELD_APP_NAME +
                 " = ? AND " + FIELD_SKU + " = ?";
 
-        return _DatabaseOld.update(TAG, statement, parameters, (wasSuccessful, error) -> {
+        return _R.get().database.update(TAG, statement, parameters, (wasSuccessful, error) -> {
 
             if (wasSuccessful) {
 

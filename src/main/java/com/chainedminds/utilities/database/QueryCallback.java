@@ -2,8 +2,10 @@ package com.chainedminds.utilities.database;
 
 import java.sql.ResultSet;
 
-public interface QueryCallback {
+public abstract class QueryCallback {
 
-    void onFetchingData(ResultSet resultSet) throws Exception;
+    public void fetch(ResultSet resultSet) throws Exception {}
+
+    public void finalize(boolean wasSuccessful, Exception error) {}
 }
 

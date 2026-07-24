@@ -1,7 +1,7 @@
 package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds._R;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -21,11 +21,10 @@ public class _Profile {
                 fieldName + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, value);
         parameters.put(2, userID);
 
-        return _DatabaseOld.update(TAG, statement, parameters);
+        return _R.get().database.update(TAG, statement, parameters, null);
     }
 
     public final boolean setProperty(Connection connection, int userID, String fieldName, Object value) {
@@ -34,10 +33,9 @@ public class _Profile {
                 fieldName + " = ? WHERE " + FIELD_USER_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, value);
         parameters.put(2, userID);
 
-        return _DatabaseOld.update(connection, TAG, statement, parameters);
+        return _R.get().database.update(connection, TAG, statement, parameters, null);
     }
 }

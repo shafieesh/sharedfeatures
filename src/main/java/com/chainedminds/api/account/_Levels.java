@@ -1,10 +1,10 @@
 package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -42,12 +42,12 @@ public class _Levels {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_LEVELS + " ORDER BY " + FIELD_LEVEL;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final Map<String, List<Integer>> levelScores = new HashMap<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -61,7 +61,7 @@ public class _Levels {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 

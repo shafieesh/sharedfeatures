@@ -1,8 +1,8 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds._Config;
-import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds._R;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -41,13 +41,13 @@ public class DynamicConfig {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_DYNAMIC_CONFIGS;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final Map<String, String> maps = new HashMap<>();
             private final Map<String, ArrayList<String>> lists = new HashMap<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -69,7 +69,7 @@ public class DynamicConfig {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -144,7 +144,7 @@ public class DynamicConfig {
         parameters.put(2, "map");
         parameters.put(3, value);
 
-        boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
+        boolean wasSuccessful = _R.get().database.insert(TAG, statement, parameters, null);
 
         if (wasSuccessful) {
 

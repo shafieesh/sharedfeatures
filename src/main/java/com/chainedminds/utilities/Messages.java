@@ -1,11 +1,14 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds._Config;
-import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds._R;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -37,12 +40,12 @@ public class Messages {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_MESSAGES;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final List<Message> messages = new ArrayList<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -56,7 +59,7 @@ public class Messages {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 

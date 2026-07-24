@@ -1,9 +1,8 @@
 package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.utilities.Task;
-import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 
@@ -34,35 +33,35 @@ public class _Coins {
 
     public void chargeCoins() {
 
-        String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
+        String statement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
                 " + 20 WHERE " + FIELD_PREMIUM_PASS + " = FALSE AND " + FIELD_COINS + " < 100";
 
-        _DatabaseOld.update(TAG, updateStatement);
+        _R.get().database.update(TAG, statement, null);
     }
 
     public void chargePremiumCoins() {
 
-        String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
+        String statement = "UPDATE " + _Config.TABLE_ACCOUNTS + " SET " + FIELD_COINS + " = " +
                 FIELD_COINS + " + 20, " + FIELD_LAST_COIN_CHARGE_AMOUNT + " = " + FIELD_LAST_COIN_CHARGE_AMOUNT +
                 " + 20 WHERE " + FIELD_PREMIUM_PASS + " = TRUE AND " + FIELD_COINS + " < 100";
 
-        _DatabaseOld.update(TAG, updateStatement);
+        _R.get().database.update(TAG, statement, null);
     }
 
     public int getCoins(int userID) {
 
-        return _Resources.get().account.getProperty(userID, FIELD_COINS, Integer.class);
+        return _R.get().account.getProperty(userID, FIELD_COINS, Integer.class);
     }
 
     public int getCoins(Connection connection, int userID) {
 
-        return _Resources.get().account.getProperty(connection, userID, FIELD_COINS, Integer.class);
+        return _R.get().account.getProperty(connection, userID, FIELD_COINS, Integer.class);
     }
 
     public boolean setCoins(Connection connection, int userID, int coins) {
 
-        return _Resources.get().account.setProperty(connection, userID, FIELD_COINS, coins);
+        return _R.get().account.setProperty(connection, userID, FIELD_COINS, coins);
     }
 
     public boolean changeCoins(Connection connection, int userID, int amount) {

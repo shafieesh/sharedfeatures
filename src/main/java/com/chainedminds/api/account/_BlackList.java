@@ -1,11 +1,11 @@
 package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.models.BlockData;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.ResultSet;
 import java.util.*;
@@ -68,16 +68,16 @@ public class _BlackList {
 
     private static void fetch() {
 
-        String selectStatement = "SELECT * FROM " + _Config.TABLE_BLACK_LIST +
+        String statement = "SELECT * FROM " + _Config.TABLE_BLACK_LIST +
                 " ORDER BY " + FIELD_LAST_BLOCK_TIME + " DESC LIMIT 2000";
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, statement, new QueryCallback() {
 
             private final List<BlockData> blocks = new ArrayList<>();
             private final Set<String> propertyIdx = new HashSet<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -108,7 +108,7 @@ public class _BlackList {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -221,7 +221,7 @@ public class _BlackList {
         parameters.put(4, payload);
         parameters.put(5, reporterID);
 
-        _DatabaseOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        _R.get().database.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             BlockData block = findBlock(ipAddress, TYPE_IP_ADDRESS, reason);
 
@@ -268,7 +268,7 @@ public class _BlackList {
         parameters.put(4, payload);
         parameters.put(5, reporterID);
 
-        _DatabaseOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        _R.get().database.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             AtomicReference<BlockData> block = new AtomicReference<>();
 
@@ -327,7 +327,7 @@ public class _BlackList {
         parameters.put(4, payload);
         parameters.put(5, reporterID);
 
-        _DatabaseOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        _R.get().database.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             BlockData block = findBlock(property + "", type, reason);
 

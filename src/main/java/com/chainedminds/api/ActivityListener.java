@@ -1,11 +1,12 @@
 package com.chainedminds.api;
 
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.utilities._NotificationManager;
 import com.chainedminds.utilities.Task;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.database.QueryCallback;
 
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,38 +40,41 @@ public class ActivityListener {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_ACTIVITY_FINDER;
 
-        _DatabaseOld.query(TAG, selectStatement, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            Map<Integer, Integer> relations = new HashMap<>();
+                Map<Integer, Integer> relations = new HashMap<>();
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                relations.put(resultSet.getInt(FIELD_TARGET_ID), resultSet.getInt(FIELD_AGENT_ID));
-            }
-
-            Map<Integer, String> targetNames = new HashMap<>();
-
-            for (int targetID : relations.keySet()) {
-
-                targetNames.put(targetID, _Resources.get().account.getName(targetID));
-            }
-
-            for (int targetID : RELATIONS.keySet()) {
-
-                if (!relations.containsKey(targetID)) {
-
-                    LAST_TARGET_ACTIONS.remove(targetID);
+                    relations.put(resultSet.getInt(FIELD_TARGET_ID), resultSet.getInt(FIELD_AGENT_ID));
                 }
+
+                Map<Integer, String> targetNames = new HashMap<>();
+
+                for (int targetID : relations.keySet()) {
+
+                    targetNames.put(targetID, _R.get().account.getName(targetID));
+                }
+
+                for (int targetID : RELATIONS.keySet()) {
+
+                    if (!relations.containsKey(targetID)) {
+
+                        LAST_TARGET_ACTIONS.remove(targetID);
+                    }
+                }
+
+                RELATIONS.clear();
+                RELATIONS.putAll(relations);
+
+                TARGETS_NAMES.clear();
+                TARGETS_NAMES.putAll(targetNames);
+
+                relations.clear();
+                targetNames.clear();
             }
-
-            RELATIONS.clear();
-            RELATIONS.putAll(relations);
-
-            TARGETS_NAMES.clear();
-            TARGETS_NAMES.putAll(targetNames);
-
-            relations.clear();
-            targetNames.clear();
         });
     }
 

@@ -1,8 +1,8 @@
 package com.chainedminds.api.store;
 
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.utilities.BackendHelper;
-import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class _InternalPayment {
         parameters.put(2, type);
         parameters.put(3, value);
 
-        return _DatabaseOld.update(connection, TAG, updateStatement, parameters);
+        return _R.get().database.update(connection, TAG, updateStatement, parameters, null);
     }
 
     public static int getSubscriptionPeriod(String market) {
@@ -70,7 +70,7 @@ public class _InternalPayment {
         String statement = "SELECT * FROM " + _Config.TABLE_TRANSACTIONS_INTERNAL + " WHERE " + FIELD_USER_ID +
                 " = ? ORDER BY " + FIELD_TRANSACTION_TIME + " DESC";
 
-        _DatabaseOld.query(TAG, statement, parameters,(resultSet) -> {
+        _R.get().database.query(TAG, statement, parameters,(resultSet) -> {
 
             while (resultSet.next()) {
 

@@ -1,8 +1,7 @@
 package com.chainedminds.utilities;
 
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds._R;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -21,7 +20,7 @@ public class _Log {
 
     public static void print(String tag, String log) {
 
-        System.out.println(tag + " - " + new Timestamp(System.currentTimeMillis()) + "\n" + log + "\n");
+        System.out.println(tag + " - " + new Timestamp(System.currentTimeMillis()) + "\n" + log);
     }
 
     public static void error(String tag, String cause) {
@@ -65,7 +64,7 @@ public class _Log {
 
         String fileNameAndExtension = fileName + "-" + System.currentTimeMillis() + ".log";
 
-        _Resources.get().file.saveFile(_File.SECTION_LOG_INFO, fileNameAndExtension, content.getBytes());
+        _R.get().file.saveFile(_File.SECTION_LOG_INFO, fileNameAndExtension, content.getBytes());
     }
 
     public static boolean log(Connection connection, int userID, String section, String action) {
@@ -74,12 +73,11 @@ public class _Log {
                 " (" + FIELD_USER_ID + ", " + FIELD_SECTION + ", " + FIELD_ACTION + ") VALUES (?, ?, ?)";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, userID);
         parameters.put(2, section);
         parameters.put(3, action);
 
-        return _DatabaseOld.insert(connection, TAG, statement, parameters);
+        return _R.get().database.insert(connection, TAG, statement, parameters, null);
     }
 
     public static void manage(String tag, String payload) {

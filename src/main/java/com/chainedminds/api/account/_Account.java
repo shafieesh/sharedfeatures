@@ -2,11 +2,10 @@ package com.chainedminds.api.account;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.models.account._AccountData;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities.database.QueryCallback;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
-import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,12 +33,12 @@ public class _Account {
 
         String selectStatement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final Map<Integer, String> mappingUserIDs = new LinkedHashMap<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -51,7 +50,7 @@ public class _Account {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -140,7 +139,7 @@ public class _Account {
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, name);
 
-        _DatabaseOld.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        _R.get().database.insert(TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             if (wasSuccessful) {
 
@@ -188,9 +187,9 @@ public class _Account {
 
         parameters.put(1, id);
 
-        QueryCallback queryCallback = resultSet -> {
-
-            if (resultSet.next()) {
+        QueryCallback callback = new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 value.set(resultSet.getObject(field, T));
             }
@@ -198,11 +197,11 @@ public class _Account {
 
         if (connection != null) {
 
-            _DatabaseOld.query(connection, TAG, statement, parameters, queryCallback);
+            _R.get().database.query(connection, TAG, statement, parameters, callback);
 
         } else {
 
-            _DatabaseOld.query(TAG, statement, parameters, queryCallback);
+            _R.get().database.query(TAG, statement, parameters, callback);
         }
 
         if (value.get() == null) {
@@ -233,11 +232,11 @@ public class _Account {
 
         if (connection != null) {
 
-            return _DatabaseOld.update(connection, TAG, statement, parameters);
+            return _R.get().database.update(connection, TAG, statement, parameters, null);
 
         } else {
 
-            return _DatabaseOld.update(TAG, statement, parameters);
+            return _R.get().database.update(TAG, statement, parameters, null);
         }
     }
 

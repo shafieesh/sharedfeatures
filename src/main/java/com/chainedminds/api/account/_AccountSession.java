@@ -2,12 +2,12 @@ package com.chainedminds.api.account;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.utilities.Cache;
 import com.chainedminds.utilities.Task;
 import com.chainedminds.utilities.database.DBResult;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.database.QueryCallback;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
@@ -59,12 +59,12 @@ public class _AccountSession {
                 ", " + FIELD_VERSION + ", " + FIELD_LAST_UPDATE +
                 " FROM " + _Config.TABLE_ACCOUNTS_SESSIONS;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             final Map<String, String> appVersions = new HashMap<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -84,7 +84,7 @@ public class _AccountSession {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -196,7 +196,7 @@ public class _AccountSession {
         parameters.put(5, version);
         parameters.put(6, language);
 
-        boolean wasSuccessful = _DatabaseOld.insert(TAG, updateStatement, parameters);
+        boolean wasSuccessful = _R.get().database.insert(TAG, updateStatement, parameters, null);
 
         if (wasSuccessful) {
 
@@ -268,15 +268,14 @@ public class _AccountSession {
 
     public boolean removeFirebaseID(int userID, String firebaseID) {
 
-        String updateStatement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
+        String statement = "UPDATE " + _Config.TABLE_ACCOUNTS_SESSIONS + " SET " +
                 FIELD_FIREBASE_ID + " = NULL WHERE " + FIELD_USER_ID + " = ? AND " + FIELD_FIREBASE_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, userID);
         parameters.put(2, firebaseID);
 
-        return _DatabaseOld.update(TAG, updateStatement, parameters);
+        return _R.get().database.update(TAG, statement, parameters, null);
     }
 
     //------------------------
@@ -305,12 +304,12 @@ public class _AccountSession {
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, userID);
 
-        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
 
             final List<SessionData> sessions = new ArrayList<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -331,7 +330,7 @@ public class _AccountSession {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -361,7 +360,7 @@ public class _AccountSession {
             parameters.put(1, userID);
             parameters.put(2, credential);
 
-            boolean wasSuccessful = _DatabaseOld.update(TAG, statement, parameters);
+            boolean wasSuccessful = _R.get().database.update(TAG, statement, parameters, null);
 
             if (wasSuccessful) {
 
@@ -379,7 +378,7 @@ public class _AccountSession {
         String statement = "DELETE FROM " + _Config.TABLE_ACCOUNTS_SESSIONS +
                 " WHERE " + FIELD_LAST_UPDATE + " < DATE_SUB(NOW(), INTERVAL 7 DAY)";
 
-        _DatabaseOld.update(TAG, statement);
+        _R.get().database.update(TAG, statement, null);
     }
 
     //------------------------------------------------------------------------------------
@@ -398,11 +397,14 @@ public class _AccountSession {
         parameters.put(1, userID);
         parameters.put(2, appName);
 
-        _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                value.set(resultSet.getObject(field, T));
+                    value.set(resultSet.getObject(field, T));
+                }
             }
         });
 
@@ -427,12 +429,12 @@ public class _AccountSession {
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, credential);
 
-        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
 
             private T value = null;
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 if (resultSet.next()) {
 
@@ -441,7 +443,7 @@ public class _AccountSession {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -470,12 +472,12 @@ public class _AccountSession {
         parameters.put(2, appName);
         parameters.put(3, platform);
 
-        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
 
             private T value = null;
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 if (resultSet.next()) {
 
@@ -484,7 +486,7 @@ public class _AccountSession {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -520,10 +522,10 @@ public class _AccountSession {
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, appName);
 
-        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -534,7 +536,7 @@ public class _AccountSession {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -562,10 +564,10 @@ public class _AccountSession {
         Map<Integer, Object> parameters = new HashMap<>();
         parameters.put(1, userID);
 
-        _DatabaseOld.query(TAG, statement, parameters, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -576,7 +578,7 @@ public class _AccountSession {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -626,7 +628,7 @@ public class _AccountSession {
         parameters.put(5, country);
         parameters.put(6, credential);
 
-        boolean wasSuccessful = _DatabaseOld.insert(TAG, statement, parameters);
+        boolean wasSuccessful = _R.get().database.insert(TAG, statement, parameters, null);
 
         if (wasSuccessful) {
 

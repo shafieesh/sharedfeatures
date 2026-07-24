@@ -13,8 +13,10 @@ import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
 import com.chainedminds.utilities._Log;
+import com.chainedminds.utilities.database._Database;
 
-public class _Resources<
+public class _R<
+        Database extends _Database,
         RequestHandler extends _RequestHandler<?>,
         FileHandler extends _FileHandler<?>,
         Profile extends _Profile,
@@ -32,26 +34,28 @@ public class _Resources<
         BlackList extends _BlackList,
         Log extends _Log> {
 
-    private static final _Resources<
-            ? extends _RequestHandler<?>,
-            ? extends _FileHandler<?>,
-            ? extends _Profile,
-            ? extends _Account,
-            ? extends _AccountSession,
-            ? extends _Friendship,
-            ? extends _File,
-            ? extends _IABPayment<?, ?>,
-            ? extends _IPGPayment<?, ?>,
-            ? extends _IABProductPurchase<?>,
-            ? extends _IPGProductPurchase<?>,
-            ? extends _IABSubscriptionPurchase<?>,
-            ? extends _IPGSubscriptionPurchase<?>,
-            ? extends _Product<?>,
-            ? extends _BlackList,
-            ? extends _Log
-            > INSTANCE = new _Resources<>();
+    private static final _R<
+                ? extends _Database,
+                ? extends _RequestHandler<?>,
+                ? extends _FileHandler<?>,
+                ? extends _Profile,
+                ? extends _Account,
+                ? extends _AccountSession,
+                ? extends _Friendship,
+                ? extends _File,
+                ? extends _IABPayment<?, ?>,
+                ? extends _IPGPayment<?, ?>,
+                ? extends _IABProductPurchase<?>,
+                ? extends _IPGProductPurchase<?>,
+                ? extends _IABSubscriptionPurchase<?>,
+                ? extends _IPGSubscriptionPurchase<?>,
+                ? extends _Product<?>,
+                ? extends _BlackList,
+                ? extends _Log
+                > INSTANCE = new _R<>();
 
     public static <
+            Database extends _Database,
             RequestHandler extends _RequestHandler<?>,
             FileHandler extends _FileHandler<?>,
             Profile extends _Profile,
@@ -67,19 +71,20 @@ public class _Resources<
             IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
             Product extends _Product<? extends _ProductData>,
             BlackList extends _BlackList,
-            Log extends _Log> _Resources<
-            RequestHandler, FileHandler, Profile, Account, AccountSession,
-            Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
-            IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
-            > get() {
+            Log extends _Log> _R<
+                        Database, RequestHandler, FileHandler, Profile, Account, AccountSession,
+                        Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
+                        IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+                        > get() {
 
-        return (_Resources<
-                RequestHandler, FileHandler, Profile, Account, AccountSession,
-                Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
-                IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
-                >) INSTANCE;
+        return (_R<
+                        Database, RequestHandler, FileHandler, Profile, Account, AccountSession,
+                        Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
+                        IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+                        >) INSTANCE;
     }
 
+    public Database database;
     public RequestHandler requestHandler;
     public FileHandler fileHandler;
     public Profile profile;

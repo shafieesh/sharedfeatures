@@ -2,10 +2,9 @@ package com.chainedminds.api.account;
 
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.QueryCallback;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
-import com.chainedminds.utilities.database._DatabaseOld;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -62,13 +61,13 @@ public class _Authentication {
 
             String selectStatement = "SELECT * FROM " + _Config.TABLE_AUTH_USERNAME;
 
-            _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+            _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
                 private final Map<Integer, AuthData> mappingUserIDs = new HashMap<>();
                 private final Map<String, AuthData> mappingUsernames = new HashMap<>();
 
                 @Override
-                public void onFetchingData(ResultSet resultSet) throws Exception {
+                public void fetch(ResultSet resultSet) throws Exception {
 
                     while (resultSet.next()) {
 
@@ -83,7 +82,7 @@ public class _Authentication {
                 }
 
                 @Override
-                public void onFinishedTask(boolean wasSuccessful, Exception error) {
+                public void finalize(boolean wasSuccessful, Exception error) {
 
                     if (wasSuccessful) {
 
@@ -241,12 +240,11 @@ public class _Authentication {
                     " WHERE " + FIELD_USER_ID + " = ?";
 
             Map<Integer, Object> parameters = new HashMap<>();
-
             parameters.put(1, userID);
 
-            QueryCallback queryCallback = resultSet -> {
-
-                if (resultSet.next()) {
+            QueryCallback callback = new QueryCallback() {
+                @Override
+                public void fetch(ResultSet resultSet) throws Exception {
 
                     value.set(resultSet.getObject(field, T));
                 }
@@ -254,11 +252,11 @@ public class _Authentication {
 
             if (connection != null) {
 
-                _DatabaseOld.query(connection, TAG, statement, parameters, queryCallback);
+                _R.get().database.query(connection, TAG, statement, parameters, callback);
 
             } else {
 
-                _DatabaseOld.query(TAG, statement, parameters, queryCallback);
+                _R.get().database.query(TAG, statement, parameters, callback);
             }
 
             if (value.get() == null) {
@@ -289,11 +287,11 @@ public class _Authentication {
 
             if (connection != null) {
 
-                return _DatabaseOld.update(connection, TAG, statement, parameters);
+                return _R.get().database.update(connection, TAG, statement, parameters, null);
 
             } else {
 
-                return _DatabaseOld.update(TAG, statement, parameters);
+                return _R.get().database.update(TAG, statement, parameters, null);
             }
         }
 
@@ -344,13 +342,13 @@ public class _Authentication {
 
             String statement = "SELECT * FROM " + _Config.TABLE_AUTH_OTP;
 
-            _DatabaseOld.query(TAG, statement, new TwoStepQueryCallback() {
+            _R.get().database.query(TAG, statement, new QueryCallback() {
 
                 private final Map<Integer, AuthData> mappingUserIDs = new HashMap<>();
                 private final Map<String, AuthData> mappingCodes = new HashMap<>();
 
                 @Override
-                public void onFetchingData(ResultSet resultSet) throws Exception {
+                public void fetch(ResultSet resultSet) throws Exception {
 
                     while (resultSet.next()) {
 
@@ -365,7 +363,7 @@ public class _Authentication {
                 }
 
                 @Override
-                public void onFinishedTask(boolean wasSuccessful, Exception error) {
+                public void finalize(boolean wasSuccessful, Exception error) {
 
                     if (wasSuccessful) {
 
@@ -414,7 +412,7 @@ public class _Authentication {
 
             if (userID != _Codes.NOT_FOUND) {
 
-                Boolean isActive = _Resources.get().account.isActive(userID);
+                Boolean isActive = _R.get().account.isActive(userID);
 
                 if (isActive != null && !isActive) {
 
@@ -424,7 +422,7 @@ public class _Authentication {
 
                 String credential = BackendHelper.generateCredential();
 
-                boolean wasSuccessful = _Resources.get().accountSession
+                boolean wasSuccessful = _R.get().accountSession
                         .addCredential(userID, credential, appName, platform, version, language);
 
                 if (wasSuccessful) {
@@ -539,7 +537,7 @@ public class _Authentication {
             parameters.put(2, code);
             parameters.put(3, new Timestamp(expirationTime));
 
-            return  _DatabaseOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
+            return  _R.get().database.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
 
                 if (wasSuccessful) {
 
@@ -567,7 +565,7 @@ public class _Authentication {
             Map<Integer, Object> parameters = new HashMap<>();
             parameters.put(1, code);
 
-            return _DatabaseOld.update(TAG, statement, parameters, (wasSuccessful, error) -> {
+            return _R.get().database.update(TAG, statement, parameters, (wasSuccessful, error) -> {
 
                 if (wasSuccessful) {
 

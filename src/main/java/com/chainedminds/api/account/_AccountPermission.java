@@ -1,10 +1,10 @@
 package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.models.account._AccountPermissionData;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -31,12 +31,12 @@ public class _AccountPermission {
         String selectStatement = "SELECT * FROM " + _Config.TABLE_ACCOUNTS_PERMISSIONS +
                 " WHERE " + FIELD_START_TIME + " <= NOW() AND NOW() <= " + FIELD_FINISH_TIME;
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final Map<Integer, Map<String, _AccountPermissionData>> permissions = new LinkedHashMap<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -52,7 +52,7 @@ public class _AccountPermission {
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 if (wasSuccessful) {
 
@@ -158,7 +158,7 @@ public class _AccountPermission {
         parameters.put(3, new Timestamp(permissionData.startTime));
         parameters.put(4, new Timestamp(permissionData.finishTime));
 
-        return _DatabaseOld.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
+        return _R.get().database.insert(connection, TAG, insertStatement, parameters, (wasSuccessful, generatedID, error) -> {
 
             if (wasSuccessful) {
 
@@ -181,7 +181,7 @@ public class _AccountPermission {
         parameters.put(1, userID);
         parameters.put(2, permission);
 
-        return _DatabaseOld.update(connection, TAG, deleteStatement, parameters, (wasSuccessful, error) -> {
+        return _R.get().database.update(connection, TAG, deleteStatement, parameters, (wasSuccessful, error) -> {
 
             if (wasSuccessful) {
 

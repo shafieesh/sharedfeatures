@@ -3,10 +3,9 @@ package com.chainedminds.api.store;
 import com.chainedminds._Classes;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.models.payment._IABTransactionData;
-import com.chainedminds.utilities.database._DatabaseOld;
-import com.chainedminds.utilities.database.TwoStepQueryCallback;
+import com.chainedminds.utilities.database.QueryCallback;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -61,19 +60,22 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
                 " WHERE " + FIELD_STATE + " != " + _IABPayment.PURCHASE_STATE_REJECTED +
                 " AND " + FIELD_EXPIRATION_DATE + " > DATE_SUB(NOW(), INTERVAL 7 DAY)";
 
-        _DatabaseOld.query(TAG, selectStatement, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                subscriptionsList.add(iabTransaction);
+                    subscriptionsList.add(iabTransaction);
+                }
             }
         });
 
         for (_IABTransactionData iabTransaction : subscriptionsList) {
 
-            Boolean verified = _Resources.get().iabPayment.verifyIABTransaction(iabTransaction);
+            Boolean verified = _R.get().iabPayment.verifyIABTransaction(iabTransaction);
 
             if (verified != null && verified) {
 
@@ -113,7 +115,7 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
         parameters.put(5, token);
         parameters.put(6, expirationDate.getTime() == 0 ? null : expirationDate);
 
-        _DatabaseOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> transactionID.set(generatedID));
+        _R.get().database.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> transactionID.set(generatedID));
 
         return transactionID.get();
     }
@@ -129,13 +131,16 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
 
         parameters.put(1, transactionID);
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                iabTransactionHolder.set(iabTransaction);
+                    iabTransactionHolder.set(iabTransaction);
+                }
             }
         });
 
@@ -153,13 +158,16 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
 
         parameters.put(1, userID);
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                transactionsList.add(iabTransaction);
+                    transactionsList.add(iabTransaction);
+                }
             }
         });
 
@@ -176,12 +184,12 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
                 " = " + _IABPayment.PURCHASE_STATE_APPLIED + " AND " +
                 FIELD_EXPIRATION_DATE + " > NOW()";
 
-        _DatabaseOld.query(TAG, selectStatement, new TwoStepQueryCallback() {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
 
             private final Set<Integer> fetchingUserIDs = new HashSet<>();
 
             @Override
-            public void onFetchingData(ResultSet resultSet) throws Exception {
+            public void fetch(ResultSet resultSet) throws Exception {
 
                 while (resultSet.next()) {
 
@@ -190,7 +198,7 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
             }
 
             @Override
-            public void onFinishedTask(boolean wasSuccessful, Exception error) {
+            public void finalize(boolean wasSuccessful, Exception error) {
 
                 queryResultWasOK.set(wasSuccessful);
 
@@ -223,13 +231,16 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
         parameters.put(1, market);
         parameters.put(2, token);
 
-        _DatabaseOld.query(TAG, selectStatement, parameters, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                iabTransactionHolder.set(iabTransaction);
+                    iabTransactionHolder.set(iabTransaction);
+                }
             }
         });
 
@@ -244,13 +255,16 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
                 " WHERE " + FIELD_STATE + " = " + _IABPayment.PURCHASE_STATE_PENDING +
                 " OR " + FIELD_STATE + " = " + _IABPayment.PURCHASE_STATE_VERIFIED;
 
-        _DatabaseOld.query(TAG, selectStatement, resultSet -> {
+        _R.get().database.query(TAG, selectStatement, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                IABTransactionData iabTransaction = readTransaction(resultSet);
+                    IABTransactionData iabTransaction = readTransaction(resultSet);
 
-                transactionsList.add(iabTransaction);
+                    transactionsList.add(iabTransaction);
+                }
             }
         });
 
@@ -266,7 +280,6 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
                 FIELD_EXPIRATION_DATE + " = ? WHERE " + FIELD_ID + " = ?";
 
         Map<Integer, Object> parameters = new HashMap<>();
-
         parameters.put(1, state);
         parameters.put(2, purchaseDate == 0 ? null : new Timestamp(purchaseDate));
         parameters.put(3, expirationDate == 0 ? null : new Timestamp(expirationDate));
@@ -274,11 +287,11 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
 
         if (connection != null) {
 
-            return _DatabaseOld.update(connection, TAG, updateStatement, parameters);
+            return _R.get().database.update(connection, TAG, updateStatement, parameters, null);
 
         } else {
 
-            return _DatabaseOld.update(TAG, updateStatement, parameters);
+            return _R.get().database.update(TAG, updateStatement, parameters, null);
         }
     }
 
@@ -292,7 +305,7 @@ public class _IABSubscriptionPurchase<IABTransactionData extends _IABTransaction
         parameters.put(1, expirationDate == 0 ? null : new Timestamp(expirationDate));
         parameters.put(2, id);
 
-        return _DatabaseOld.update(TAG, updateStatement, parameters);
+        return _R.get().database.update(TAG, updateStatement, parameters, null);
     }
 
     private IABTransactionData readTransaction(ResultSet resultSet) throws Exception {

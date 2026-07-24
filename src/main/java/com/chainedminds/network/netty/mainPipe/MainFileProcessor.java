@@ -1,6 +1,6 @@
 package com.chainedminds.network.netty.mainPipe;
 
-import com.chainedminds._Resources;
+import com.chainedminds._R;
 import com.chainedminds.api._RequestHandler;
 import com.chainedminds.network.netty.ChannelPool;
 import com.chainedminds.network.netty.NettyServer;
@@ -54,7 +54,7 @@ public class MainFileProcessor extends ChannelInboundHandlerAdapter {
 
             Runnable task = () -> {
 
-                Object responseData = _Resources.get().fileHandler
+                Object responseData = _R.get().fileHandler
                         .processRequest(context, remoteAddress, newMessageHolder, newDataHolder);
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);
@@ -72,7 +72,7 @@ public class MainFileProcessor extends ChannelInboundHandlerAdapter {
 
             if (!NettyServer.execute(task)) {
 
-                Object responseData = _Resources.get().fileHandler
+                Object responseData = _R.get().fileHandler
                         .sendServerBusyResponse(newMessageHolder, newDataHolder);
 
                 _RequestHandler.optimizeReadTimeout(context, responseData);

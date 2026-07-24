@@ -3,14 +3,14 @@ package com.chainedminds.api.store;
 import com.chainedminds._Classes;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
+import com.chainedminds._R;
 import com.chainedminds.models._ProductData;
-import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.models.payment.PasargadData;
 import com.chainedminds.models.payment.ZarinPalData;
+import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities.DynamicConfig;
-import com.chainedminds.utilities.HttpResponseCallback;
 import com.chainedminds.utilities.Utilities;
-import com.chainedminds.utilities.database._DatabaseOld;
+import com.chainedminds.utilities.database.QueryCallback;
 import com.chainedminds.utilities.json.Json;
 
 import java.sql.Connection;
@@ -130,7 +130,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         String appName = ipgTransaction.appName;
         String market = ipgTransaction.market;
         String sku = ipgTransaction.sku;
-        int price = (int)ipgTransaction.price;
+        int price = (int) ipgTransaction.price;
 
         _IPGTransactionData transaction = _Classes.construct(
                 _Classes.getInstance().ipgTransactionClass);
@@ -382,20 +382,17 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
 
-        Utilities.openConnection(url, headers, "POST", jsonRequest, new HttpResponseCallback() {
-            @Override
-            public void onHttpResponse(int responseCode, String receivedMessage) {
+        Utilities.openConnection(url, headers, "POST", jsonRequest, (responseCode, receivedMessage) -> {
 
-                System.out.println("Response : " + responseCode + " : " + receivedMessage);
+            System.out.println("Response : " + responseCode + " : " + receivedMessage);
 
-                if (responseCode == 200) {
+            if (responseCode == 200) {
 
-                    ZarinPalData response = Json.getObject(receivedMessage, ZarinPalData.class);
+                ZarinPalData response = Json.getObject(receivedMessage, ZarinPalData.class);
 
-                    if (response != null) {
+                if (response != null) {
 
-                        verified.set(response.Status == 100 || response.Status == 101);
-                    }
+                    verified.set(response.Status == 100 || response.Status == 101);
                 }
             }
         });
@@ -416,20 +413,17 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         String jsonPaymentData = Json.getString(paymentData);
 
-        Utilities.openConnection(getTransactionResultUrl, null, "POST", jsonPaymentData, new HttpResponseCallback() {
-            @Override
-            public void onHttpResponse(int responseCode, String receivedMessage) {
+        Utilities.openConnection(getTransactionResultUrl, null, "POST", jsonPaymentData, (responseCode, receivedMessage) -> {
 
-                System.out.println(responseCode + " : " + receivedMessage);
+            System.out.println(responseCode + " : " + receivedMessage);
 
-                if (responseCode == 200) {
+            if (responseCode == 200) {
 
-                    PasargadData checkTransactionResponse = Json.getObject(receivedMessage, PasargadData.class);
+                PasargadData checkTransactionResponse = Json.getObject(receivedMessage, PasargadData.class);
 
-                    if (checkTransactionResponse != null) {
+                if (checkTransactionResponse != null) {
 
-                        paymentSuccessful.set(checkTransactionResponse.IsSuccess);
-                    }
+                    paymentSuccessful.set(checkTransactionResponse.IsSuccess);
                 }
             }
         });
@@ -461,18 +455,18 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         Utilities.openConnection(getSignUrl, getSignHeaders, "POST",
                 jsonPaymentData, (responseCode, receivedMessage) -> {
 
-            System.out.println(responseCode + " : " + receivedMessage);
+                    System.out.println(responseCode + " : " + receivedMessage);
 
-            if (responseCode == 200) {
+                    if (responseCode == 200) {
 
-                PasargadData signResponse = Json.getObject(receivedMessage, PasargadData.class);
+                        PasargadData signResponse = Json.getObject(receivedMessage, PasargadData.class);
 
-                if (signResponse != null && signResponse.IsSuccess) {
+                        if (signResponse != null && signResponse.IsSuccess) {
 
-                    signedRequest.set(signResponse.Sign);
-                }
-            }
-        });
+                            signedRequest.set(signResponse.Sign);
+                        }
+                    }
+                });
 
         if (signedRequest.get() == null) {
 
@@ -486,20 +480,17 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         Map<String, String> getTokenHeaders = new HashMap<>();
         getTokenHeaders.put("Sign", signedRequest.get());
 
-        Utilities.openConnection(getTokenUrl, getTokenHeaders, "POST", jsonPaymentData, new HttpResponseCallback() {
-            @Override
-            public void onHttpResponse(int responseCode, String receivedMessage) {
+        Utilities.openConnection(getTokenUrl, getTokenHeaders, "POST", jsonPaymentData, (responseCode, receivedMessage) -> {
 
-                System.out.println(responseCode + " : " + receivedMessage);
+            System.out.println(responseCode + " : " + receivedMessage);
 
-                if (responseCode == 200) {
+            if (responseCode == 200) {
 
-                    PasargadData verificationResponse = Json.getObject(receivedMessage, PasargadData.class);
+                PasargadData verificationResponse = Json.getObject(receivedMessage, PasargadData.class);
 
-                    if (verificationResponse != null) {
+                if (verificationResponse != null) {
 
-                        paymentVerification.set(verificationResponse.IsSuccess);
-                    }
+                    paymentVerification.set(verificationResponse.IsSuccess);
                 }
             }
         });
@@ -622,23 +613,20 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
 
-        Utilities.openConnection(url, headers, "POST", jsonRequest, new HttpResponseCallback() {
-            @Override
-            public void onHttpResponse(int responseCode, String receivedMessage) {
+        Utilities.openConnection(url, headers, "POST", jsonRequest, (responseCode, receivedMessage) -> {
 
-                System.out.println("Response : " + responseCode + " : " + receivedMessage);
+            System.out.println("Response : " + responseCode + " : " + receivedMessage);
 
-                if (responseCode == 200) {
+            if (responseCode == 200) {
 
-                    ZarinPalData response = Json.getObject(receivedMessage, ZarinPalData.class);
+                ZarinPalData response = Json.getObject(receivedMessage, ZarinPalData.class);
 
-                    if (response != null) {
+                if (response != null) {
 
-                        transaction.gateway = "ZarinPal";
-                        transaction.paymentLink = "https://www.zarinpal.com/pg/StartPay/" + response.Authority + "/ZarinGate";
-                        transaction.arbitraryData = new HashMap<>();
-                        transaction.arbitraryData.put(FIELD_ZARINPAL_AUTHORITY, response.Authority);
-                    }
+                    transaction.gateway = "ZarinPal";
+                    transaction.paymentLink = "https://www.zarinpal.com/pg/StartPay/" + response.Authority + "/ZarinGate";
+                    transaction.arbitraryData = new HashMap<>();
+                    transaction.arbitraryData.put(FIELD_ZARINPAL_AUTHORITY, response.Authority);
                 }
             }
         });
@@ -680,7 +668,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
         parameters.put(7, sku);
         parameters.put(8, amount);
 
-        return _DatabaseOld.insert(TAG, statement, parameters);
+        return _R.get().database.insert(TAG, statement, parameters, null);
     }
 
     public int addArbitraryData(String gateway, Map<String, String> arbitraryData) {
@@ -714,7 +702,7 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         String statement = "INSERT INTO " + table + " (" + fields + ") VALUES (" + values + ")";
 
-        _DatabaseOld.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
+        _R.get().database.insert(TAG, statement, parameters, (wasSuccessful, generatedID, error) -> {
 
             if (wasSuccessful) {
 
@@ -735,13 +723,16 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         parameters.put(1, orderID);
 
-        _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                IPGTransactionData ipgTransaction = readTransaction(resultSet);
+                    IPGTransactionData ipgTransaction = readTransaction(resultSet);
 
-                ipgTransactionHolder.set(ipgTransaction);
+                    ipgTransactionHolder.set(ipgTransaction);
+                }
             }
         });
 
@@ -768,11 +759,14 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
             parameters.put(1, transactionID);
 
-            _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
+            _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
+                @Override
+                public void fetch(ResultSet resultSet) throws Exception {
 
-                if (resultSet.next()) {
+                    if (resultSet.next()) {
 
-                    ipgTransactionHolder.get().arbitraryData = readArbitraryTransaction(gateway, resultSet);
+                        ipgTransactionHolder.get().arbitraryData = readArbitraryTransaction(gateway, resultSet);
+                    }
                 }
             });
         }
@@ -810,13 +804,16 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
                 " JOIN " + table + " AS T2 ON T1." + FIELD_TRANSACTION_ID + " = T2." + FIELD_ID +
                 " WHERE " + condition;
 
-        _DatabaseOld.query(TAG, statement, parameters, resultSet -> {
+        _R.get().database.query(TAG, statement, parameters, new QueryCallback() {
+            @Override
+            public void fetch(ResultSet resultSet) throws Exception {
 
-            if (resultSet.next()) {
+                if (resultSet.next()) {
 
-                IPGTransactionData ipgTransaction = readTransaction(resultSet);
+                    IPGTransactionData ipgTransaction = readTransaction(resultSet);
 
-                ipgTransactionHolder.set(ipgTransaction);
+                    ipgTransactionHolder.set(ipgTransaction);
+                }
             }
         });
 
@@ -835,11 +832,11 @@ public class _IPGPayment<IPGTransactionData extends _IPGTransactionData,
 
         if (connection != null) {
 
-            return _DatabaseOld.update(connection, TAG, updateStatement, parameters);
+            return _R.get().database.update(connection, TAG, updateStatement, parameters, null);
 
         } else {
 
-            return _DatabaseOld.update(TAG, updateStatement, parameters);
+            return _R.get().database.update(TAG, updateStatement, parameters, null);
         }
     }
 
