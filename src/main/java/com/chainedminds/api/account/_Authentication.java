@@ -246,7 +246,10 @@ public class _Authentication {
                 @Override
                 public void fetch(ResultSet resultSet) throws Exception {
 
-                    value.set(resultSet.getObject(field, T));
+                    if (resultSet.next()) {
+
+                        value.set(resultSet.getObject(field, T));
+                    }
                 }
             };
 
