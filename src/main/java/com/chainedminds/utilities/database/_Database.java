@@ -63,7 +63,7 @@ public abstract class _Database {
 
         for (int index = 0; index < parameters.size(); index++) {
 
-            indexedParameters.put(index, parameters.get(index));
+            indexedParameters.put(index + 1, parameters.get(index));
         }
 
         return query(tag, statement, indexedParameters, callback);
@@ -81,7 +81,7 @@ public abstract class _Database {
 
         for (int index = 0; index < parameters.size(); index++) {
 
-            indexedParameters.put(index, parameters.get(index));
+            indexedParameters.put(index + 1, parameters.get(index));
         }
 
         return query(connection, tag, statement, indexedParameters, callback);
@@ -192,7 +192,7 @@ public abstract class _Database {
 
         for (int index = 0; index < parameters.size(); index++) {
 
-            indexedParameters.put(index, parameters.get(index));
+            indexedParameters.put(index + 1, parameters.get(index));
         }
 
         return update(tag, statement, indexedParameters, callback);
@@ -209,7 +209,7 @@ public abstract class _Database {
 
         for (int index = 0; index < parameters.size(); index++) {
 
-            indexedParameters.put(index, parameters.get(index));
+            indexedParameters.put(index + 1, parameters.get(index));
         }
 
         return update(connection, tag, statement, indexedParameters, callback);
@@ -306,7 +306,7 @@ public abstract class _Database {
 
         for (int index = 0; index < parameters.size(); index++) {
 
-            indexedParameters.put(index, parameters.get(index));
+            indexedParameters.put(index + 1, parameters.get(index));
         }
 
         return insert(tag, statement, indexedParameters, callback);
@@ -323,7 +323,7 @@ public abstract class _Database {
 
         for (int index = 0; index < parameters.size(); index++) {
 
-            indexedParameters.put(index, parameters.get(index));
+            indexedParameters.put(index + 1, parameters.get(index));
         }
 
         return insert(connection, tag, statement, indexedParameters, callback);
