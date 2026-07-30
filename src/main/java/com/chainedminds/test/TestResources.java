@@ -19,11 +19,13 @@ import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
 import com.chainedminds.utilities._Log;
+import com.chainedminds.utilities.database._DBConnection;
 import com.chainedminds.utilities.database._Database;
 
 import java.sql.Connection;
 
 public class TestResources extends _R<
+        _DBConnection,
         _Database,
         TestRequestHandler,
         TestFileHandler,
@@ -43,6 +45,7 @@ public class TestResources extends _R<
         _Log> {
 
     public static _R<
+            _DBConnection,
             _Database,
             TestRequestHandler,
             TestFileHandler,
@@ -66,8 +69,8 @@ public class TestResources extends _R<
 
     public static void config() {
 
-        _R<_Database, TestRequestHandler, TestFileHandler, _Profile, _Account, _AccountSession,
-                _Friendship,
+        _R<_DBConnection, _Database, TestRequestHandler, TestFileHandler,
+                _Profile, _Account, _AccountSession, _Friendship,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
                 _IABProductPurchase<_IABTransactionData>,
@@ -77,6 +80,22 @@ public class TestResources extends _R<
                 _Product<_ProductData>,
                 _BlackList, _Log> resources = _R.get();
 
+        resources.dbConnection = new _DBConnection() {
+            @Override
+            public String getPassword() {
+                return super.getPassword();
+            }
+
+            @Override
+            public String getUsername() {
+                return super.getUsername();
+            }
+
+            @Override
+            public String getAddress() {
+                return super.getAddress();
+            }
+        };
         resources.database = new _Database() {
             @Override
             public Connection connect() {

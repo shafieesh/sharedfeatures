@@ -9,6 +9,7 @@ import com.chainedminds.models.market.JhoobinClass;
 import com.chainedminds.models.market.MarketData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.utilities.*;
+import com.chainedminds.utilities.database._DBConnection;
 import com.chainedminds.utilities.json.Json;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -716,7 +717,7 @@ public class _IABPayment<
                         return;
                     }
 
-                    Connection connection = _DBConnectionOld.connect(_DBConnectionOld.MANUAL_COMMIT);
+                    Connection connection = _R.get().dbConnection.connect(_DBConnection.MANUAL_COMMIT);
 
                     boolean wasSuccessful = onConsuming(connection, transaction, originalProduct);
 
@@ -735,16 +736,16 @@ public class _IABPayment<
 
                     if (wasSuccessful) {
 
-                        _DBConnectionOld.commit(connection);
+                        _R.get().dbConnection.commit(connection);
 
                         transaction.state = PURCHASE_STATE_APPLIED;
 
                     } else {
 
-                        _DBConnectionOld.rollback(connection);
+                        _R.get().dbConnection.rollback(connection);
                     }
 
-                    _DBConnectionOld.close(connection);
+                    _R.get().dbConnection.close(connection);
 
                     if (wasSuccessful) {
 

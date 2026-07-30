@@ -5,6 +5,7 @@ import com.chainedminds._Config;
 import com.chainedminds._R;
 import com.chainedminds.utilities.*;
 import com.chainedminds.utilities.database.QueryCallback;
+import com.chainedminds.utilities.database._DBConnection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -191,7 +192,7 @@ public class _Authentication {
 
         public static boolean setPassword(int userID, String newPassword) {
 
-            Connection connection = _DBConnectionOld.connect(_DBConnectionOld.MANUAL_COMMIT);
+            Connection connection = _R.get().dbConnection.connect(_DBConnection.MANUAL_COMMIT);
 
             String oldPassword = getPassword(userID);
 
@@ -201,14 +202,14 @@ public class _Authentication {
 
             if (wasSuccessful) {
 
-                _DBConnectionOld.commit(connection);
+                _R.get().dbConnection.commit(connection);
 
             } else {
 
-                _DBConnectionOld.rollback(connection);
+                _R.get().dbConnection.rollback(connection);
             }
 
-            _DBConnectionOld.close(connection);
+            _R.get().dbConnection.close(connection);
 
             return wasSuccessful;
         }

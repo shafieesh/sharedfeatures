@@ -120,8 +120,6 @@ public class SocketPool {
 
         } catch (Exception e) {
 
-            System.out.println(e.getMessage());
-
             socketPool.remove(socket);
         }
 
@@ -298,9 +296,6 @@ public class SocketPool {
                         connections[index] = connection;
 
                         connection.setPosition(index);
-
-                        System.out.println("SocketPool " + address + " [" + index + "] -> connected");
-
                         break;
                     }
                 }
@@ -338,8 +333,6 @@ public class SocketPool {
                     flags[position] = EMPTY_SLOT;
                     connections[position] = null;
                 }
-
-                System.out.println("SocketPool " + address + " [" + position + "] -> removed");
 
             } else {
 

@@ -24,11 +24,39 @@ public class Utilities {
         }
     }
 
-    public static boolean isNumber(String input) {
+    public static boolean isLong(String input) {
 
         try {
 
             Long.parseLong(input);
+
+            return true;
+
+        } catch (Exception ignored) {
+
+            return false;
+        }
+    }
+
+    public static boolean isInteger(String input) {
+
+        try {
+
+            Integer.parseInt(input);
+
+            return true;
+
+        } catch (Exception ignored) {
+
+            return false;
+        }
+    }
+
+    public static boolean isDouble(String input) {
+
+        try {
+
+            Double.parseDouble(input);
 
             return true;
 
@@ -365,23 +393,6 @@ public class Utilities {
             }
 
         }).start();
-    }
-
-    @Deprecated
-    public static boolean nullCheck(Object... objects) {
-
-        if (objects != null) {
-
-            for (Object object : objects) {
-
-                if (object == null) {
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public static boolean valueChanged(Object object1, Object object2) {
