@@ -1,7 +1,5 @@
 package com.chainedminds.models;
 
-import io.netty.channel.ChannelHandlerContext;
-
 public class ClientData {
 
     public String firebaseID;
@@ -20,8 +18,7 @@ public class ClientData {
     public String model;
     public String product;
     public String uuid;
-    //public transient String channelID;
-    public transient ChannelHandlerContext channelContext;
+    public String channelID;
     public String packageName;
     public String country;
     public String gameName;
