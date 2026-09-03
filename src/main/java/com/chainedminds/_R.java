@@ -6,13 +6,11 @@ import com.chainedminds.api.account._Account;
 import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.api.account._BlackList;
 import com.chainedminds.api.account._Profile;
-import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.api.store.*;
 import com.chainedminds.models._ProductData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
-import com.chainedminds.utilities._Log;
 import com.chainedminds.utilities.database._DBConnection;
 import com.chainedminds.utilities.database._Database;
 
@@ -24,7 +22,6 @@ public class _R<
         Profile extends _Profile,
         Account extends _Account,
         AccountSession extends _AccountSession,
-        Friendship extends _Friendship,
         File extends _File,
         IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
         IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
@@ -33,8 +30,7 @@ public class _R<
         IABSubscriptionPurchase extends _IABSubscriptionPurchase<? extends _IABTransactionData>,
         IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
         Product extends _Product<? extends _ProductData>,
-        BlackList extends _BlackList,
-        Log extends _Log> {
+        BlackList extends _BlackList> {
 
     private static final _R<
             ? extends _DBConnection,
@@ -44,7 +40,6 @@ public class _R<
             ? extends _Profile,
             ? extends _Account,
             ? extends _AccountSession,
-            ? extends _Friendship,
             ? extends _File,
             ? extends _IABPayment<?, ?>,
             ? extends _IPGPayment<?, ?>,
@@ -53,8 +48,7 @@ public class _R<
             ? extends _IABSubscriptionPurchase<?>,
             ? extends _IPGSubscriptionPurchase<?>,
             ? extends _Product<?>,
-            ? extends _BlackList,
-            ? extends _Log
+            ? extends _BlackList
             > INSTANCE = new _R<>();
 
     public static <
@@ -65,7 +59,6 @@ public class _R<
             Profile extends _Profile,
             Account extends _Account,
             AccountSession extends _AccountSession,
-            Friendship extends _Friendship,
             File extends _File,
             IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
             IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
@@ -74,17 +67,16 @@ public class _R<
             IABSubscriptionPurchase extends _IABSubscriptionPurchase<? extends _IABTransactionData>,
             IPGSubscriptionPurchase extends _IPGSubscriptionPurchase<? extends _IPGTransactionData>,
             Product extends _Product<? extends _ProductData>,
-            BlackList extends _BlackList,
-            Log extends _Log> _R<
+            BlackList extends _BlackList> _R<
             DBConnection, Database, RequestHandler, FileHandler, Profile, Account, AccountSession,
-            Friendship, File, IABPayment, IPGPayment, IABProductPurchase, IPGProductPurchase,
-            IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+            File, IABPayment, IPGPayment, IABProductPurchase, IPGProductPurchase,
+            IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList
             > get() {
 
         return (_R<
                 DBConnection, Database, RequestHandler, FileHandler, Profile, Account, AccountSession,
-                Friendship, File, IABPayment, IPGPayment, IABProductPurchase,
-                IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList, Log
+                File, IABPayment, IPGPayment, IABProductPurchase,
+                IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList
                 >) INSTANCE;
     }
 
@@ -95,7 +87,6 @@ public class _R<
     public Profile profile;
     public Account account;
     public AccountSession accountSession;
-    public Friendship friendship;
     public File file;
     public IABPayment iabPayment;
     public IPGPayment ipgPayment;
@@ -105,5 +96,4 @@ public class _R<
     public IPGSubscriptionPurchase ipgSubscriptionPurchase;
     public Product product;
     public BlackList blackList;
-    public Log log;
 }

@@ -8,7 +8,7 @@ class TestRunner {
     public static void main(String[] args) {
 
         _Config.config();
-        TestResources.config();
+        TestR.config();
 
         _Config.PORT_MAIN_FILE_TRANSPORT = 1000;
 

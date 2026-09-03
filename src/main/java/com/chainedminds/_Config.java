@@ -133,8 +133,8 @@ public class _Config {
     public static String TABLE_NAME_ACTIVITY_FINDER = "activity_finder";
     public static String TABLE_ACTIVITY_FINDER;
     //----------------------------------------------------------------------------------------------------------------//
-    public static String TABLE_NAME_FRIENDS_LIST = "friends_list";
-    public static String TABLE_FRIENDS_LIST;
+    public static String TABLE_NAME_FRIENDS_LIST = "friendships";
+    public static String TABLE_FRIENDSHIPS;
     //----------------------------------------------------------------------------------------------------------------//
     public static String TABLE_NAME_QUIZ_WARS_QUESTIONS_TEMP = "quiz_wars_questions_temp";
     public static String TABLE_QUIZ_WARS_QUESTIONS_TEMP;
@@ -314,7 +314,7 @@ public class _Config {
         TABLE_LEAGUE_PRIZES = DATABASE_NAME + "." + TABLE_NAME_LEAGUE_PRIZES;
         TABLE_IAB_TRANSACTIONS = DATABASE_NAME + "." + TABLE_NAME_IAB_TRANSACTIONS;
         TABLE_ACTIVITY_FINDER = DATABASE_NAME + "." + TABLE_NAME_ACTIVITY_FINDER;
-        TABLE_FRIENDS_LIST = DATABASE_NAME + "." + TABLE_NAME_FRIENDS_LIST;
+        TABLE_FRIENDSHIPS = DATABASE_NAME + "." + TABLE_NAME_FRIENDS_LIST;
         TABLE_QUIZ_WARS_QUESTIONS_TEMP = DATABASE_NAME + "." + TABLE_NAME_QUIZ_WARS_QUESTIONS_TEMP;
         TABLE_QUIZ_WARS_QUESTIONS = DATABASE_NAME + "." + TABLE_NAME_QUIZ_WARS_QUESTIONS;
         TABLE_ROBOT_MESSAGES = DATABASE_NAME + "." + TABLE_NAME_ROBOT_MESSAGES;

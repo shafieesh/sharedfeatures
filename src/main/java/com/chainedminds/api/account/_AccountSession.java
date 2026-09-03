@@ -32,8 +32,8 @@ public class _AccountSession {
     public static final Cache<String, Integer> CREDENTIALS_CACHE = new Cache<>();
     public static final Cache<Integer, Map<String, String>> LANGUAGE_CACHE = new Cache<>();
 
-    public final Set<String> CACHED_USERS_INFO = new HashSet<>();
-    public static final Map<String, Map<Integer, Long>> USER_ACTIVITY = new HashMap<>();
+    public static final Set<String> CACHED_USERS_INFO = new HashSet<>();
+    public static final Map<Integer, Long> USER_ACTIVITY = new HashMap<>();
     public static final Map<String, String> APP_VERSIONS = new HashMap<>();
 
     public void start() {
@@ -78,8 +78,7 @@ public class _AccountSession {
                     String highestVersion = highestVersion(version, storedVersion);
                     appVersions.put(appName, highestVersion);
 
-                    USER_ACTIVITY.putIfAbsent(appName, new HashMap<>());
-                    USER_ACTIVITY.get(appName).put(userID, lastUpdate);
+                    USER_ACTIVITY.put(userID, lastUpdate);
                 }
             }
 

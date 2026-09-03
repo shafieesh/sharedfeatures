@@ -20,16 +20,13 @@ public class Activity {
 
     private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
-    public static String getLastActivity(int userID, String appName, String language) {
+    public static String getLastActivity(int userID, String language) {
 
         cleanUpLastAccessTimes();
 
-        AtomicReference<Type> activity = new AtomicReference<>(Type.NOTHING);
+        AtomicReference<Type> activity = new AtomicReference<>();
 
-        Utilities.lock(TAG, LOCK.writeLock(), () -> {
-
-            activity.set(LAST_ACTIVITY_CACHE.getOrDefault(userID, Type.NOTHING));
-        });
+        Utilities.lock(TAG, LOCK.writeLock(), () -> activity.set(LAST_ACTIVITY_CACHE.getOrDefault(userID, Type.NOTHING)));
 
         switch (activity.get()) {
 
@@ -39,9 +36,7 @@ public class Activity {
 
             default:
 
-                long lastActivity = _AccountSession.USER_ACTIVITY
-                        .getOrDefault(appName, new HashMap<>())
-                        .getOrDefault(userID, 0L);
+                long lastActivity = _AccountSession.USER_ACTIVITY.getOrDefault(userID, 0L);
 
                 long diff = System.currentTimeMillis() - lastActivity;
 

@@ -6,25 +6,22 @@ import com.chainedminds.api.account._Account;
 import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.api.account._BlackList;
 import com.chainedminds.api.account._Profile;
-import com.chainedminds.api.friendship._Friendship;
 import com.chainedminds.api.store.*;
 import com.chainedminds.models._FileData;
 import com.chainedminds.models._ProductData;
 import com.chainedminds.models._ProfileData;
 import com.chainedminds.models.account._AccountData;
-import com.chainedminds.models.account._FriendData;
 import com.chainedminds.models.notification._MessageData;
 import com.chainedminds.models.notification._NotificationData;
 import com.chainedminds.models.payment._IABTransactionData;
 import com.chainedminds.models.payment._IPGTransactionData;
 import com.chainedminds.utilities._File;
-import com.chainedminds.utilities._Log;
 import com.chainedminds.utilities.database._DBConnection;
 import com.chainedminds.utilities.database._Database;
 
 import java.sql.Connection;
 
-public class TestResources extends _R<
+public class TestR extends _R<
         _DBConnection,
         _Database,
         TestRequestHandler,
@@ -32,7 +29,6 @@ public class TestResources extends _R<
         _Profile,
         _Account,
         _AccountSession,
-        _Friendship,
         _File,
         _IABPayment<_IABTransactionData, _ProductData>,
         _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -41,8 +37,7 @@ public class TestResources extends _R<
         _IABSubscriptionPurchase<_IABTransactionData>,
         _IPGSubscriptionPurchase<_IPGTransactionData>,
         _Product<_ProductData>,
-        _BlackList,
-        _Log> {
+        _BlackList> {
 
     public static _R<
             _DBConnection,
@@ -52,7 +47,6 @@ public class TestResources extends _R<
             _Profile,
             _Account,
             _AccountSession,
-            _Friendship,
             _File,
             _IABPayment<_IABTransactionData, _ProductData>,
             _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -61,8 +55,7 @@ public class TestResources extends _R<
             _IABSubscriptionPurchase<_IABTransactionData>,
             _IPGSubscriptionPurchase<_IPGTransactionData>,
             _Product<_ProductData>,
-            _BlackList,
-            _Log> get() {
+            _BlackList> get() {
 
         return _R.get();
     }
@@ -70,7 +63,7 @@ public class TestResources extends _R<
     public static void config() {
 
         _R<_DBConnection, _Database, TestRequestHandler, TestFileHandler,
-                _Profile, _Account, _AccountSession, _Friendship,
+                _Profile, _Account, _AccountSession,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
                 _IABProductPurchase<_IABTransactionData>,
@@ -78,7 +71,7 @@ public class TestResources extends _R<
                 _IABSubscriptionPurchase<_IABTransactionData>,
                 _IPGSubscriptionPurchase<_IPGTransactionData>,
                 _Product<_ProductData>,
-                _BlackList, _Log> resources = _R.get();
+                _BlackList> resources = _R.get();
 
         resources.dbConnection = new _DBConnection() {
             @Override
@@ -112,7 +105,6 @@ public class TestResources extends _R<
         resources.profile = new _Profile();
         resources.account = new _Account();
         resources.accountSession = new _AccountSession();
-        resources.friendship = new _Friendship();
         resources.file = new _File();
         resources.iabPayment = new _IABPayment<>();
         resources.ipgPayment = new _IPGPayment<>();
@@ -122,12 +114,10 @@ public class TestResources extends _R<
         resources.ipgSubscriptionPurchase = new _IPGSubscriptionPurchase<>();
         resources.product = new _Product<>();
         resources.blackList = new _BlackList();
-        resources.log = new _Log();
 
         _Classes classes = _Classes.getInstance();
         classes.dataClass = TestData.class;
         classes.accountClass = _AccountData.class;
-        classes.friendClass = _FriendData.class;
         classes.fileClass = _FileData.class;
         classes.iabTransactionClass = _IABTransactionData.class;
         classes.ipgTransactionClass = _IPGTransactionData.class;

@@ -1,8 +1,10 @@
 package com.chainedminds;
 
-import com.chainedminds.models.*;
+import com.chainedminds.models._Data;
+import com.chainedminds.models._FileData;
+import com.chainedminds.models._ProductData;
+import com.chainedminds.models._ProfileData;
 import com.chainedminds.models.account._AccountData;
-import com.chainedminds.models.account._FriendData;
 import com.chainedminds.models.notification._MessageData;
 import com.chainedminds.models.notification._NotificationData;
 import com.chainedminds.models.payment._IABTransactionData;
@@ -22,7 +24,6 @@ public class _Classes {
 
     public Class<? extends _Data<?>> dataClass;
     public Class<? extends _AccountData> accountClass;
-    public Class<? extends _FriendData> friendClass;
     public Class<? extends _FileData> fileClass;
     public Class<? extends _IABTransactionData> iabTransactionClass;
     public Class<? extends _IPGTransactionData> ipgTransactionClass;
