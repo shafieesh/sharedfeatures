@@ -47,7 +47,7 @@ public class _Friendship {
 
     public static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
-    public void fetch() {
+    public static void fetch() {
 
         String statement = "SELECT * FROM " + _Config.TABLE_FRIENDSHIPS;
 
