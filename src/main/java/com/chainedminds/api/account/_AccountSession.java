@@ -78,7 +78,7 @@ public class _AccountSession {
                     String highestVersion = highestVersion(version, storedVersion);
                     appVersions.put(appName, highestVersion);
 
-                    USER_ACTIVITY.put(userID, lastUpdate);
+                    USER_ACTIVITY.put(userID, Math.max(USER_ACTIVITY.getOrDefault(userID, 0L), lastUpdate));
                 }
             }
 
