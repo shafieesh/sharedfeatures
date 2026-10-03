@@ -14,10 +14,10 @@ public class _AccountActivity {
 
     private static final String TAG = _AccountActivity.class.getSimpleName();
 
-    public static final Map<Integer, Long> LAST_ACCESS = new HashMap<>();
-    public static final Map<Integer, String> LAST_ACTIVITY = new HashMap<>();
+    public final Map<Integer, Long> LAST_ACCESS = new HashMap<>();
+    public final Map<Integer, String> LAST_ACTIVITY = new HashMap<>();
 
-    private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
+    private final ReadWriteLock LOCK = new ReentrantReadWriteLock();
 
     public String getLastActivity(int userID, String language) {
 
