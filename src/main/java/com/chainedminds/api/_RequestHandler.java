@@ -27,56 +27,9 @@ public class _RequestHandler<Data> {
 
     private final Class<Data> mappedClass;
 
-    private static final ReadWriteLock LOCK = new ReentrantReadWriteLock();
-
-    private static final Map<Integer, Long> LAST_ACCESS_CACHE = new HashMap<>();
-
     public _RequestHandler(Class<Data> mappedClass) {
 
         this.mappedClass = mappedClass;
-    }
-
-    public long getLastAccessTime(int userID) {
-
-        cleanUpLastAccessTimes();
-
-        AtomicLong lastAccessTime = new AtomicLong();
-
-        Utilities.lock(TAG, LOCK.readLock(), () -> lastAccessTime.set(LAST_ACCESS_CACHE.getOrDefault(userID, 0L)));
-
-        return lastAccessTime.get();
-    }
-
-    public void setLastAccessTime(int userID, String appName) {
-
-        long lastAccessTime = getLastAccessTime(userID);
-
-        long currentTime = System.currentTimeMillis();
-
-        Utilities.lock(TAG, LOCK.writeLock(), () -> LAST_ACCESS_CACHE.put(userID, currentTime));
-
-        if (System.currentTimeMillis() - lastAccessTime >= _Config.FIVE_MINUTES) {
-
-            _AccountSession.USER_ACTIVITY.put(userID, currentTime);
-
-            _Friendship.notifyPlayerIsOnline(userID, appName);
-        }
-    }
-
-    private void cleanUpLastAccessTimes() {
-
-        Utilities.lock(TAG, LOCK.writeLock(), () -> {
-
-            LAST_ACCESS_CACHE.keySet().removeIf(key -> System.currentTimeMillis() -
-                    LAST_ACCESS_CACHE.getOrDefault(key, 0L) > _Config.TEN_MINUTES);
-        });
-    }
-
-    public int getRecentUsersCount() {
-
-        cleanUpLastAccessTimes();
-
-        return LAST_ACCESS_CACHE.size();
     }
 
     public Object handleRequest(Data data, String channelID, ChannelHandlerContext channel) {

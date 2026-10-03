@@ -1,5 +1,6 @@
 package com.chainedminds;
 
+import com.chainedminds.api._AccountActivity;
 import com.chainedminds.api._FileHandler;
 import com.chainedminds.api._RequestHandler;
 import com.chainedminds.api.account._Account;
@@ -14,6 +15,8 @@ import com.chainedminds.utilities._File;
 import com.chainedminds.utilities.database._DBConnection;
 import com.chainedminds.utilities.database._Database;
 
+import java.util.logging.FileHandler;
+
 public class _R<
         DBConnection extends _DBConnection,
         Database extends _Database,
@@ -22,6 +25,7 @@ public class _R<
         Profile extends _Profile,
         Account extends _Account,
         AccountSession extends _AccountSession,
+        AccountActivity extends _AccountActivity,
         File extends _File,
         IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
         IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
@@ -40,6 +44,7 @@ public class _R<
             ? extends _Profile,
             ? extends _Account,
             ? extends _AccountSession,
+            ? extends _AccountActivity,
             ? extends _File,
             ? extends _IABPayment<?, ?>,
             ? extends _IPGPayment<?, ?>,
@@ -59,6 +64,7 @@ public class _R<
             Profile extends _Profile,
             Account extends _Account,
             AccountSession extends _AccountSession,
+            AccountActivity extends _AccountActivity,
             File extends _File,
             IABPayment extends _IABPayment<? extends _IABTransactionData, ? extends _ProductData>,
             IPGPayment extends _IPGPayment<? extends _IPGTransactionData, ? extends _ProductData>,
@@ -69,13 +75,13 @@ public class _R<
             Product extends _Product<? extends _ProductData>,
             BlackList extends _BlackList> _R<
             DBConnection, Database, RequestHandler, FileHandler, Profile, Account, AccountSession,
-            File, IABPayment, IPGPayment, IABProductPurchase, IPGProductPurchase,
+            AccountActivity, File, IABPayment, IPGPayment, IABProductPurchase, IPGProductPurchase,
             IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList
             > get() {
 
         return (_R<
                 DBConnection, Database, RequestHandler, FileHandler, Profile, Account, AccountSession,
-                File, IABPayment, IPGPayment, IABProductPurchase,
+                AccountActivity, File, IABPayment, IPGPayment, IABProductPurchase,
                 IPGProductPurchase, IABSubscriptionPurchase, IPGSubscriptionPurchase, Product, BlackList
                 >) INSTANCE;
     }
@@ -87,6 +93,7 @@ public class _R<
     public Profile profile;
     public Account account;
     public AccountSession accountSession;
+    public AccountActivity accountActivity;
     public File file;
     public IABPayment iabPayment;
     public IPGPayment ipgPayment;

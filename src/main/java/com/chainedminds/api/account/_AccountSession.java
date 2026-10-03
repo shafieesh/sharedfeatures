@@ -3,6 +3,7 @@ package com.chainedminds.api.account;
 import com.chainedminds._Codes;
 import com.chainedminds._Config;
 import com.chainedminds._R;
+import com.chainedminds.api._AccountActivity;
 import com.chainedminds.api.IPLocationFinder;
 import com.chainedminds.utilities.Cache;
 import com.chainedminds.utilities.Task;
@@ -33,7 +34,6 @@ public class _AccountSession {
     public static final Cache<Integer, Map<String, String>> LANGUAGE_CACHE = new Cache<>();
 
     public static final Set<String> CACHED_USERS_INFO = new HashSet<>();
-    public static final Map<Integer, Long> USER_ACTIVITY = new HashMap<>();
     public static final Map<String, String> APP_VERSIONS = new HashMap<>();
 
     public void start() {
@@ -78,7 +78,7 @@ public class _AccountSession {
                     String highestVersion = highestVersion(version, storedVersion);
                     appVersions.put(appName, highestVersion);
 
-                    USER_ACTIVITY.put(userID, Math.max(USER_ACTIVITY.getOrDefault(userID, 0L), lastUpdate));
+                    _R.get().accountActivity.setLastAccess(userID, lastUpdate);
                 }
             }
 

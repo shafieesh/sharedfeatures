@@ -2,6 +2,7 @@ package com.chainedminds.test;
 
 import com.chainedminds._Classes;
 import com.chainedminds._R;
+import com.chainedminds.api._AccountActivity;
 import com.chainedminds.api.account._Account;
 import com.chainedminds.api.account._AccountSession;
 import com.chainedminds.api.account._BlackList;
@@ -29,6 +30,7 @@ public class TestR extends _R<
         _Profile,
         _Account,
         _AccountSession,
+        _AccountActivity,
         _File,
         _IABPayment<_IABTransactionData, _ProductData>,
         _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -47,6 +49,7 @@ public class TestR extends _R<
             _Profile,
             _Account,
             _AccountSession,
+            _AccountActivity,
             _File,
             _IABPayment<_IABTransactionData, _ProductData>,
             _IPGPayment<_IPGTransactionData, _ProductData>,
@@ -63,7 +66,7 @@ public class TestR extends _R<
     public static void config() {
 
         _R<_DBConnection, _Database, TestRequestHandler, TestFileHandler,
-                _Profile, _Account, _AccountSession,
+                _Profile, _Account, _AccountSession, _AccountActivity,
                 _File, _IABPayment<_IABTransactionData, _ProductData>,
                 _IPGPayment<_IPGTransactionData, _ProductData>,
                 _IABProductPurchase<_IABTransactionData>,

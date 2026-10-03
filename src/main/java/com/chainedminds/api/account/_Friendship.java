@@ -2,6 +2,7 @@ package com.chainedminds.api.account;
 
 import com.chainedminds._Config;
 import com.chainedminds._R;
+import com.chainedminds.api._AccountActivity;
 import com.chainedminds.utilities.Messages;
 import com.chainedminds.utilities.Utilities;
 import com.chainedminds.utilities._NotificationManager;
@@ -123,7 +124,7 @@ public class _Friendship {
 
     public static int getOnlineStatus(int userID) {
 
-        long lastAccessTime = _R.get().requestHandler.getLastAccessTime(userID);
+        long lastAccessTime = _R.get().accountActivity.getLastAccess(userID);
 
         long currentTime = System.currentTimeMillis();
 
