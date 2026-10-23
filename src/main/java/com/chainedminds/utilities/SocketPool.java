@@ -1,5 +1,7 @@
 package com.chainedminds.utilities;
 
+import com.chainedminds.utilities.json.Json;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -113,6 +115,35 @@ public class SocketPool {
         try {
 
             Transfer.writeUnsafe(socket, request);
+
+            response = Transfer.readUnsafe(socket);
+
+            socketPool.close(socket);
+
+        } catch (Exception e) {
+
+            socketPool.remove(socket);
+        }
+
+        return response;
+    }
+
+    public static byte[] transfer(SocketPool socketPool, byte[] request, InputStream inputStream, int size, Transfer.ProgressListener progressListener) {
+
+        Socket socket = socketPool.connect();
+
+        if (socket == null) {
+
+            return null;
+        }
+
+        byte[] response = null;
+
+        try {
+
+            Transfer.writeUnsafe(socket, request);
+
+            Transfer.writeUnsafe(socket, inputStream, size, progressListener);
 
             response = Transfer.readUnsafe(socket);
 
