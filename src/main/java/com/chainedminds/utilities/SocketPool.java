@@ -128,7 +128,7 @@ public class SocketPool {
         return response;
     }
 
-    public static byte[] transfer(SocketPool socketPool, byte[] request, InputStream inputStream, int size, Transfer.ProgressListener progressListener) {
+    public static byte[] transfer(SocketPool socketPool, byte[] request, InputStream inputStream, long size, Transfer.ProgressListener progressListener) {
 
         Socket socket = socketPool.connect();
 

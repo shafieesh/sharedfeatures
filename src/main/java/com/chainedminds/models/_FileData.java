@@ -6,6 +6,6 @@ public class _FileData {
     public Long size;
     public byte[] md5;
     public String type;
-
+    public String path;
     public String base64;
 }
